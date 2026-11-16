@@ -262,6 +262,7 @@ class Gateway:
         self.limiter = RateLimiter(config.limits, config.state_path, sleep=sleep)
         self._log_lock = threading.Lock()
         self.run_tag = ""
+        self.role_by_model: dict[str, str] = {}
         self.observed_limits: dict[str, dict] = {}  # what 429s told us
 
     def _resolve_model(self, requested: str) -> str:
@@ -292,7 +293,7 @@ class Gateway:
         requested = kwargs.get("model") or (args[0] if args else "")
         model = self._resolve_model(requested)
         role = kwargs.pop("tracecheck_role", "") or (
-            "judge" if model != requested.split("/")[-1] else ""
+            "judge" if model != requested.split("/")[-1] else self.role_by_model.get(model, "")
         )
         kwargs["model"] = f"openai/{model}"
         provider = self.config.providers[self.config.limits[model].provider]

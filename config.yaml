@@ -4,10 +4,10 @@
 budget_usd: 0            # hard rule: free tier only, never call a paid API
 
 models:
-  agent: gemini-3.5-flash-lite        # the agent under test
-  user: gemini-3.1-flash-lite         # tau2 user simulator (separate model = separate free quota)
+  agent: glm-4.5-flash                # the agent under test - fixed for the whole project
+  user: glm-4-flash-250414            # tau2 user simulator
   judge: gemini-3.1-flash-lite        # replaces tau2's hardcoded NL-assertion judge (gpt-5.4-mini)
-  investigator: gemini-3.5-flash-lite # phase 3
+  investigator: gemini-3.5-flash-lite # phase 3 - a different vendor than the agent it diagnoses
   temperature: 0.0
 
 # Free-tier limits per model. `rpm` for gemini-3.5-flash-lite (15) was read
@@ -47,4 +47,4 @@ run:
   base_seed: 300
   max_steps: 100
   max_errors: 10
-  min_requests_to_start: 60 # do not start a simulation with less daily quota left
+  min_requests_to_start: 40 # do not start a simulation with less daily quota left

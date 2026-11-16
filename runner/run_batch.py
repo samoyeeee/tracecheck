@@ -92,7 +92,8 @@ def plan(task_ids: list[str], k: int, run_dir: Path) -> list[tuple[str, int]]:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--tag", required=True, help="run name, e.g. v1")
-    ap.add_argument("--agent", default="llm_agent", help="registered tau2 agent name")
+    ap.add_argument("--agent", default="v1",
+                    help="agent version from agent/versions.py (v1, ...) or a built-in tau2 agent name")
     ap.add_argument("--config", default=str(ROOT / "config.yaml"))
     ap.add_argument("--task-ids", nargs="*", help="override config task selection")
     ap.add_argument("--k", type=int, help="override trials per task")
@@ -137,15 +138,24 @@ def main(argv=None) -> int:
     gw = install(gateway_config(cfg))
     gw.run_tag = args.tag
     m = cfg["models"]
+    gw.role_by_model = {m["user"]: "user", m["agent"]: "agent"}  # for the usage log
+
+    from agent.versions import SPECS, register_all, registered_name
+    spec = SPECS.get(args.agent)
+    agent_name = registered_name(args.agent) if spec else args.agent
+    if spec:
+        register_all()
     llm_args = {"temperature": m["temperature"]}
     config = TextRunConfig(
-        domain=run["domain"], agent=args.agent,
+        domain=run["domain"], agent=agent_name,
         llm_agent=m["agent"], llm_args_agent=dict(llm_args),
         llm_user=m["user"], llm_args_user=dict(llm_args),
         max_steps=run["max_steps"], max_errors=run["max_errors"],
     )
     meta = {"tag": args.tag, "agent": args.agent, "models": m, "k": k,
-            "task_ids": list(by_id), "run": run}
+            "task_ids": list(by_id), "run": run,
+            "agent_description": spec.description if spec else "tau2 built-in agent",
+            "tau2_commit": "c06b07dd7c4d4ec61ba6ff9bcdf0b15dd7ef36d4"}
     (run_dir / "_run_meta.json").write_text(json.dumps(meta, indent=1))
 
     done_now = 0
