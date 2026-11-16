@@ -1,0 +1,33 @@
+# TraceCheck configuration. No secrets here: the API key comes from the
+# GEMINI_API_KEY environment variable (see .env.example).
+
+budget_usd: 0            # hard rule: free tier only, never call a paid API
+
+models:
+  agent: gemini-3.5-flash-lite        # the agent under test
+  user: gemini-3.1-flash-lite         # tau2 user simulator (separate model = separate free quota)
+  judge: gemini-3.1-flash-lite        # replaces tau2's hardcoded NL-assertion judge (gpt-5.4-mini)
+  investigator: gemini-3.5-flash-lite # phase 3
+  temperature: 0.0
+
+# Free-tier limits per model. `rpm` for gemini-3.5-flash-lite (15) was read
+# from a live 429 on 2026-11-16; `rpd` values are NOT verified yet - check
+# https://aistudio.google.com (Rate limits page) and correct them. We keep a
+# safety margin below the server limit; a server 429 always wins over these.
+rate_limits:
+  gemini-3.5-flash-lite: {rpm: 12, rpd: 450}
+  gemini-3.1-flash-lite: {rpm: 12, rpd: 450}
+
+# USD per 1M tokens [input, output], only for a "what would this cost on the
+# paid tier" column. Left empty = reported as unknown rather than guessed.
+list_prices: {}
+
+run:
+  domain: retail
+  k: 4                      # trials per task
+  task_split: base          # base (114) | train (74) | test (40)
+  task_ids: null            # explicit list overrides the split
+  base_seed: 300
+  max_steps: 100
+  max_errors: 10
+  min_requests_to_start: 60 # do not start a simulation with less daily quota left
