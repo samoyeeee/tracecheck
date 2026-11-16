@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from runner.gateway import (  # noqa: E402
     PLACEHOLDER_SIGNATURE, DailyQuotaExhausted, Gateway, GatewayConfig,
-    ModelLimit, RateLimiter, add_placeholder_signatures, parse_quota_error,
+    ModelLimit, Provider, RateLimiter, add_placeholder_signatures, parse_quota_error,
 )
 from runner.run_batch import is_done, plan, sim_path  # noqa: E402
 
@@ -82,7 +82,9 @@ def test_placeholder_signature_only_when_missing():
 
 
 def _gateway(tmp_path, fn, rpd=100):
-    cfg = GatewayConfig(default_model="m", limits={"m": ModelLimit(rpm=1000, rpd=rpd)},
+    cfg = GatewayConfig(default_model="m", limits={"m": ModelLimit(rpm=1000, rpd=rpd, provider="p")},
+                        providers={"p": Provider(api_base="https://example.test/v1/", key_env="X_KEY",
+                                                 extra_body={"thinking": {"type": "disabled"}})},
                         state_path=tmp_path / "q.json", cost_log_path=tmp_path / "cost.csv")
     return Gateway(cfg, fn, sleep=lambda s: None)
 
@@ -166,3 +168,26 @@ def test_crash_is_retried_on_resume_then_counted_as_failure(tmp_path):
     assert is_done(path)  # gives up: kept as a failed run with reward 0
     import json
     assert json.loads(path.read_text())["reward_info"]["reward"] == 0.0
+
+
+def test_provider_routing_and_zhipu_daily_code(tmp_path):
+    seen = {}
+
+    def fn(**kw):
+        seen.update(kw)
+        return _ok()
+
+    _gateway(tmp_path, fn).completion(model="m", messages=[
+        {"role": "assistant", "tool_calls": [{"id": "a", "function": {"name": "f", "arguments": "{}"}}]}])
+    assert seen["api_base"] == "https://example.test/v1/" and seen["model"] == "openai/m"
+    assert seen["extra_body"] == {"thinking": {"type": "disabled"}}
+    assert "extra_content" not in seen["messages"][0]["tool_calls"][0]  # signatures are Gemini-only
+    assert parse_quota_error('{"error":{"code":"1304","message":"该API已达今日调用次数限额"}}')["scope"] == "day"
+
+
+def test_extract_json_handles_fences_and_chatter():
+    from runner.gateway import extract_json
+    assert extract_json('{"a": 1}') == '{"a": 1}'
+    assert extract_json('```json\n{"a": 1}\n```') == '{"a": 1}'
+    assert extract_json('Here you go:\n{"a": [1, 2]}\nDone.') == '{"a": [1, 2]}'
+    assert extract_json("no json here") == "no json here"

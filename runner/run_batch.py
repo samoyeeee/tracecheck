@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from runner.gateway import (  # noqa: E402
-    DailyQuotaExhausted, GatewayConfig, ModelLimit, install,
+    DailyQuotaExhausted, GatewayConfig, ModelLimit, Provider, install,
 )
 
 INFRA = "infrastructure_error"
@@ -40,6 +40,7 @@ def gateway_config(cfg: dict) -> GatewayConfig:
         default_model=cfg["models"]["agent"],
         judge_model=cfg["models"]["judge"],
         limits={m: ModelLimit(**v) for m, v in cfg["rate_limits"].items()},
+        providers={n: Provider(**v) for n, v in cfg["providers"].items()},
         list_prices=cfg.get("list_prices") or {},
         state_path=ROOT / "results" / "quota_state.json",
         cost_log_path=ROOT / "results" / "cost_log.csv",
@@ -96,18 +97,24 @@ def main(argv=None) -> int:
     ap.add_argument("--task-ids", nargs="*", help="override config task selection")
     ap.add_argument("--k", type=int, help="override trials per task")
     ap.add_argument("--status", action="store_true", help="print progress and exit")
+    for role in ("agent", "user", "judge"):
+        ap.add_argument(f"--{role}-model", help=f"override models.{role} from the config")
     args = ap.parse_args(argv)
 
     cfg = load_config(Path(args.config))
+    for role in ("agent", "user", "judge"):
+        if getattr(args, f"{role}_model"):
+            cfg["models"][role] = getattr(args, f"{role}_model")
     run = cfg["run"]
     k = args.k or run["k"]
     run_dir = ROOT / "results" / "runs" / args.tag
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    # The OpenAI client insists on a key being set; the real one is GEMINI_API_KEY.
-    os.environ.setdefault("OPENAI_API_KEY", os.environ.get("GEMINI_API_KEY", ""))
-    if not os.environ["OPENAI_API_KEY"]:
-        sys.exit("GEMINI_API_KEY is not set (see .env.example).")
+    # Every provider used by the configured models needs its key in the environment.
+    used = {cfg["rate_limits"][cfg["models"][r]]["provider"] for r in ("agent", "user", "judge")}
+    missing = [cfg["providers"][n]["key_env"] for n in used if not os.environ.get(cfg["providers"][n]["key_env"])]
+    if missing:
+        sys.exit(f"Missing environment variable(s): {', '.join(missing)} (see .env.example).")
 
     from tau2.data_model.simulation import TextRunConfig
     from tau2.runner import get_tasks, run_single_task

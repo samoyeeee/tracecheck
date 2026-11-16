@@ -11,14 +11,15 @@ simulator and the NL-assertion judge) and adds what a free-tier run needs:
                      (a BaseException, so tau2's own retry loops do not swallow
                      it) and the batch runner stops and can be resumed later.
 4. Usage log       - one CSV row per call in results/cost_log.csv.
-5. Gemini shims    - route to the OpenAI-compatible endpoint, drop the
+5. Provider shims  - route each model to its provider's OpenAI-compatible
+                     endpoint (Gemini, Zhipu GLM), drop the
                      unsupported ``seed`` param, and add the documented
                      placeholder thought signature to replayed tool calls
                      (tau2's message model drops the real one, and Gemini 3.x
                      rejects tool calls without any signature).
 
 Nothing here reads or stores an API key value; the OpenAI client picks it up
-from the OPENAI_API_KEY / GEMINI_API_KEY environment variable.
+from the environment variable named by its provider's ``key_env``.
 """
 
 from __future__ import annotations
@@ -37,7 +38,6 @@ from pathlib import Path
 from typing import Any, Callable, Optional
 from zoneinfo import ZoneInfo
 
-GEMINI_OPENAI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai/"
 # Placeholder accepted by the Gemini API when the real signature is unavailable.
 PLACEHOLDER_SIGNATURE = "skip_thought_signature_validator"
 # Gemini daily quotas reset at midnight Pacific time.
@@ -62,12 +62,25 @@ class MalformedToolCall(Exception):
 class ModelLimit:
     rpm: int
     rpd: int
+    provider: str = "gemini"
+
+
+@dataclass
+class Provider:
+    """An OpenAI-compatible endpoint and its quirks."""
+    api_base: str
+    key_env: str
+    # Gemini 3.x rejects replayed tool calls that carry no thought signature.
+    placeholder_signatures: bool = False
+    # Extra JSON body fields sent on every call (e.g. Zhipu's thinking switch).
+    extra_body: dict = field(default_factory=dict)
 
 
 @dataclass
 class GatewayConfig:
     default_model: str
     limits: dict[str, ModelLimit]
+    providers: dict[str, Provider] = field(default_factory=dict)
     # Non-Gemini model names tau2 hardcodes (e.g. the NL-assertion judge) are
     # rewritten to this model so a zero-budget run never calls a paid API.
     judge_model: Optional[str] = None
@@ -181,7 +194,8 @@ def parse_quota_error(text: str) -> dict:
     info: dict[str, Any] = {"scope": None, "limit": None, "retry_delay": None}
     m = re.search(r"quotaId['\"]?\s*[:=]\s*['\"]([A-Za-z\-]+)", text)
     quota_id = m.group(1) if m else ""
-    if "PerDay" in quota_id or re.search(r"per day", text, re.I):
+    # Zhipu: business code 1304 = daily call limit reached.
+    if "PerDay" in quota_id or re.search(r"per day|\b1304\b|今日", text, re.I):
         info["scope"] = "day"
     elif "PerMinute" in quota_id or re.search(r"per minute", text, re.I):
         info["scope"] = "minute"
@@ -213,6 +227,30 @@ def add_placeholder_signatures(messages: list[dict]) -> list[dict]:
             msg["tool_calls"] = calls
         out.append(msg)
     return out
+
+
+def extract_json(text: Optional[str]) -> Optional[str]:
+    """Return the JSON payload of a reply that may be fenced or have chatter around it."""
+    if not text:
+        return text
+    stripped = text.strip()
+    try:
+        json.loads(stripped)
+        return stripped
+    except json.JSONDecodeError:
+        pass
+    m = re.search(r"```(?:json)?\s*(.*?)```", stripped, re.S)
+    candidates = [m.group(1).strip()] if m else []
+    start, end = stripped.find("{"), stripped.rfind("}")
+    if start != -1 and end > start:
+        candidates.append(stripped[start:end + 1])
+    for candidate in candidates:
+        try:
+            json.loads(candidate)
+            return candidate
+        except json.JSONDecodeError:
+            continue
+    return text  # not recoverable: let the caller fail loudly
 
 
 # -- the gateway ------------------------------------------------------------
@@ -257,14 +295,16 @@ class Gateway:
             "judge" if model != requested.split("/")[-1] else ""
         )
         kwargs["model"] = f"openai/{model}"
-        kwargs["api_base"] = GEMINI_OPENAI_BASE
+        provider = self.config.providers[self.config.limits[model].provider]
+        kwargs["api_base"] = provider.api_base
         kwargs.pop("seed", None)  # not accepted by the compatible endpoint
         if role == "judge":
             kwargs.pop("reasoning_effort", None)  # tuned for the OpenAI judge model
         kwargs["num_retries"] = 0  # retries are handled here, and counted
-        if os.environ.get("GEMINI_API_KEY") and not kwargs.get("api_key"):
-            kwargs["api_key"] = os.environ["GEMINI_API_KEY"]
-        if kwargs.get("messages"):
+        kwargs["api_key"] = os.environ.get(provider.key_env, "")
+        if provider.extra_body:
+            kwargs["extra_body"] = {**provider.extra_body, **(kwargs.get("extra_body") or {})}
+        if kwargs.get("messages") and provider.placeholder_signatures:
             kwargs["messages"] = add_placeholder_signatures(kwargs["messages"])
         args = args[1:] if args else args
 
@@ -317,6 +357,14 @@ class Gateway:
                 self._sleep(pause)
                 waited += pause
                 continue
+            if role == "judge":
+                # tau2 json.loads() the judge reply as-is; some models wrap it
+                # in a Markdown code fence, which would crash a finished run.
+                try:
+                    msg = response.choices[0].message
+                    msg.content = extract_json(msg.content)
+                except (AttributeError, IndexError):
+                    pass
             usage = getattr(response, "usage", None)
             prompt = getattr(usage, "prompt_tokens", 0) or 0
             completion = getattr(usage, "completion_tokens", 0) or 0

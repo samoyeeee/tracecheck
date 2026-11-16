@@ -15,8 +15,25 @@ models:
 # https://aistudio.google.com (Rate limits page) and correct them. We keep a
 # safety margin below the server limit; a server 429 always wins over these.
 rate_limits:
-  gemini-3.5-flash-lite: {rpm: 12, rpd: 450}
-  gemini-3.1-flash-lite: {rpm: 12, rpd: 450}
+  gemini-3.5-flash-lite: {provider: gemini, rpm: 12, rpd: 450}
+  gemini-3.1-flash-lite: {provider: gemini, rpm: 12, rpd: 450}
+  # Zhipu free models: no published RPM/RPD found (third-party sources say
+  # "1 concurrent request"). We run serially; these caps are our own safety
+  # values, not server limits. Daily-limit errors (code 1304) stop the run.
+  glm-4.5-flash: {provider: zhipu, rpm: 30, rpd: 5000}
+  glm-4-flash-250414: {provider: zhipu, rpm: 30, rpd: 5000}
+  glm-4.7-flash: {provider: zhipu, rpm: 30, rpd: 5000}
+
+# OpenAI-compatible endpoints. Keys are read from the named environment variable.
+providers:
+  gemini:
+    api_base: https://generativelanguage.googleapis.com/v1beta/openai/
+    key_env: GEMINI_API_KEY
+    placeholder_signatures: true
+  zhipu:
+    api_base: https://open.bigmodel.cn/api/paas/v4/
+    key_env: ZHIPU_API_KEY
+    extra_body: {thinking: {type: disabled}}   # plain tool-calling agent, no reasoning mode
 
 # USD per 1M tokens [input, output], only for a "what would this cost on the
 # paid tier" column. Left empty = reported as unknown rather than guessed.
