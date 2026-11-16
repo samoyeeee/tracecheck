@@ -191,3 +191,13 @@ def test_extract_json_handles_fences_and_chatter():
     assert extract_json('```json\n{"a": 1}\n```') == '{"a": 1}'
     assert extract_json('Here you go:\n{"a": [1, 2]}\nDone.') == '{"a": [1, 2]}'
     assert extract_json("no json here") == "no json here"
+
+
+def test_shards_are_disjoint_and_cover_everything():
+    from runner.run_batch import parse_shard, shard_tasks
+    ids = [str(i) for i in range(7)]
+    a, b = shard_tasks(ids, parse_shard("0/2")), shard_tasks(ids, parse_shard("1/2"))
+    assert not set(a) & set(b) and sorted(a + b) == ids
+    assert shard_tasks(ids, parse_shard(None)) == ids
+    with pytest.raises(ValueError):
+        parse_shard("2/2")

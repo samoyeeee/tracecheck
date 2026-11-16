@@ -35,14 +35,32 @@ def load_config(path: Path) -> dict:
     return yaml.safe_load(path.read_text())
 
 
-def gateway_config(cfg: dict) -> GatewayConfig:
+def parse_shard(text: str | None) -> tuple[int, int]:
+    """'1/2' -> (1, 2): this process is worker 1 of 2. None -> (0, 1), i.e. everything."""
+    if not text:
+        return 0, 1
+    i, n = (int(x) for x in text.split("/"))
+    if not 0 <= i < n:
+        raise ValueError(f"bad --shard {text!r}: need 0 <= i < n")
+    return i, n
+
+
+def shard_tasks(task_ids: list[str], shard: tuple[int, int]) -> list[str]:
+    """Tasks owned by this worker: every n-th task, so workers never overlap."""
+    i, n = shard
+    return [t for idx, t in enumerate(task_ids) if idx % n == i]
+
+
+def gateway_config(cfg: dict, shard: tuple[int, int] = (0, 1)) -> GatewayConfig:
+    # Each parallel worker keeps its own request counter file (no write races).
+    state = "quota_state.json" if shard[1] == 1 else f"quota_state.shard{shard[0]}.json"
     return GatewayConfig(
         default_model=cfg["models"]["agent"],
         judge_model=cfg["models"]["judge"],
         limits={m: ModelLimit(**v) for m, v in cfg["rate_limits"].items()},
         providers={n: Provider(**v) for n, v in cfg["providers"].items()},
         list_prices=cfg.get("list_prices") or {},
-        state_path=ROOT / "results" / "quota_state.json",
+        state_path=ROOT / "results" / state,
         cost_log_path=ROOT / "results" / "cost_log.csv",
     )
 
@@ -97,6 +115,8 @@ def main(argv=None) -> int:
     ap.add_argument("--config", default=str(ROOT / "config.yaml"))
     ap.add_argument("--task-ids", nargs="*", help="override config task selection")
     ap.add_argument("--k", type=int, help="override trials per task")
+    ap.add_argument("--shard", help="i/n: run only every n-th task starting at i, so n "
+                    "processes can work on the same tag in parallel")
     ap.add_argument("--status", action="store_true", help="print progress and exit")
     for role in ("agent", "user", "judge"):
         ap.add_argument(f"--{role}-model", help=f"override models.{role} from the config")
@@ -124,10 +144,12 @@ def main(argv=None) -> int:
     tasks = get_tasks(run["domain"], task_split_name=None if task_ids else run["task_split"],
                       task_ids=[str(t) for t in task_ids] if task_ids else None)
     by_id = {t.id: t for t in tasks}
-    pending = plan(list(by_id), k, run_dir)
-    total = len(by_id) * k
+    shard = parse_shard(args.shard)
+    mine = shard_tasks(list(by_id), shard)
+    pending = plan(mine, k, run_dir)
+    total = len(mine) * k
     print(f"[{args.tag}] {total - len(pending)}/{total} simulations done, {len(pending)} pending "
-          f"({len(by_id)} tasks x k={k}).")
+          f"({len(mine)} tasks x k={k}).")
     if args.status or not pending:
         return 0
 
@@ -135,7 +157,7 @@ def main(argv=None) -> int:
     logger.remove()  # tau2 logs every step at DEBUG; keep only problems
     logger.add(sys.stderr, level="ERROR")
 
-    gw = install(gateway_config(cfg))
+    gw = install(gateway_config(cfg, shard))
     gw.run_tag = args.tag
     m = cfg["models"]
     gw.role_by_model = {m["user"]: "user", m["agent"]: "agent"}  # for the usage log
@@ -188,7 +210,7 @@ def main(argv=None) -> int:
               f"(midnight Pacific time) to continue.")
     except KeyboardInterrupt:
         print("\nInterrupted. Re-run the same command to continue.")
-    left = len(plan(list(by_id), k, run_dir))
+    left = len(plan(mine, k, run_dir))
     print(f"[{args.tag}] finished {done_now} this session, {left} still pending. "
           f"Requests used today: " + ", ".join(
               f"{mod}={gw.limiter.used_today(mod)}" for mod in cfg["rate_limits"]))
