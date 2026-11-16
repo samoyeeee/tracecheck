@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 TAG="$1"; shift
 PY=vendor/tau2-bench/.venv/bin/python
 while true; do
-  timeout -s INT 30m "$PY" -m runner.run_batch --tag "$TAG" "$@" 2>&1 | grep -E "task |\[$TAG\]|Stopped|Missing|Limits"
+  timeout -s INT 30m "$PY" -m runner.run_batch --tag "$TAG" "$@" 2>&1 | grep --line-buffered -E "task |\[$TAG\]|Stopped|Missing|Limits"
   git add results/runs/"$TAG" results/cost_log.csv >/dev/null 2>&1
   if ! git diff --cached --quiet; then
     DONE=$(ls results/runs/"$TAG"/task_*.json 2>/dev/null | wc -l)
