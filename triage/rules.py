@@ -359,10 +359,17 @@ def check_transfer(messages, calls) -> list[Finding]:
     return out
 
 
+def check_transfer_made(messages, calls) -> list[Finding]:
+    """Observation, not a verdict: the agent handed the user to a human."""
+    return [Finding(rule_id="transfer_to_human", layer="rules", severity="info", knowledge="observed",
+                    step=c["step"], message="agent transferred the user to a human agent",
+                    evidence=[_call_ev(c)]) for c in calls if c["name"] == "transfer_to_human_agents"][:1]
+
+
 CHECKS: list[Callable] = [
     check_tool_errors, check_repeated_calls, check_one_call_at_a_time, check_authentication,
     check_other_user, check_status_before_write, check_once_per_order, check_cancel_reason,
-    check_refund_and_payment, check_confirmation, check_transfer,
+    check_refund_and_payment, check_confirmation, check_transfer, check_transfer_made,
 ]
 
 
