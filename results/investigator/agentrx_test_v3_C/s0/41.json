@@ -1,0 +1,33 @@
+{
+ "prompt_hash": "8e5f8b3eac0f48c0",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\"critical_step\": 17, \"failed_agent\": \"assistant\", \"category\": \"Intent-Plan Misalignment\", \"evidence\": [{\"step\": 17, \"quote\": \"CALL modify_pending_order_items({\\\"order_id\\\": \\\"#W4082615\\\"\"}], \"observed_facts\": [\"The agent modified the items of order #W4082615 before modifying its address, which changed the order status to 'pending (item modified)' and prevented subsequent address modifications.\"], \"inference\": [\"The agent failed to follow the correct sequence of actions by modifying items before updating the shipping address, leading to the failure when attempting to update the address afterwards.\"], \"needs_verification\": [\"Whether the agent should have updated the address before modifying the order items.\"], \"confidence\": 0.8, \"abstain\": false, \"summary\": \"The agent modified the order items before updating the shipping address, locking the order status and causing the address update to fail.\"}",
+ "parsed": {
+  "critical_step": 17,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 17,
+    "quote": "CALL modify_pending_order_items({\"order_id\": \"#W4082615\""
+   }
+  ],
+  "observed_facts": [
+   "The agent modified the items of order #W4082615 before modifying its address, which changed the order status to 'pending (item modified)' and prevented subsequent address modifications."
+  ],
+  "inference": [
+   "The agent failed to follow the correct sequence of actions by modifying items before updating the shipping address, leading to the failure when attempting to update the address afterwards."
+  ],
+  "needs_verification": [
+   "Whether the agent should have updated the address before modifying the order items."
+  ],
+  "confidence": 0.8,
+  "abstain": false,
+  "summary": "The agent modified the order items before updating the shipping address, locking the order status and causing the address update to fail."
+ },
+ "usage": {
+  "prompt_tokens": 7260,
+  "completion_tokens": 211
+ }
+}

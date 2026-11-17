@@ -1,0 +1,39 @@
+{
+ "prompt_hash": "2ab9649b9e35a0e7",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 29,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Instruction/Plan Adherence Failure\",\n  \"evidence\": [\n    {\n      \"step\": 28,\n      \"quote\": \"If it's simpler, just ship the whole order to my NYC address, and I'll deal with the returns later.\"\n    },\n    {\n      \"step\": 29,\n      \"quote\": \"Got it! I'll leave the order as is and let it ship to your NYC address.\"\n    }\n  ],\n  \"observed_facts\": [\n    \"The user explicitly asked to ship the order to their NYC address in step 28.\",\n    \"The agent agreed in step 29 but failed to call the `modify_pending_order_address` tool to update the shipping address.\",\n    \"The policy requires modifying the address using the appropriate tool before shipping to a new address.\"\n  ],\n  \"inference\": [\n    \"The agent conversationalized the address change without executing the required tool call, leading to a failure on the task evaluation check for `modify_pending_order_address`.\"\n  ],\n  \"needs_verification\": [\n    \"Verify whether the agent should have updated the order address in the database despite the order being pending and the user requesting the change.\"\n  ],\n  \"confidence\": 0.85,\n  \"abstain\": false,\n  \"summary\": \"The agent failed to execute the required `modify_pending_order_address` tool call when the user requested to ship the order to their NYC address.\"\n}",
+ "parsed": {
+  "critical_step": 29,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 28,
+    "quote": "If it's simpler, just ship the whole order to my NYC address, and I'll deal with the returns later."
+   },
+   {
+    "step": 29,
+    "quote": "Got it! I'll leave the order as is and let it ship to your NYC address."
+   }
+  ],
+  "observed_facts": [
+   "The user explicitly asked to ship the order to their NYC address in step 28.",
+   "The agent agreed in step 29 but failed to call the `modify_pending_order_address` tool to update the shipping address.",
+   "The policy requires modifying the address using the appropriate tool before shipping to a new address."
+  ],
+  "inference": [
+   "The agent conversationalized the address change without executing the required tool call, leading to a failure on the task evaluation check for `modify_pending_order_address`."
+  ],
+  "needs_verification": [
+   "Verify whether the agent should have updated the order address in the database despite the order being pending and the user requesting the change."
+  ],
+  "confidence": 0.85,
+  "abstain": false,
+  "summary": "The agent failed to execute the required `modify_pending_order_address` tool call when the user requested to ship the order to their NYC address."
+ },
+ "usage": {
+  "prompt_tokens": 6657,
+  "completion_tokens": 359
+ }
+}

@@ -1,0 +1,34 @@
+{
+ "prompt_hash": "d6d8277254b06c94",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\"critical_step\": 21, \"failed_agent\": \"assistant\", \"category\": \"Intent-Plan Misalignment\", \"evidence\": [{\"step\": 21, \"quote\": \"CALL modify_pending_order_items({\\\"order_id\\\": \\\"#W6750959\\\", \\\"item_ids\\\": [\\\"3254583681\\\"], \\\"new_item_ids\\\": [\\\"9440686670\\\"], \\\"payment_method_id\\\": \\\"paypal_8080730\\\"})\"}], \"observed_facts\": [\"The agent modified the order items at step 21 before updating the shipping address.\", \"Modifying order items changes the order status to 'pending (item modified)' per policy, locking further modifications.\"], \"inference\": [\"Because the agent modified the items first instead of addressing the address change or doing both together, the order status became 'pending (item modified)', preventing the subsequent address update and causing all later cancel/modify actions to fail.\"], \"needs_verification\": [\"Whether the agent could have updated the address and items in a different order or if the policy explicitly prohibits address updates after item modification.\"], \"confidence\": 0.7, \"abstain\": false, \"summary\": \"The agent modified the order items prematurely at step 21, locking the order status to 'pending (item modified)' and preventing the requested address change from being executed.\"}",
+ "parsed": {
+  "critical_step": 21,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 21,
+    "quote": "CALL modify_pending_order_items({\"order_id\": \"#W6750959\", \"item_ids\": [\"3254583681\"], \"new_item_ids\": [\"9440686670\"], \"payment_method_id\": \"paypal_8080730\"})"
+   }
+  ],
+  "observed_facts": [
+   "The agent modified the order items at step 21 before updating the shipping address.",
+   "Modifying order items changes the order status to 'pending (item modified)' per policy, locking further modifications."
+  ],
+  "inference": [
+   "Because the agent modified the items first instead of addressing the address change or doing both together, the order status became 'pending (item modified)', preventing the subsequent address update and causing all later cancel/modify actions to fail."
+  ],
+  "needs_verification": [
+   "Whether the agent could have updated the address and items in a different order or if the policy explicitly prohibits address updates after item modification."
+  ],
+  "confidence": 0.7,
+  "abstain": false,
+  "summary": "The agent modified the order items prematurely at step 21, locking the order status to 'pending (item modified)' and preventing the requested address change from being executed."
+ },
+ "usage": {
+  "prompt_tokens": 7054,
+  "completion_tokens": 306
+ }
+}

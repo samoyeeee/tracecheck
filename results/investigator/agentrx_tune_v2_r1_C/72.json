@@ -1,0 +1,39 @@
+{
+ "prompt_hash": "d7eb40ad5be74ff1",
+ "prompt_version": "v2",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 13,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Intent-Plan Misalignment\",\n  \"evidence\": [\n    {\n      \"step\": 13,\n      \"quote\": \"Could you please provide the new options for the backpack and desk lamp?\"\n    },\n    {\n      \"step\": 21,\n      \"quote\": \"CALL modify_pending_order_items({\\\"order_id\\\": \\\"#W5270061\\\", \\\"item_ids\\\": [\\\"2492465580\\\", \\\"7453605304\\\"]\"\n    }\n  ],\n  \"observed_facts\": [\n    \"At step 2, the user requested both modifying the backpack/desk lamp and updating the shipping address.\",\n    \"At step 13, the agent formed a plan to modify items first and then update the address, but item modification locks the order according to policy.\",\n    \"At step 21, the agent called item modification, which changed the order status to 'pending (item modified)' and prevented subsequent address updates.\"\n  ],\n  \"inference\": [\n    \"Modifying items first locks the order and prevents address updates due to domain policy ('agent will not be able to modify or cancel the order anymore'), so the plan order was wrong.\"\n  ],\n  \"needs_verification\": [\n    \"Whether the policy allows modifying the shipping address before modifying items.\"\n  ],\n  \"confidence\": 0.8,\n  \"abstain\": false,\n  \"summary\": \"The agent followed a wrong plan order by modifying order items before updating the shipping address, which locked the order and prevented completion of the address update.\"\n}",
+ "parsed": {
+  "critical_step": 13,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 13,
+    "quote": "Could you please provide the new options for the backpack and desk lamp?"
+   },
+   {
+    "step": 21,
+    "quote": "CALL modify_pending_order_items({\"order_id\": \"#W5270061\", \"item_ids\": [\"2492465580\", \"7453605304\"]"
+   }
+  ],
+  "observed_facts": [
+   "At step 2, the user requested both modifying the backpack/desk lamp and updating the shipping address.",
+   "At step 13, the agent formed a plan to modify items first and then update the address, but item modification locks the order according to policy.",
+   "At step 21, the agent called item modification, which changed the order status to 'pending (item modified)' and prevented subsequent address updates."
+  ],
+  "inference": [
+   "Modifying items first locks the order and prevents address updates due to domain policy ('agent will not be able to modify or cancel the order anymore'), so the plan order was wrong."
+  ],
+  "needs_verification": [
+   "Whether the policy allows modifying the shipping address before modifying items."
+  ],
+  "confidence": 0.8,
+  "abstain": false,
+  "summary": "The agent followed a wrong plan order by modifying order items before updating the shipping address, which locked the order and prevented completion of the address update."
+ },
+ "usage": {
+  "prompt_tokens": 7258,
+  "completion_tokens": 386
+ }
+}

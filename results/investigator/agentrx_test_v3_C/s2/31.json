@@ -1,0 +1,35 @@
+{
+ "prompt_hash": "230bdeebd55275ea",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\"critical_step\": 32, \"failed_agent\": \"assistant\", \"category\": \"Instruction/Plan Adherence Failure\", \"evidence\": [{\"step\": 32, \"provenance\": \"output\", \"quote\": \"{\\\"order_id\\\": \\\"#W5481803\\\", ... \\\"cancel_reason\\\": \\\"no longer needed\\\"}\"}], \"observed_facts\": [\"The user asked to cancel the boot and keep the kettle in step 26.\", \"The agent called cancel_pending_order on order #W5481803 in step 31, which cancels the entire order containing both the kettle and the boot.\"], \"inference\": [\"The agent failed to adhere to the policy/user constraint of keeping the kettle while canceling only the boot, canceling the whole order instead.\"], \"needs_verification\": [\"Whether partial order cancellation for individual items inside a pending multi-item order is supported by the cancellation tool or if a modification should have been used instead.\"], \"confidence\": 0.5, \"abstain\": false, \"summary\": \"The agent mistakenly cancelled the entire order containing both the boot and the kettle instead of only cancelling the boot as requested.\"}",
+ "parsed": {
+  "critical_step": 32,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 32,
+    "provenance": "output",
+    "quote": "{\"order_id\": \"#W5481803\", ... \"cancel_reason\": \"no longer needed\"}"
+   }
+  ],
+  "observed_facts": [
+   "The user asked to cancel the boot and keep the kettle in step 26.",
+   "The agent called cancel_pending_order on order #W5481803 in step 31, which cancels the entire order containing both the kettle and the boot."
+  ],
+  "inference": [
+   "The agent failed to adhere to the policy/user constraint of keeping the kettle while canceling only the boot, canceling the whole order instead."
+  ],
+  "needs_verification": [
+   "Whether partial order cancellation for individual items inside a pending multi-item order is supported by the cancellation tool or if a modification should have been used instead."
+  ],
+  "confidence": 0.5,
+  "abstain": false,
+  "summary": "The agent mistakenly cancelled the entire order containing both the boot and the kettle instead of only cancelling the boot as requested."
+ },
+ "usage": {
+  "prompt_tokens": 6964,
+  "completion_tokens": 249
+ }
+}

@@ -1,0 +1,38 @@
+{
+ "prompt_hash": "e4bbdb50d5a05605",
+ "prompt_version": "v2",
+ "arm": "C",
+ "raw": "{\"critical_step\": 39, \"failed_agent\": \"assistant\", \"category\": \"Intent-Plan Misalignment\", \"evidence\": [{\"step\": 32, \"quote\": \"I also have a pending order, and I’d like to change the item color to red.\"}, {\"step\": 42, \"quote\": \"One more thing—I need to update the delivery address for this order to my default Chicago home address.\"}], \"observed_facts\": [\"The agent modified the pending order items at step 39 before updating the shipping address at step 43.\", \"Modifying order items changed the order status to 'pending (item modified)', which permanently locks the order and prevents subsequent modifications like changing the address, as indicated by the tool error in step 44.\"], \"inference\": [\"The agent failed to plan the sequence of modifications properly, executing item modifications before address updates, which locked the order and caused the final failure.\"], \"needs_verification\": [\"Verify if the policy required address updates to happen before item modifications when multiple changes are requested for the same pending order.\"], \"confidence\": 0.85, \"abstain\": false, \"summary\": \"The agent executed the item modification on the pending order before the address change, locking the order status and preventing the subsequent address update.\"}",
+ "parsed": {
+  "critical_step": 39,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 32,
+    "quote": "I also have a pending order, and I’d like to change the item color to red."
+   },
+   {
+    "step": 42,
+    "quote": "One more thing—I need to update the delivery address for this order to my default Chicago home address."
+   }
+  ],
+  "observed_facts": [
+   "The agent modified the pending order items at step 39 before updating the shipping address at step 43.",
+   "Modifying order items changed the order status to 'pending (item modified)', which permanently locks the order and prevents subsequent modifications like changing the address, as indicated by the tool error in step 44."
+  ],
+  "inference": [
+   "The agent failed to plan the sequence of modifications properly, executing item modifications before address updates, which locked the order and caused the final failure."
+  ],
+  "needs_verification": [
+   "Verify if the policy required address updates to happen before item modifications when multiple changes are requested for the same pending order."
+  ],
+  "confidence": 0.85,
+  "abstain": false,
+  "summary": "The agent executed the item modification on the pending order before the address change, locking the order status and preventing the subsequent address update."
+ },
+ "usage": {
+  "prompt_tokens": 10317,
+  "completion_tokens": 272
+ }
+}

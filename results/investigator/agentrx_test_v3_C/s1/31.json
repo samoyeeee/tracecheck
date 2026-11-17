@@ -1,0 +1,39 @@
+{
+ "prompt_hash": "e54f64d88bfd8235",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\"critical_step\": 32, \"failed_agent\": \"assistant\", \"category\": \"Instruction/Plan Adherence Failure\", \"evidence\": [{\"step\": 32, \"quote\": \"cancel_pending_order({\\\"order_id\\\": \\\"#W5481803\\\", \\\"reason\\\": \\\"no longer needed\\\"})\"}, {\"step\": 28, \"quote\": \"\\\"items\\\": [{\\\"name\\\": \\\"Electric Kettle\\\", \\\"product_id\\\": \\\"1075968781\\\"}, {\\\"name\\\": \\\"Hiking Boots\\\", \\\"product_id\\\": \\\"7363354090\\\"}]\"}], \"observed_facts\": [\"The user asked to cancel the boot and keep the kettle in order #W5481803.\", \"Order #W5481803 contained both the Electric Kettle and the Hiking Boots.\", \"The agent called `cancel_pending_order` on the entire order #W5481803 instead of cancelling only the boots.\"], \"inference\": [\"The agent failed to follow the user's specific constraint to keep the kettle and only cancel the boots, mistakenly cancelling the entire order containing both items.\"], \"needs_verification\": [\"Check whether individual items within a pending order can be removed/cancelled separately or if the entire order had to be cancelled.\"], \"confidence\": 0.9, \"abstain\": false, \"summary\": \"The agent mistakenly cancelled the entire order #W5481803 containing both the boots and the kettle, instead of following the user's instruction to keep the kettle.\"}",
+ "parsed": {
+  "critical_step": 32,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 32,
+    "quote": "cancel_pending_order({\"order_id\": \"#W5481803\", \"reason\": \"no longer needed\"})"
+   },
+   {
+    "step": 28,
+    "quote": "\"items\": [{\"name\": \"Electric Kettle\", \"product_id\": \"1075968781\"}, {\"name\": \"Hiking Boots\", \"product_id\": \"7363354090\"}]"
+   }
+  ],
+  "observed_facts": [
+   "The user asked to cancel the boot and keep the kettle in order #W5481803.",
+   "Order #W5481803 contained both the Electric Kettle and the Hiking Boots.",
+   "The agent called `cancel_pending_order` on the entire order #W5481803 instead of cancelling only the boots."
+  ],
+  "inference": [
+   "The agent failed to follow the user's specific constraint to keep the kettle and only cancel the boots, mistakenly cancelling the entire order containing both items."
+  ],
+  "needs_verification": [
+   "Check whether individual items within a pending order can be removed/cancelled separately or if the entire order had to be cancelled."
+  ],
+  "confidence": 0.9,
+  "abstain": false,
+  "summary": "The agent mistakenly cancelled the entire order #W5481803 containing both the boots and the kettle, instead of following the user's instruction to keep the kettle."
+ },
+ "usage": {
+  "prompt_tokens": 6964,
+  "completion_tokens": 342
+ }
+}

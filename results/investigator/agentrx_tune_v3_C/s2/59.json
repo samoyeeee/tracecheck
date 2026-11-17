@@ -1,0 +1,40 @@
+{
+ "prompt_hash": "49ae55b562df8bcb",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n \"critical_step\": 12,\n \"failed_agent\": \"user\",\n \"category\": \"Underspecified User Intent\",\n \"evidence\": [\n  {\n   \"step\": 12,\n   \"provenance\": \"step\",\n   \"quote\": \"If the older order, #W2702727, can't be processed within the next 5 days, I’d like to have it canceled.\"\n  },\n  {\n   \"step\": 22,\n   \"provenance\": \"step\",\n   \"quote\": \"Now, I need to update the shipping address for order #W8268610 to my new home at 1234 Elm St\"\n  }\n },\n \"observed_facts\": [\n  \"The user mixed up the order IDs and their intended actions in the conversation relative to what was requested in the benchmark prompt (cancelling #W2702727 instead of #W8268610, and updating address for #W8268610 instead of #W2702727).\",\n  \"The agent followed the user's explicit instructions step by step, resulting in actions performed on the wrong orders compared to the gold reference.\"\n ],\n \"inference\": [\n  \"The user gave confusing or incorrect instructions regarding which order to cancel and which to update, causing the agent to execute actions on the wrong order IDs.\"\n ],\n \"needs_verification\": [\n  \"Whether the user prompt's instructions were intended to swap the order IDs from the user's initial inquiry.\"\n ],\n \"confidence\": 0.5,\n \"abstain\": false,\n \"summary\": \"The user mistakenly mixed up the order IDs for cancellation and address modification, leading the agent to execute actions on the wrong orders.\"\n}",
+ "parsed": {
+  "critical_step": 12,
+  "failed_agent": "user",
+  "category": "Underspecified User Intent",
+  "evidence": [
+   {
+    "step": 12,
+    "provenance": "step",
+    "quote": "If the older order, #W2702727, can't be processed within the next 5 days, I’d like to have it canceled."
+   },
+   {
+    "step": 22,
+    "provenance": "step",
+    "quote": "Now, I need to update the shipping address for order #W8268610 to my new home at 1234 Elm St"
+   }
+  ],
+  "observed_facts": [
+   "The user mixed up the order IDs and their intended actions in the conversation relative to what was requested in the benchmark prompt (cancelling #W2702727 instead of #W8268610, and updating address for #W8268610 instead of #W2702727).",
+   "The agent followed the user's explicit instructions step by step, resulting in actions performed on the wrong orders compared to the gold reference."
+  ],
+  "inference": [
+   "The user gave confusing or incorrect instructions regarding which order to cancel and which to update, causing the agent to execute actions on the wrong order IDs."
+  ],
+  "needs_verification": [
+   "Whether the user prompt's instructions were intended to swap the order IDs from the user's initial inquiry."
+  ],
+  "confidence": 0.5,
+  "abstain": false,
+  "summary": "The user mistakenly mixed up the order IDs for cancellation and address modification, leading the agent to execute actions on the wrong orders."
+ },
+ "usage": {
+  "prompt_tokens": 5424,
+  "completion_tokens": 404
+ }
+}

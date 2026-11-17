@@ -1,0 +1,35 @@
+{
+ "prompt_hash": "5fcb3aa17f365e84",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\"critical_step\": 13, \"failed_agent\": \"assistant\", \"category\": \"Intent-Plan Misalignment\", \"evidence\": [{\"step\": 13, \"quote\": \"1. Modify the backpack and desk lamp to your desired options.\\n2. Update the shipping address\"}], \"observed_facts\": [\"At step 13, the agent planned to modify items first and then update the shipping address.\", \"Modifying items locks the order from further modifications such as address changes, according to policy rules.\"], \"inference\": [\"Because the agent planned and executed the item modification before the address change, the order status became 'pending (item modified)' which prevented the shipping address from being updated.\", \"This wrong sequence of steps is the root cause of the task failure.\"], \"needs_verification\": [\"Whether the agent should have updated the address before modifying items.\"], \"confidence\": 0.8, \"abstain\": false, \"summary\": \"The agent chose the wrong sequence of steps by modifying order items before updating the shipping address, which locked the order and prevented the address change.\"}",
+ "parsed": {
+  "critical_step": 13,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 13,
+    "quote": "1. Modify the backpack and desk lamp to your desired options.\n2. Update the shipping address"
+   }
+  ],
+  "observed_facts": [
+   "At step 13, the agent planned to modify items first and then update the shipping address.",
+   "Modifying items locks the order from further modifications such as address changes, according to policy rules."
+  ],
+  "inference": [
+   "Because the agent planned and executed the item modification before the address change, the order status became 'pending (item modified)' which prevented the shipping address from being updated.",
+   "This wrong sequence of steps is the root cause of the task failure."
+  ],
+  "needs_verification": [
+   "Whether the agent should have updated the address before modifying items."
+  ],
+  "confidence": 0.8,
+  "abstain": false,
+  "summary": "The agent chose the wrong sequence of steps by modifying order items before updating the shipping address, which locked the order and prevented the address change."
+ },
+ "usage": {
+  "prompt_tokens": 7258,
+  "completion_tokens": 226
+ }
+}

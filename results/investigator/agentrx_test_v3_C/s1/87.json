@@ -1,0 +1,43 @@
+{
+ "prompt_hash": "85d3458017bf35da",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\"critical_step\": 31, \"failed_agent\": \"assistant\", \"category\": \"Instruction/Plan Adherence Failure\", \"evidence\": [{\"step\": 8, \"quote\": \"Um, actually... I'd like to update both my pending orders and my default address, please.\"}, {\"step\": 28, \"quote\": \"\\\"orders\\\": [\\\"#W2166301\\\", \\\"#W2466703\\\", \\\"#W6832752\\\", \\\"#W7739115\\\", \\\"#W1994898\\\"]\"}, {\"step\": 31, \"quote\": \"CALL modify_pending_order_address({\\\"order_id\\\": \\\"#W2166301\\\", \\\"address1\\\": \\\"565 Maple Drive\\\"...\"}], \"observed_facts\": [\"The user has three pending orders (#W2166301, #W2466703, and #W6832752).\", \"The user requested to update all pending orders and their default address to the Washington DC address.\", \"The agent only modified orders #W2166301 and #W2466703, completely missing pending order #W6832752.\"], \"inference\": [\"The agent failed to check all pending orders properly and missed modifying order #W6832752, resulting in an incomplete task execution.\"], \"needs_verification\": [\"Check if there were other pending orders besides the three identified.\"], \"confidence\": 0.9, \"abstain\": false, \"summary\": \"The agent failed to modify all pending orders as requested by missing one of the pending orders (#W6832752) during the update process.\"}",
+ "parsed": {
+  "critical_step": 31,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 8,
+    "quote": "Um, actually... I'd like to update both my pending orders and my default address, please."
+   },
+   {
+    "step": 28,
+    "quote": "\"orders\": [\"#W2166301\", \"#W2466703\", \"#W6832752\", \"#W7739115\", \"#W1994898\"]"
+   },
+   {
+    "step": 31,
+    "quote": "CALL modify_pending_order_address({\"order_id\": \"#W2166301\", \"address1\": \"565 Maple Drive\"..."
+   }
+  ],
+  "observed_facts": [
+   "The user has three pending orders (#W2166301, #W2466703, and #W6832752).",
+   "The user requested to update all pending orders and their default address to the Washington DC address.",
+   "The agent only modified orders #W2166301 and #W2466703, completely missing pending order #W6832752."
+  ],
+  "inference": [
+   "The agent failed to check all pending orders properly and missed modifying order #W6832752, resulting in an incomplete task execution."
+  ],
+  "needs_verification": [
+   "Check if there were other pending orders besides the three identified."
+  ],
+  "confidence": 0.9,
+  "abstain": false,
+  "summary": "The agent failed to modify all pending orders as requested by missing one of the pending orders (#W6832752) during the update process."
+ },
+ "usage": {
+  "prompt_tokens": 7216,
+  "completion_tokens": 388
+ }
+}

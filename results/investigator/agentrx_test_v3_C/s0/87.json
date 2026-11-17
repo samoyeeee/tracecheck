@@ -1,0 +1,39 @@
+{
+ "prompt_hash": "88847e9430aa79e3",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 23,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Instruction/Plan Adherence Failure\",\n  \"evidence\": [\n    {\n      \"step\": 10,\n      \"quote\": \"\\\"orders\\\": [\\\"#W2166301\\\", \\\"#W2466703\\\", \\\"#W6832752\\\", \\\"#W7739115\\\", \\\"#W1994898\\\"]\"\n    },\n    {\n      \"step\": 23,\n      \"quote\": \"CALL get_order_details({\\\"order_id\\\": \\\"#W6832752\\\"})\"\n    }\n  ],\n  \"observed_facts\": [\n    \"The user wanted to modify all their pending orders' addresses to the Washington DC address.\",\n    \"The user's pending orders were #W2166301, #W2466703, and #W6832752.\",\n    \"The agent only modified orders #W2166301 and #W2466703, completely missing order #W6832752.\"\n  ],\n  \"inference\": [\n    \"The agent failed to check and update all pending orders as requested by the user, missing order #W6832752 during the modification phase.\"\n  ],\n  \"needs_verification\": [\n    \"Whether the agent intended to modify all three pending orders or forgot about #W6832752 after retrieving it earlier.\"\n  ],\n  \"confidence\": 0.8,\n  \"abstain\": false,\n  \"summary\": \"The agent failed to modify all pending orders, missing order #W6832752 during the update step.\"\n}",
+ "parsed": {
+  "critical_step": 23,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 10,
+    "quote": "\"orders\": [\"#W2166301\", \"#W2466703\", \"#W6832752\", \"#W7739115\", \"#W1994898\"]"
+   },
+   {
+    "step": 23,
+    "quote": "CALL get_order_details({\"order_id\": \"#W6832752\"})"
+   }
+  ],
+  "observed_facts": [
+   "The user wanted to modify all their pending orders' addresses to the Washington DC address.",
+   "The user's pending orders were #W2166301, #W2466703, and #W6832752.",
+   "The agent only modified orders #W2166301 and #W2466703, completely missing order #W6832752."
+  ],
+  "inference": [
+   "The agent failed to check and update all pending orders as requested by the user, missing order #W6832752 during the modification phase."
+  ],
+  "needs_verification": [
+   "Whether the agent intended to modify all three pending orders or forgot about #W6832752 after retrieving it earlier."
+  ],
+  "confidence": 0.8,
+  "abstain": false,
+  "summary": "The agent failed to modify all pending orders, missing order #W6832752 during the update step."
+ },
+ "usage": {
+  "prompt_tokens": 7216,
+  "completion_tokens": 418
+ }
+}

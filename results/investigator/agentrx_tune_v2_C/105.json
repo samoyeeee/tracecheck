@@ -1,0 +1,11 @@
+{
+ "prompt_hash": "e4bbdb50d5a05605",
+ "prompt_version": "v2",
+ "arm": "C",
+ "raw": "{\n \"critical_step\": 39,\n \"failed_agent\": \"assistant\",\n \"category\": \"Intent-Plan Misalignment\",\n \"evidence\": [\n  {\n   \"step\": 39,\n   \"purpose\": \"modify items before address\",\n   \"quote\": \"modify_pending_order_items({\\\"order_id\\\": \\\"#W4860251\\\"\"\n  },\n  {\n   \"step\": 44,\n   \"purpose\": \"address modification fails because items were modified first\",\n   \"quote\": \"Error: non-pending order cannot be modified\"\n  }\n },\n \"observed_facts\": [\n  \"The user requested both to change the pending order item to red and the address to their default Chicago home.\",\n  \"The agent modified the pending order items at step 39, changing the order status to 'pending (item modified)'.\",\n  \"At step 43, the agent attempted to modify the order address, which failed because the tool rejected modifying a non-pending (items modified) order.\"\n ],\n \"inference\": [\n  \"Modifying the items before modifying the address locked the order state into 'pending (item modified)', making subsequent address updates impossible according to the policy rules.\",\n  \"Following the correct sequence (address update first, or combining actions if possible) would have allowed the task to succeed.\"\n ],\n \"needs_verification\": [\n  \"Whether the policy allows modifying address and items in any order, or if item modification strictly locks the order preventing address updates.\"\n ],\n \"confidence\": 0.7,\n \"abstain\": false,\n \"summary\": \"The agent modified the order items before updating the shipping address, locking the order status and causing the subsequent address change to fail.\"\n}",
+ "parsed": {},
+ "usage": {
+  "prompt_tokens": 10317,
+  "completion_tokens": 388
+ }
+}

@@ -1,0 +1,35 @@
+{
+ "prompt_hash": "d668569cba3e8976",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\"critical_step\": 21, \"failed_agent\": \"assistant\", \"category\": \"Intent-Plan Misalignment\", \"evidence\": [{\"step\": 21, \"quote\": \"CALL modify_pending_order_items({\\\"order_id\\\": \\\"#W6750959\\\", \\\"item_ids\\\": [\\\"3254583681\\\"], \\\"new_item_ids\\\": [\\\"9440686670\\\"], \\\"payment_method_id\\\": \\\"paypal_8080730\\\"})\"}], \"observed_facts\": [\"At step 14, the user asked for both an item exchange/modification and to update the shipping address.\", \"At step 21, the agent called modify_pending_order_items, which under domain policy changes the order status to 'pending (items modified)' and locks it from further modifications.\", \"At step 23, the agent attempted to modify the address, which failed because the order status was already locked.\"], \"inference\": [\"The agent should have modified the address first or handled both modifications together before calling modify_pending_order_items, as modifying items permanently locks the order against further address changes.\"], \"needs_verification\": [\"Whether the policy allows batching address and item modifications in a single flow before locking the order.\"], \"confidence\": 0.5, \"abstain\": false, \"summary\": \"The agent modified the order items prematurely, locking the order status to 'pending (items modified)' before updating the shipping address, which caused all subsequent address update and cancellation attempts to fail.\"}",
+ "parsed": {
+  "critical_step": 21,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 21,
+    "quote": "CALL modify_pending_order_items({\"order_id\": \"#W6750959\", \"item_ids\": [\"3254583681\"], \"new_item_ids\": [\"9440686670\"], \"payment_method_id\": \"paypal_8080730\"})"
+   }
+  ],
+  "observed_facts": [
+   "At step 14, the user asked for both an item exchange/modification and to update the shipping address.",
+   "At step 21, the agent called modify_pending_order_items, which under domain policy changes the order status to 'pending (items modified)' and locks it from further modifications.",
+   "At step 23, the agent attempted to modify the address, which failed because the order status was already locked."
+  ],
+  "inference": [
+   "The agent should have modified the address first or handled both modifications together before calling modify_pending_order_items, as modifying items permanently locks the order against further address changes."
+  ],
+  "needs_verification": [
+   "Whether the policy allows batching address and item modifications in a single flow before locking the order."
+  ],
+  "confidence": 0.5,
+  "abstain": false,
+  "summary": "The agent modified the order items prematurely, locking the order status to 'pending (items modified)' before updating the shipping address, which caused all subsequent address update and cancellation attempts to fail."
+ },
+ "usage": {
+  "prompt_tokens": 7054,
+  "completion_tokens": 341
+ }
+}

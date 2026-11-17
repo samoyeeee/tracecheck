@@ -1,0 +1,46 @@
+{
+ "prompt_hash": "92e54bd13fc5e88b",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n \"critical_step\": 29,\n \"failed_agent\": \"assistant\",\n \"category\": \"Instruction/Plan Adherence Failure\",\n \"evidence\": [\n  {\n   \"step\": 28,\n   \"rating\": \"\",\n   \"quote\": \"If it's simpler, just ship the whole order to my NYC address, and I'll deal with the returns later.\"\n  },\n  {\n   \"step\": 29,\n   \"rating\": \"\",\n   \"quote\": \"Got it! I'll leave the order as is and let it ship to your NYC address. Once it arrives, you can initiate returns for the office items if needed.\"\n  }\n ],\n \"observed_facts\": [\n  {\n   \"step\": 28,\n   \"quote\": \"If it's simpler, just ship the whole order to my NYC address, and I'll deal with the returns later.\"\n  },\n  {\n   \"step\": 29,\n   \"quote\": \"Got it! I'll leave the order as is and let it ship to your NYC address.\"\n  }\n ],\n \"inference\": [\n  \"The user explicitly requested to ship the order to the NYC address, but the agent agreed without actually calling the tool modify_pending_order_address to update the shipping address in the database.\"\n ],\n \"needs_verification\": [\n  \"Verify whether the agent was required to make the modify_pending_order_address tool call upon the user's final instruction.\"\n ],\n \"confidence\": 0.6,\n \"abstain\": false,\n \"summary\": \"The agent failed to update the order shipping address to the user's NYC address using the required tool before concluding the conversation.\"\n}",
+ "parsed": {
+  "critical_step": 29,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 28,
+    "rating": "",
+    "quote": "If it's simpler, just ship the whole order to my NYC address, and I'll deal with the returns later."
+   },
+   {
+    "step": 29,
+    "rating": "",
+    "quote": "Got it! I'll leave the order as is and let it ship to your NYC address. Once it arrives, you can initiate returns for the office items if needed."
+   }
+  ],
+  "observed_facts": [
+   {
+    "step": 28,
+    "quote": "If it's simpler, just ship the whole order to my NYC address, and I'll deal with the returns later."
+   },
+   {
+    "step": 29,
+    "quote": "Got it! I'll leave the order as is and let it ship to your NYC address."
+   }
+  ],
+  "inference": [
+   "The user explicitly requested to ship the order to the NYC address, but the agent agreed without actually calling the tool modify_pending_order_address to update the shipping address in the database."
+  ],
+  "needs_verification": [
+   "Verify whether the agent was required to make the modify_pending_order_address tool call upon the user's final instruction."
+  ],
+  "confidence": 0.6,
+  "abstain": false,
+  "summary": "The agent failed to update the order shipping address to the user's NYC address using the required tool before concluding the conversation."
+ },
+ "usage": {
+  "prompt_tokens": 6657,
+  "completion_tokens": 385
+ }
+}

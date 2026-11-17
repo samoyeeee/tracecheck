@@ -1,0 +1,39 @@
+{
+ "prompt_hash": "c286d637642ad50b",
+ "prompt_version": "v1",
+ "arm": "C",
+ "raw": "{\n \"critical_step\": 23,\n \"failed_agent\": \"assistant\",\n \"category\": \"Intent-Plan Misalignment\",\n \"evidence\": [\n  {\n   \"step\": 22,\n   \"quote\": \"Now, I need to update the shipping address for order #W8268610 to my new home\"\n  },\n  {\n   \"step\": 23,\n   \"quote\": \"CALL modify_pending_order_address({\\\"order_id\\\": \\\"#W8268610\\\", \\\"address1\\\": \\\"1234 Elm St\\\"\"\n  }\n],\n \"observed_facts\": [\n  \"User requested to update the shipping address for order #W8268610 in step 22.\",\n  \"Agent modified the address for order #W8268610 instead of order #W2702727 as intended by the user's initial prompt and reference expectations.\",\n  \"Reference solution expected order #W2702727 to be modified and #W8268610 to be cancelled.\"\n],\n \"inference\": [\n  \"The agent mixed up the two order IDs throughout the conversation, addressing the wrong order relative to the user's implicit or explicit goals, causing the final state to diverge from the reference expectations.\"\n],\n \"needs_verification\": [\n  \"Verify whether the user intended to cancel #W2702727 and modify #W8268610 or vice versa based on the full conversation history.\"\n],\n \"confidence\": 0.9,\n \"abstain\": false,\n \"summary\": \"The agent misaligned the user's intentions by acting on the wrong order IDs during the modification step.\"\n}",
+ "parsed": {
+  "critical_step": 23,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 22,
+    "quote": "Now, I need to update the shipping address for order #W8268610 to my new home"
+   },
+   {
+    "step": 23,
+    "quote": "CALL modify_pending_order_address({\"order_id\": \"#W8268610\", \"address1\": \"1234 Elm St\""
+   }
+  ],
+  "observed_facts": [
+   "User requested to update the shipping address for order #W8268610 in step 22.",
+   "Agent modified the address for order #W8268610 instead of order #W2702727 as intended by the user's initial prompt and reference expectations.",
+   "Reference solution expected order #W2702727 to be modified and #W8268610 to be cancelled."
+  ],
+  "inference": [
+   "The agent mixed up the two order IDs throughout the conversation, addressing the wrong order relative to the user's implicit or explicit goals, causing the final state to diverge from the reference expectations."
+  ],
+  "needs_verification": [
+   "Verify whether the user intended to cancel #W2702727 and modify #W8268610 or vice versa based on the full conversation history."
+  ],
+  "confidence": 0.9,
+  "abstain": false,
+  "summary": "The agent misaligned the user's intentions by acting on the wrong order IDs during the modification step."
+ },
+ "usage": {
+  "prompt_tokens": 5121,
+  "completion_tokens": 401
+ }
+}

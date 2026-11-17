@@ -1,0 +1,42 @@
+{
+ "prompt_hash": "590080b2cc560d8f",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\"critical_step\": 31, \"failed_agent\": \"assistant\", \"category\": \"Instruction/Plan Adherence Failure\", \"evidence\": [{\"step\": 8, \"quote\": \"Um, actually... I'd like to update both my pending orders and my default address, please.\"}, {\"step\": 29, \"quote\": \"Would you like me to update both your pending orders and your default address to this address?\"}, {\"step\": 31, \"quote\": \"CALL modify_pending_order_address({\\\"order_id\\\": \\\"#W2166301\\\", \\\"address1\\\": \\\"565 Maple Drive\\\", \\\"address2\\\": \\\"Suite 501\\\", \\\"city\\\": \\\"Washington\\\", \\\"state\\\": \\\"DC\\\", \\\"country\\\": \\\"USA\\\", \\\"zip\\\": \\\"20307\\\"})\"}], \"observed_facts\": [\"The user has three pending orders according to user details: #W2166301, #W2466703, and #W6832752.\", \"The agent only checked and modified two pending orders (#W2166301 and #W2466703), missing #W6832752.\"], \"inference\": [\"The agent failed to retrieve and update all pending orders as requested by the user and implied by the customer profile, missing order #W6832752 entirely in the modification stage.\"], \"needs_verification\": [\"Check whether all pending orders belonging to the user should have been updated when the user asked to update 'all pending orders'.\"], \"confidence\": 0.7, \"abstain\": false, \"summary\": \"The agent missed updating one of the pending orders (#W6832752) when modifying the user's pending orders to the new address.\"}",
+ "parsed": {
+  "critical_step": 31,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 8,
+    "quote": "Um, actually... I'd like to update both my pending orders and my default address, please."
+   },
+   {
+    "step": 29,
+    "quote": "Would you like me to update both your pending orders and your default address to this address?"
+   },
+   {
+    "step": 31,
+    "quote": "CALL modify_pending_order_address({\"order_id\": \"#W2166301\", \"address1\": \"565 Maple Drive\", \"address2\": \"Suite 501\", \"city\": \"Washington\", \"state\": \"DC\", \"country\": \"USA\", \"zip\": \"20307\"})"
+   }
+  ],
+  "observed_facts": [
+   "The user has three pending orders according to user details: #W2166301, #W2466703, and #W6832752.",
+   "The agent only checked and modified two pending orders (#W2166301 and #W2466703), missing #W6832752."
+  ],
+  "inference": [
+   "The agent failed to retrieve and update all pending orders as requested by the user and implied by the customer profile, missing order #W6832752 entirely in the modification stage."
+  ],
+  "needs_verification": [
+   "Check whether all pending orders belonging to the user should have been updated when the user asked to update 'all pending orders'."
+  ],
+  "confidence": 0.7,
+  "abstain": false,
+  "summary": "The agent missed updating one of the pending orders (#W6832752) when modifying the user's pending orders to the new address."
+ },
+ "usage": {
+  "prompt_tokens": 7216,
+  "completion_tokens": 395
+ }
+}

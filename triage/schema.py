@@ -88,3 +88,33 @@ class TraceReport:
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+
+# --- phase 3: investigator output -------------------------------------------
+
+CATEGORIES = [  # AgentRx taxonomy (github.com/microsoft/agentrx, MIT licence)
+    "Instruction/Plan Adherence Failure", "Invention of New Information", "Invalid Invocation",
+    "Misinterpretation of Tool Output", "Intent-Plan Misalignment", "Underspecified User Intent",
+    "Intent Not Supported", "Guardrails Triggered", "System Failure", "Inconclusive",
+]
+
+
+@dataclass
+class Diagnosis:
+    traj_id: str
+    arm: str                            # A / B / C
+    prompt_version: str
+    critical_step: Optional[int]
+    failed_agent: Optional[str]         # "assistant" or "user" (the simulated user can be at fault)
+    category: Optional[str]
+    evidence: list[dict]                # [{step, quote, valid}] - valid = quote found verbatim in that step
+    observed_facts: list[str]
+    inference: list[str]
+    needs_verification: list[str]
+    confidence: Optional[float]
+    abstain: bool                       # True -> shown as "需要人工判断"
+    abstain_reason: str = ""
+    summary: str = ""
+    model: str = ""
+    error: str = ""                     # parse / API problem, if any
+    samples: list = field(default_factory=list)  # arm C: the individual answers that were voted on

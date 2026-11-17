@@ -1,0 +1,39 @@
+{
+ "prompt_hash": "cd70c77137ca2a49",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 39,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Intent-Plan Misalignment\",\n  \"evidence\": [\n    {\n      \"step\": 39,\n      \"quote\": \"modify_pending_order_items({\\\"order_id\\\": \\\"#W4860251\\\", \\\"item_ids\\\": [\\\"5209958006\\\"], \\\"new_item_ids\\\": [\\\"8964750292\\\"], \\\"payment_method_id\\\": \\\"credit_card_2112420\\\"})\"\n    },\n    {\n      \"step\": 42,\n      \"quote\": \"One more thing—I need to update the delivery address for this order to my default Chicago home address.\"\n    }\n  ],\n  \"observed_facts\": [\n    \"The user wanted to both change the item color and update the shipping address for the pending order #W4860251.\",\n    \"The agent modified the pending order items at step 39, which according to policy locks or changes the order status such that further modifications (like address changes) cannot be performed.\",\n    \"The agent attempted to modify the address at step 43, resulting in a tool error stating that non-pending orders cannot be modified.\"\n  ],\n  \"inference\": [\n    \"By modifying the order items before modifying the shipping address, the agent triggered a policy restriction that prevented the subsequent address update, violating the correct operational order for multiple pending order updates.\"\n  ],\n  \"needs_verification\": [\n    \"Whether the retail system policy permits updating both items and address in a different sequence or if modifying items permanently locks the order against address changes.\"\n  ],\n  \"confidence\": 0.6,\n  \"abstain\": false,\n  \"summary\": \"The agent modified the pending order items before updating the shipping address, which locked the order status and caused the subsequent address modification tool call to fail.\"\n}",
+ "parsed": {
+  "critical_step": 39,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 39,
+    "quote": "modify_pending_order_items({\"order_id\": \"#W4860251\", \"item_ids\": [\"5209958006\"], \"new_item_ids\": [\"8964750292\"], \"payment_method_id\": \"credit_card_2112420\"})"
+   },
+   {
+    "step": 42,
+    "quote": "One more thing—I need to update the delivery address for this order to my default Chicago home address."
+   }
+  ],
+  "observed_facts": [
+   "The user wanted to both change the item color and update the shipping address for the pending order #W4860251.",
+   "The agent modified the pending order items at step 39, which according to policy locks or changes the order status such that further modifications (like address changes) cannot be performed.",
+   "The agent attempted to modify the address at step 43, resulting in a tool error stating that non-pending orders cannot be modified."
+  ],
+  "inference": [
+   "By modifying the order items before modifying the shipping address, the agent triggered a policy restriction that prevented the subsequent address update, violating the correct operational order for multiple pending order updates."
+  ],
+  "needs_verification": [
+   "Whether the retail system policy permits updating both items and address in a different sequence or if modifying items permanently locks the order against address changes."
+  ],
+  "confidence": 0.6,
+  "abstain": false,
+  "summary": "The agent modified the pending order items before updating the shipping address, which locked the order status and caused the subsequent address modification tool call to fail."
+ },
+ "usage": {
+  "prompt_tokens": 10317,
+  "completion_tokens": 446
+ }
+}
