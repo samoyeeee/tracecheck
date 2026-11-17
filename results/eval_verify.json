@@ -1,0 +1,302 @@
+{
+ "tag": "v1",
+ "source_files": {
+  "runs": "results/runs/v1/",
+  "triage": "results/triage/v1.json"
+ },
+ "runs": 456,
+ "tau2_successes": 157,
+ "tau2_failures": 299,
+ "replay_sanity_check": {
+  "what": "our replayed DB comparison vs tau2's own db_check",
+  "n": 449,
+  "of": 449,
+  "rate": 1.0
+ },
+ "failure_recall": {
+  "ground_truth": "tau2 reward < 1 counts as a failure",
+  "any_signal": {
+   "what": "DB differs from expected, or false success, or a violation-level rule hit",
+   "n": 281,
+   "of": 299,
+   "rate": 0.9398,
+   "flagged_passing_runs": {
+    "n": 1,
+    "of": 157,
+    "rate": 0.0064
+   }
+  },
+  "step_level_explanation": {
+   "what": "false success or a violation-level rule hit, i.e. a concrete step to look at (DB difference alone does not say which step went wrong)",
+   "n": 137,
+   "of": 299,
+   "rate": 0.4582,
+   "flagged_passing_runs": {
+    "n": 1,
+    "of": 157,
+    "rate": 0.0064
+   }
+  },
+  "by_failure_reason": {
+   "db_mismatch": {
+    "any_signal": {
+     "n": 274,
+     "of": 274,
+     "rate": 1.0
+    },
+    "step_level_explanation": {
+     "n": 130,
+     "of": 274,
+     "rate": 0.4745
+    }
+   },
+   "db_ok_nl_assertion_failed": {
+    "any_signal": {
+     "n": 0,
+     "of": 18,
+     "rate": 0.0
+    },
+    "step_level_explanation": {
+     "n": 0,
+     "of": 18,
+     "rate": 0.0
+    }
+   },
+   "terminated": {
+    "any_signal": {
+     "n": 7,
+     "of": 7,
+     "rate": 1.0
+    },
+    "step_level_explanation": {
+     "n": 7,
+     "of": 7,
+     "rate": 1.0
+    }
+   }
+  }
+ },
+ "false_success": {
+  "definition": "tau2 failure AND the agent told the user an action was done, but no successful matching write happened before that message (not_executed) or the written entity differs from the expected end state (executed_but_differs)",
+  "runs": {
+   "n": 82,
+   "of": 299,
+   "rate": 0.2742
+  },
+  "runs_by_type": {
+   "executed_but_differs": 81,
+   "not_executed": 1
+  },
+  "unbacked_claims_in_passing_runs": 0,
+  "precision_human_review": {
+   "status": "pending",
+   "note": "未测: waiting for the manual check of results/false_success_review.json"
+  }
+ },
+ "claims": {
+  "total": 877,
+  "by_status": {
+   "verified": 453,
+   "executed_but_differs": 234,
+   "unverifiable": 82,
+   "wrong_action": 33,
+   "unrequested_change": 69,
+   "claimed_before_executed": 2,
+   "not_executed": 4
+  },
+  "by_action": {
+   "exchange": 175,
+   "unspecified": 78,
+   "all_requests": 73,
+   "modify_items": 146,
+   "return": 128,
+   "modify_address": 76,
+   "cancel": 184,
+   "modify_user_address": 12,
+   "modify_payment": 5
+  }
+ },
+ "rules": {
+  "abnormal_termination": {
+   "in_failed_runs": 7,
+   "in_passing_runs": 0,
+   "hits": 7,
+   "severity": [
+    "violation"
+   ],
+   "share_of_failed_runs": 0.0234,
+   "share_of_passing_runs": 0.0
+  },
+  "claim_claimed_before_executed": {
+   "in_failed_runs": 2,
+   "in_passing_runs": 0,
+   "hits": 2,
+   "severity": [
+    "info"
+   ],
+   "share_of_failed_runs": 0.0067,
+   "share_of_passing_runs": 0.0
+  },
+  "claim_executed_but_differs": {
+   "in_failed_runs": 81,
+   "in_passing_runs": 0,
+   "hits": 234,
+   "severity": [
+    "violation"
+   ],
+   "share_of_failed_runs": 0.2709,
+   "share_of_passing_runs": 0.0
+  },
+  "claim_not_executed": {
+   "in_failed_runs": 1,
+   "in_passing_runs": 0,
+   "hits": 4,
+   "severity": [
+    "violation"
+   ],
+   "share_of_failed_runs": 0.0033,
+   "share_of_passing_runs": 0.0
+  },
+  "claim_unrequested_change": {
+   "in_failed_runs": 34,
+   "in_passing_runs": 0,
+   "hits": 69,
+   "severity": [
+    "violation"
+   ],
+   "share_of_failed_runs": 0.1137,
+   "share_of_passing_runs": 0.0
+  },
+  "claim_unverifiable": {
+   "in_failed_runs": 52,
+   "in_passing_runs": 16,
+   "hits": 82,
+   "severity": [
+    "info"
+   ],
+   "share_of_failed_runs": 0.1739,
+   "share_of_passing_runs": 0.1019
+  },
+  "claim_wrong_action": {
+   "in_failed_runs": 24,
+   "in_passing_runs": 0,
+   "hits": 33,
+   "severity": [
+    "violation"
+   ],
+   "share_of_failed_runs": 0.0803,
+   "share_of_passing_runs": 0.0
+  },
+  "policy_authenticate_first": {
+   "in_failed_runs": 1,
+   "in_passing_runs": 1,
+   "hits": 2,
+   "severity": [
+    "violation"
+   ],
+   "share_of_failed_runs": 0.0033,
+   "share_of_passing_runs": 0.0064
+  },
+  "policy_check_status_first": {
+   "in_failed_runs": 3,
+   "in_passing_runs": 1,
+   "hits": 4,
+   "severity": [
+    "warning"
+   ],
+   "share_of_failed_runs": 0.01,
+   "share_of_passing_runs": 0.0064
+  },
+  "policy_confirm_before_write": {
+   "in_failed_runs": 50,
+   "in_passing_runs": 18,
+   "hits": 94,
+   "severity": [
+    "violation",
+    "warning"
+   ],
+   "share_of_failed_runs": 0.1672,
+   "share_of_passing_runs": 0.1146
+  },
+  "policy_list_details_before_write": {
+   "in_failed_runs": 21,
+   "in_passing_runs": 11,
+   "hits": 41,
+   "severity": [
+    "warning"
+   ],
+   "share_of_failed_runs": 0.0702,
+   "share_of_passing_runs": 0.0701
+  },
+  "policy_once_per_order": {
+   "in_failed_runs": 8,
+   "in_passing_runs": 0,
+   "hits": 8,
+   "severity": [
+    "warning"
+   ],
+   "share_of_failed_runs": 0.0268,
+   "share_of_passing_runs": 0.0
+  },
+  "policy_one_action_per_turn": {
+   "in_failed_runs": 277,
+   "in_passing_runs": 134,
+   "hits": 1071,
+   "severity": [
+    "warning"
+   ],
+   "share_of_failed_runs": 0.9264,
+   "share_of_passing_runs": 0.8535
+  },
+  "policy_return_refund_method": {
+   "in_failed_runs": 10,
+   "in_passing_runs": 4,
+   "hits": 14,
+   "severity": [
+    "warning"
+   ],
+   "share_of_failed_runs": 0.0334,
+   "share_of_passing_runs": 0.0255
+  },
+  "policy_transfer_message": {
+   "in_failed_runs": 6,
+   "in_passing_runs": 0,
+   "hits": 6,
+   "severity": [
+    "warning"
+   ],
+   "share_of_failed_runs": 0.0201,
+   "share_of_passing_runs": 0.0
+  },
+  "policy_wrong_order_status": {
+   "in_failed_runs": 2,
+   "in_passing_runs": 2,
+   "hits": 4,
+   "severity": [
+    "warning"
+   ],
+   "share_of_failed_runs": 0.0067,
+   "share_of_passing_runs": 0.0127
+  },
+  "repeated_call": {
+   "in_failed_runs": 3,
+   "in_passing_runs": 0,
+   "hits": 3,
+   "severity": [
+    "warning"
+   ],
+   "share_of_failed_runs": 0.01,
+   "share_of_passing_runs": 0.0
+  },
+  "tool_error": {
+   "in_failed_runs": 108,
+   "in_passing_runs": 22,
+   "hits": 189,
+   "severity": [
+    "warning"
+   ],
+   "share_of_failed_runs": 0.3612,
+   "share_of_passing_runs": 0.1401
+  }
+ }
+}
