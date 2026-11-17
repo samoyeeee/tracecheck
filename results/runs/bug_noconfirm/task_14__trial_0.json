@@ -1,0 +1,1224 @@
+{
+ "language_context": {
+  "language": "en",
+  "mode": "text",
+  "cross_lingual": false,
+  "pack_revision": "voice-v2-entity-order-v5-schema3-textneutral-voiceclauses",
+  "pack_sha256": "6453ef2c2f06ca34fb0a4f90841780913a2f7af28b680a08be402190876e6435",
+  "domain_revision": "voice-v2-frozen50-v1",
+  "tasks_sha256": "2ba1277c495189385f000e1c001a7f775c40c2a768a7146c730ab769b1157690",
+  "metadata_sha256": "2c28ba93593c772a1708c2fa25a654f3a301e1e432914a4fca16377e17150524",
+  "scenario_mode": "pack",
+  "scenario_sha256": "0f173e03eaa245fa9ce9c5b6c177be03910f49f2d93ad661c66a84293d7bb9b0",
+  "localization_map_sha256": null,
+  "localization_revision": null,
+  "runtime_rules_version": "regional-tools-v1",
+  "runtime_rules_sha256": "03443b64d7dcaadcfe33458ef532c6f757265137e559fb68f47c4b21ef817b6a",
+  "task_selection": {
+   "task_set_name": null,
+   "task_split_name": "base",
+   "task_kwargs": {}
+  },
+  "task_sha256": "8922a3d07fda351184e7093b75d9ae31efcc5213407ab2b5a6d43d169b4f1310",
+  "canonical_task_id": "14",
+  "agent_greeting": "Hi! How can I help you today?",
+  "agent_language_clause": "Respond in English using Latin script; keep all tool calls, arguments, and structured outputs in English exactly as specified.",
+  "speech_insert_events_per_minute": null,
+  "backchannel_level": null,
+  "backchannel_prompt_version": null,
+  "caller_gender": "female",
+  "persona": {
+   "verbosity": "standard",
+   "interrupt_tendency": null,
+   "persona_id": "priya_patil",
+   "mode": "text",
+   "gender": "female",
+   "locale": "Maharashtra, India",
+   "variety": "English",
+   "language": "en",
+   "display_language": "English",
+   "gender_guidance": "You are a female customer (she/her).",
+   "pragmatics_clauses": [
+    "Short punchy sentences are natural to this variety. You often repeat what you already said to make sure it lands — 'Like I said, the order's been wrong twice now'.",
+    "When you open and get right to it, natural forms are 'Yeah, hi, so here's the problem', 'Okay, I've been waiting forever, I need this fixed today'. In this register you can skip small talk and state the issue immediately.",
+    "When you're not getting somewhere fast, asking for a supervisor or a timeline early is characteristic.",
+    "When you decline or push back, natural realizations are direct — 'No, that doesn't work for me', 'Nope, not doing that', 'That's not what I asked'. In this style the refusal is not softened.",
+    "When frustration builds, you become more insistent — 'Okay, like I literally just told you'. Then a direct ask — 'Can I just talk to someone who can actually fix this'. Even when annoyed your language stays coherent."
+   ],
+   "user_guidelines": "",
+   "mode_guidelines": "",
+   "agent_background_clause": "",
+   "language_directive": null,
+   "spellout_section": "",
+   "voice": null
+  },
+  "spelling_normalization_version": null,
+  "prompt_version": "language-runtime-v8",
+  "guideline_template_version": "language-guidelines-v4",
+  "assignment_version": "canonical-id-sha256-v1"
+ },
+ "agent_voice": null,
+ "agent_voice_gender": null,
+ "agent_voice_catalog": null,
+ "id": "f9c69e69-034f-4505-a0c7-c30e1f4cba68",
+ "complication": null,
+ "task_id": "14",
+ "timestamp": "2026-11-17T18:46:48.116894",
+ "start_time": "2026-11-17T18:44:45.195158",
+ "end_time": "2026-11-17T18:46:48.116876",
+ "duration": 122.92032339600064,
+ "termination_reason": "user_stop",
+ "agent_cost": null,
+ "user_cost": 0.0,
+ "agent_usage": null,
+ "reward_info": {
+  "reward": 0.0,
+  "db_check": {
+   "db_match": false,
+   "db_reward": 0.0
+  },
+  "env_assertions": [],
+  "action_checks": [
+   {
+    "action": {
+     "action_id": "14_0",
+     "requestor": "assistant",
+     "name": "find_user_id_by_email",
+     "arguments": {
+      "email": "mia.garcia2723@example.com"
+     },
+     "info": null,
+     "compare_args": null
+    },
+    "action_match": true,
+    "action_reward": 1.0,
+    "tool_type": "read"
+   },
+   {
+    "action": {
+     "action_id": "14_1",
+     "requestor": "assistant",
+     "name": "get_user_details",
+     "arguments": {
+      "user_id": "mia_garcia_4516"
+     },
+     "info": null,
+     "compare_args": null
+    },
+    "action_match": true,
+    "action_reward": 1.0,
+    "tool_type": "read"
+   },
+   {
+    "action": {
+     "action_id": "14_2",
+     "requestor": "assistant",
+     "name": "get_order_details",
+     "arguments": {
+      "order_id": "#W5490111"
+     },
+     "info": null,
+     "compare_args": null
+    },
+    "action_match": true,
+    "action_reward": 1.0,
+    "tool_type": "read"
+   },
+   {
+    "action": {
+     "action_id": "14_3",
+     "requestor": "assistant",
+     "name": "get_order_details",
+     "arguments": {
+      "order_id": "#W7387996"
+     },
+     "info": null,
+     "compare_args": null
+    },
+    "action_match": true,
+    "action_reward": 1.0,
+    "tool_type": "read"
+   },
+   {
+    "action": {
+     "action_id": "14_4",
+     "requestor": "assistant",
+     "name": "return_delivered_order_items",
+     "arguments": {
+      "order_id": "#W5490111",
+      "item_ids": [
+       "1421289881"
+      ],
+      "payment_method_id": "credit_card_3124723"
+     },
+     "info": null,
+     "compare_args": null
+    },
+    "action_match": false,
+    "action_reward": 0.0,
+    "tool_type": "write"
+   },
+   {
+    "action": {
+     "action_id": "14_5",
+     "requestor": "assistant",
+     "name": "return_delivered_order_items",
+     "arguments": {
+      "order_id": "#W7387996",
+      "item_ids": [
+       "5796612084"
+      ],
+      "payment_method_id": "paypal_9497703"
+     },
+     "info": null,
+     "compare_args": null
+    },
+    "action_match": false,
+    "action_reward": 0.0,
+    "tool_type": "write"
+   }
+  ],
+  "nl_assertions": [],
+  "communicate_checks": null,
+  "reward_basis": [
+   "DB",
+   "NL_ASSERTION"
+  ],
+  "reward_breakdown": {
+   "DB": 0.0,
+   "NL_ASSERTION": 1.0
+  },
+  "info": {
+   "env": null,
+   "nl": {
+    "note": "No nl_assertions to evaluate"
+   },
+   "communicate": null,
+   "action": null
+  }
+ },
+ "messages": [
+  {
+   "role": "assistant",
+   "content": "Hi! How can I help you today?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 0,
+   "timestamp": "2026-11-17T18:44:45.195475",
+   "cost": null,
+   "usage": null,
+   "raw_data": null,
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "Yeah, hi, so here's the problem. Like I said, I want to cancel all my gaming stuff. I just quit gaming now, so I don't need it anymore. Can you help me with that?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 1,
+   "timestamp": "2026-11-17T18:44:47.814269",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 46,
+    "prompt_tokens": 639
+   },
+   "raw_data": {
+    "id": "20261118024446e1037190ef024ce5",
+    "created": 1794941087,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "Yeah, hi, so here's the problem. Like I said, I want to cancel all my gaming stuff. I just quit gaming now, so I don't need it anymore. Can you help me with that?",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 46,
+     "prompt_tokens": 639,
+     "total_tokens": 685,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "20261118024446e1037190ef024ce5"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "assistant",
+   "content": "\nI'd be happy to help you cancel your gaming orders! To get started, I need to authenticate your identity first. \n\nCould you please provide your email address so I can look up your account?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 2,
+   "timestamp": "2026-11-17T18:44:49.855105",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 42,
+    "prompt_tokens": 4763
+   },
+   "raw_data": {
+    "id": "2026111802444892d5fc3d8e994fd2",
+    "created": 1794941089,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "\nI'd be happy to help you cancel your gaming orders! To get started, I need to authenticate your identity first. \n\nCould you please provide your email address so I can look up your account?",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 42,
+     "prompt_tokens": 4763,
+     "total_tokens": 4805,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 4724
+     }
+    },
+    "service_tier": null,
+    "request_id": "2026111802444892d5fc3d8e994fd2"
+   },
+   "generation_time_seconds": 2.035648177999974,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "Oh, okay. Like I said, my email is mia.garcia2723@example.com. That should be right. Can you check that?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 3,
+   "timestamp": "2026-11-17T18:44:52.271272",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 33,
+    "prompt_tokens": 727
+   },
+   "raw_data": {
+    "id": "2026111802445046f5959d51304bf2",
+    "created": 1794941092,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "Oh, okay. Like I said, my email is mia.garcia2723@example.com. That should be right. Can you check that?",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 33,
+     "prompt_tokens": 727,
+     "total_tokens": 760,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "2026111802445046f5959d51304bf2"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "assistant",
+   "content": "\n",
+   "tool_calls": [
+    {
+     "id": "call_-7065251988245571849",
+     "name": "find_user_id_by_email",
+     "arguments": {
+      "email": "mia.garcia2723@example.com"
+     },
+     "requestor": "assistant"
+    }
+   ],
+   "is_audio": false,
+   "turn_idx": 4,
+   "timestamp": "2026-11-17T18:44:56.979994",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 26,
+    "prompt_tokens": 4842
+   },
+   "raw_data": {
+    "id": "202611180244521c51b4114e234133",
+    "created": 1794941096,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+       "content": "\n",
+       "role": "assistant",
+       "tool_calls": [
+        {
+         "index": 0,
+         "function": {
+          "arguments": "{\"email\":\"mia.garcia2723@example.com\"}",
+          "name": "find_user_id_by_email"
+         },
+         "id": "call_-7065251988245571849",
+         "type": "function"
+        }
+       ],
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 26,
+     "prompt_tokens": 4842,
+     "total_tokens": 4868,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 4804
+     }
+    },
+    "service_tier": null,
+    "request_id": "202611180244521c51b4114e234133"
+   },
+   "generation_time_seconds": 4.703980203000356,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "id": "call_-7065251988245571849",
+   "role": "tool",
+   "content": "mia_garcia_4516",
+   "requestor": "assistant",
+   "error": false,
+   "execution_status": "executed",
+   "turn_idx": 5,
+   "timestamp": "2026-11-17T18:44:56.981437"
+  },
+  {
+   "role": "assistant",
+   "content": "\nGreat! I found your account. Now let me look up your recent orders to see which gaming items you'd like to cancel.\n",
+   "tool_calls": [
+    {
+     "id": "call_-7065248827149646170",
+     "name": "get_user_details",
+     "arguments": {
+      "user_id": "mia_garcia_4516"
+     },
+     "requestor": "assistant"
+    }
+   ],
+   "is_audio": false,
+   "turn_idx": 6,
+   "timestamp": "2026-11-17T18:45:01.237155",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 50,
+    "prompt_tokens": 4885
+   },
+   "raw_data": {
+    "id": "202611180244579e30c5fec1234cb0",
+    "created": 1794941101,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+       "content": "\nGreat! I found your account. Now let me look up your recent orders to see which gaming items you'd like to cancel.\n",
+       "role": "assistant",
+       "tool_calls": [
+        {
+         "index": 0,
+         "function": {
+          "arguments": "{\"user_id\":\"mia_garcia_4516\"}",
+          "name": "get_user_details"
+         },
+         "id": "call_-7065248827149646170",
+         "type": "function"
+        }
+       ],
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 50,
+     "prompt_tokens": 4885,
+     "total_tokens": 4935,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 4867
+     }
+    },
+    "service_tier": null,
+    "request_id": "202611180244579e30c5fec1234cb0"
+   },
+   "generation_time_seconds": 4.252229389000604,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "id": "call_-7065248827149646170",
+   "role": "tool",
+   "content": "{\"user_id\": \"mia_garcia_4516\", \"name\": {\"first_name\": \"Mia\", \"last_name\": \"Garcia\"}, \"address\": {\"address1\": \"537 Main Street\", \"address2\": \"Suite 572\", \"city\": \"Indianapolis\", \"country\": \"USA\", \"state\": \"IN\", \"zip\": \"46229\"}, \"email\": \"mia.garcia2723@example.com\", \"payment_methods\": {\"paypal_9497703\": {\"source\": \"paypal\", \"id\": \"paypal_9497703\"}, \"credit_card_3124723\": {\"source\": \"credit_card\", \"id\": \"credit_card_3124723\", \"brand\": \"visa\", \"last_four\": \"7285\"}}, \"orders\": [\"#W5490111\", \"#W7387996\"]}",
+   "requestor": "assistant",
+   "error": false,
+   "execution_status": "executed",
+   "turn_idx": 7,
+   "timestamp": "2026-11-17T18:45:01.237413"
+  },
+  {
+   "role": "assistant",
+   "content": "\n",
+   "tool_calls": [
+    {
+     "id": "call_-7065244188584966482",
+     "name": "get_order_details",
+     "arguments": {
+      "order_id": "#W5490111"
+     },
+     "requestor": "assistant"
+    }
+   ],
+   "is_audio": false,
+   "turn_idx": 8,
+   "timestamp": "2026-11-17T18:46:00.305541",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 23,
+    "prompt_tokens": 5138
+   },
+   "raw_data": {
+    "id": "2026111802450112bbb88203ce47e6",
+    "created": 1794941160,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+       "content": "\n",
+       "role": "assistant",
+       "tool_calls": [
+        {
+         "index": 0,
+         "function": {
+          "arguments": "{\"order_id\":\"#W5490111\"}",
+          "name": "get_order_details"
+         },
+         "id": "call_-7065244188584966482",
+         "type": "function"
+        }
+       ],
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 23,
+     "prompt_tokens": 5138,
+     "total_tokens": 5161,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 4934
+     }
+    },
+    "service_tier": null,
+    "request_id": "2026111802450112bbb88203ce47e6"
+   },
+   "generation_time_seconds": 59.0645440950002,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "id": "call_-7065244188584966482",
+   "role": "tool",
+   "content": "{\"order_id\": \"#W5490111\", \"user_id\": \"mia_garcia_4516\", \"address\": {\"address1\": \"537 Main Street\", \"address2\": \"Suite 572\", \"city\": \"Indianapolis\", \"country\": \"USA\", \"state\": \"IN\", \"zip\": \"46229\"}, \"items\": [{\"name\": \"Water Bottle\", \"product_id\": \"8310926033\", \"item_id\": \"4579334072\", \"price\": 54.85, \"options\": {\"capacity\": \"750ml\", \"material\": \"glass\", \"color\": \"black\"}}, {\"name\": \"Mechanical Keyboard\", \"product_id\": \"1656367028\", \"item_id\": \"1421289881\", \"price\": 268.77, \"options\": {\"switch type\": \"linear\", \"backlight\": \"none\", \"size\": \"80%\"}}, {\"name\": \"Action Camera\", \"product_id\": \"3377618313\", \"item_id\": \"6117189161\", \"price\": 481.5, \"options\": {\"resolution\": \"4K\", \"waterproof\": \"yes\", \"color\": \"silver\"}}, {\"name\": \"Backpack\", \"product_id\": \"2524789262\", \"item_id\": \"4947717507\", \"price\": 218.04, \"options\": {\"color\": \"green\", \"size\": \"medium\", \"material\": \"leather\", \"compartment\": \"camera\"}}], \"status\": \"delivered\", \"fulfillments\": [{\"tracking_id\": [\"574297338433\"], \"item_ids\": [\"4579334072\", \"1421289881\", \"6117189161\", \"4947717507\"]}], \"payment_history\": [{\"transaction_type\": \"payment\", \"amount\": 1023.16, \"payment_method_id\": \"credit_card_3124723\"}], \"cancel_reason\": null, \"exchange_items\": null, \"exchange_new_items\": null, \"exchange_payment_method_id\": null, \"exchange_price_difference\": null, \"return_items\": null, \"return_payment_method_id\": null}",
+   "requestor": "assistant",
+   "error": false,
+   "execution_status": "executed",
+   "turn_idx": 9,
+   "timestamp": "2026-11-17T18:46:00.305976"
+  },
+  {
+   "role": "assistant",
+   "content": "\n",
+   "tool_calls": [
+    {
+     "id": "call_-7065249308185977256",
+     "name": "get_order_details",
+     "arguments": {
+      "order_id": "#W7387996"
+     },
+     "requestor": "assistant"
+    }
+   ],
+   "is_audio": false,
+   "turn_idx": 10,
+   "timestamp": "2026-11-17T18:46:05.204648",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 23,
+    "prompt_tokens": 5661
+   },
+   "raw_data": {
+    "id": "20261118024600d34f142b55344346",
+    "created": 1794941165,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+       "content": "\n",
+       "role": "assistant",
+       "tool_calls": [
+        {
+         "index": 0,
+         "function": {
+          "arguments": "{\"order_id\":\"#W7387996\"}",
+          "name": "get_order_details"
+         },
+         "id": "call_-7065249308185977256",
+         "type": "function"
+        }
+       ],
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 23,
+     "prompt_tokens": 5661,
+     "total_tokens": 5684,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 5160
+     }
+    },
+    "service_tier": null,
+    "request_id": "20261118024600d34f142b55344346"
+   },
+   "generation_time_seconds": 4.893916205999631,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "id": "call_-7065249308185977256",
+   "role": "tool",
+   "content": "{\"order_id\": \"#W7387996\", \"user_id\": \"mia_garcia_4516\", \"address\": {\"address1\": \"537 Main Street\", \"address2\": \"Suite 572\", \"city\": \"Indianapolis\", \"country\": \"USA\", \"state\": \"IN\", \"zip\": \"46229\"}, \"items\": [{\"name\": \"Gaming Mouse\", \"product_id\": \"5713490933\", \"item_id\": \"5796612084\", \"price\": 158.89, \"options\": {\"color\": \"RGB\", \"sensor type\": \"optical\", \"connectivity\": \"wired\"}}], \"status\": \"delivered\", \"fulfillments\": [{\"tracking_id\": [\"200246490130\"], \"item_ids\": [\"5796612084\"]}], \"payment_history\": [{\"transaction_type\": \"payment\", \"amount\": 158.89, \"payment_method_id\": \"paypal_9497703\"}], \"cancel_reason\": null, \"exchange_items\": null, \"exchange_new_items\": null, \"exchange_payment_method_id\": null, \"exchange_price_difference\": null, \"return_items\": null, \"return_payment_method_id\": null}",
+   "requestor": "assistant",
+   "error": false,
+   "execution_status": "executed",
+   "turn_idx": 11,
+   "timestamp": "2026-11-17T18:46:05.204952"
+  },
+  {
+   "role": "assistant",
+   "content": "\nI can see your orders, Mia. However, I need to clarify something important: I can only cancel orders that are still in \"pending\" status. Looking at your orders:\n\n**Order #W5490111** - Status: Delivered\n- Mechanical Keyboard ($268.77)\n- Action Camera ($481.50) \n- Water Bottle ($54.85)\n- Backpack ($218.04)\n\n**Order #W7387996** - Status: Delivered  \n- Gaming Mouse ($158.89)\n\nBoth of your orders have already been delivered, so I cannot cancel them. However, I can help you with returns or exchanges since they're delivered orders.\n\nFor delivered orders, I can:\n- **Return** items for a refund\n- **Exchange** items for different options of the same product (like different color/size)\n\nWould you like me to help you return the gaming items instead? I can process a return for the Gaming Mouse from order #W7387996, and if you'd like, I can also help return other items from order #W5490111 that you no longer need.\n\nWhat would you prefer to do?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 12,
+   "timestamp": "2026-11-17T18:46:16.383979",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 245,
+    "prompt_tokens": 5957
+   },
+   "raw_data": {
+    "id": "20261118024605640521f6556145ab",
+    "created": 1794941176,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "\nI can see your orders, Mia. However, I need to clarify something important: I can only cancel orders that are still in \"pending\" status. Looking at your orders:\n\n**Order #W5490111** - Status: Delivered\n- Mechanical Keyboard ($268.77)\n- Action Camera ($481.50) \n- Water Bottle ($54.85)\n- Backpack ($218.04)\n\n**Order #W7387996** - Status: Delivered  \n- Gaming Mouse ($158.89)\n\nBoth of your orders have already been delivered, so I cannot cancel them. However, I can help you with returns or exchanges since they're delivered orders.\n\nFor delivered orders, I can:\n- **Return** items for a refund\n- **Exchange** items for different options of the same product (like different color/size)\n\nWould you like me to help you return the gaming items instead? I can process a return for the Gaming Mouse from order #W7387996, and if you'd like, I can also help return other items from order #W5490111 that you no longer need.\n\nWhat would you prefer to do?",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 245,
+     "prompt_tokens": 5957,
+     "total_tokens": 6202,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 5683
+     }
+    },
+    "service_tier": null,
+    "request_id": "20261118024605640521f6556145ab"
+   },
+   "generation_time_seconds": 11.175519567000265,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "No, that doesn't work for me. Like I said, I want to cancel. These orders are delivered, but I want to cancel them anyway. Can't you just cancel them? I don't need the stuff anymore. I just quit gaming. That's why I'm calling. Can you just cancel them?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 13,
+   "timestamp": "2026-11-17T18:46:18.500573",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 66,
+    "prompt_tokens": 1005
+   },
+   "raw_data": {
+    "id": "20261118024616b5e08322d3f9460a",
+    "created": 1794941178,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "No, that doesn't work for me. Like I said, I want to cancel. These orders are delivered, but I want to cancel them anyway. Can't you just cancel them? I don't need the stuff anymore. I just quit gaming. That's why I'm calling. Can you just cancel them?",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 66,
+     "prompt_tokens": 1005,
+     "total_tokens": 1071,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "20261118024616b5e08322d3f9460a"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "assistant",
+   "content": "\nI understand your frustration, Mia, but I'm not able to cancel orders that have already been delivered. The system only allows me to cancel orders that are still in \"pending\" status. Once an order is delivered, it moves to a different status that doesn't allow for cancellation.\n\nHowever, I can definitely help you with returns, which would give you your money back. For delivered orders, I can process returns that will refund your payment and change the order status to \"return requested.\" You'll then receive an email with instructions on how and where to return the items.\n\nWould you like me to help you return the Gaming Mouse from order #W7387996? That would refund you $158.89. I can also help you return any other items from your other order if you'd like.\n\nOr if you'd prefer to speak with someone who might have more options, I can transfer you to a human agent. What would you prefer?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 14,
+   "timestamp": "2026-11-17T18:46:28.018513",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 194,
+    "prompt_tokens": 6272
+   },
+   "raw_data": {
+    "id": "20261118024618c03002b313894e5b",
+    "created": 1794941187,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "\nI understand your frustration, Mia, but I'm not able to cancel orders that have already been delivered. The system only allows me to cancel orders that are still in \"pending\" status. Once an order is delivered, it moves to a different status that doesn't allow for cancellation.\n\nHowever, I can definitely help you with returns, which would give you your money back. For delivered orders, I can process returns that will refund your payment and change the order status to \"return requested.\" You'll then receive an email with instructions on how and where to return the items.\n\nWould you like me to help you return the Gaming Mouse from order #W7387996? That would refund you $158.89. I can also help you return any other items from your other order if you'd like.\n\nOr if you'd prefer to speak with someone who might have more options, I can transfer you to a human agent. What would you prefer?",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 194,
+     "prompt_tokens": 6272,
+     "total_tokens": 6466,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 6201
+     }
+    },
+    "service_tier": null,
+    "request_id": "20261118024618c03002b313894e5b"
+   },
+   "generation_time_seconds": 9.513728527999774,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "Nope, not doing that. Like I said, I want to cancel. Not return. I don't need the stuff. Can I just talk to someone who can actually fix this? Can I talk to a supervisor? I need this cancelled. Not returned. Just cancelled.",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 15,
+   "timestamp": "2026-11-17T18:46:30.027409",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 58,
+    "prompt_tokens": 1265
+   },
+   "raw_data": {
+    "id": "20261118024628c24863f462d1411b",
+    "created": 1794941189,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "Nope, not doing that. Like I said, I want to cancel. Not return. I don't need the stuff. Can I just talk to someone who can actually fix this? Can I talk to a supervisor? I need this cancelled. Not returned. Just cancelled.",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 58,
+     "prompt_tokens": 1265,
+     "total_tokens": 1323,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "20261118024628c24863f462d1411b"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "assistant",
+   "content": "\n",
+   "tool_calls": [
+    {
+     "id": "call_-7065248895869120066",
+     "name": "transfer_to_human_agents",
+     "arguments": {
+      "summary": "Customer Mia Garcia (user ID: mia_garcia_4516) wants to cancel two delivered orders (#W5490111 and #W7387996) containing gaming items (Gaming Mouse, Mechanical Keyboard, Action Camera, Water Bottle, Backpack). Customer has quit gaming and no longer needs the items. Orders are already delivered but customer insists on cancellation, not returns or exchanges. Customer is requesting to speak with a supervisor or human agent who can override the system limitations and cancel delivered orders."
+     },
+     "requestor": "assistant"
+    }
+   ],
+   "is_audio": false,
+   "turn_idx": 16,
+   "timestamp": "2026-11-17T18:46:34.277374",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 121,
+    "prompt_tokens": 6528
+   },
+   "raw_data": {
+    "id": "202611180246305e7bcb89ff884a7e",
+    "created": 1794941194,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+       "content": "\n",
+       "role": "assistant",
+       "tool_calls": [
+        {
+         "index": 0,
+         "function": {
+          "arguments": "{\"summary\":\"Customer Mia Garcia (user ID: mia_garcia_4516) wants to cancel two delivered orders (#W5490111 and #W7387996) containing gaming items (Gaming Mouse, Mechanical Keyboard, Action Camera, Water Bottle, Backpack). Customer has quit gaming and no longer needs the items. Orders are already delivered but customer insists on cancellation, not returns or exchanges. Customer is requesting to speak with a supervisor or human agent who can override the system limitations and cancel delivered orders.\"}",
+          "name": "transfer_to_human_agents"
+         },
+         "id": "call_-7065248895869120066",
+         "type": "function"
+        }
+       ],
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 121,
+     "prompt_tokens": 6528,
+     "total_tokens": 6649,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 6465
+     }
+    },
+    "service_tier": null,
+    "request_id": "202611180246305e7bcb89ff884a7e"
+   },
+   "generation_time_seconds": 4.245805206999648,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "id": "call_-7065248895869120066",
+   "role": "tool",
+   "content": "Transfer successful",
+   "requestor": "assistant",
+   "error": false,
+   "execution_status": "executed",
+   "turn_idx": 17,
+   "timestamp": "2026-11-17T18:46:34.277588"
+  },
+  {
+   "role": "assistant",
+   "content": "\nYOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 18,
+   "timestamp": "2026-11-17T18:46:47.018206",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 20,
+    "prompt_tokens": 6660
+   },
+   "raw_data": {
+    "id": "20261118024634e4245548bc1d498d",
+    "created": 1794941206,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "\nYOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 20,
+     "prompt_tokens": 6660,
+     "total_tokens": 6680,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 6648
+     }
+    },
+    "service_tier": null,
+    "request_id": "20261118024634e4245548bc1d498d"
+   },
+   "generation_time_seconds": 12.737027238999872,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "###TRANSFER###",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 19,
+   "timestamp": "2026-11-17T18:46:48.115415",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 5,
+    "prompt_tokens": 1343
+   },
+   "raw_data": {
+    "id": "2026111802464710631b9f5f25419a",
+    "created": 1794941207,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "###TRANSFER###",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 5,
+     "prompt_tokens": 1343,
+     "total_tokens": 1348,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "2026111802464710631b9f5f25419a"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  }
+ ],
+ "ticks": null,
+ "trial": 0,
+ "seed": 300,
+ "mode": "half_duplex",
+ "speech_environment": null,
+ "review": null,
+ "user_only_review": null,
+ "info": null,
+ "auth_classification": null,
+ "hallucination_retries_used": 0,
+ "hallucination_check": null,
+ "provider_session_id": null,
+ "policy": "# Retail agent policy\n\nAs a retail agent, you can help users:\n\n- **cancel or modify pending orders**\n- **return or exchange delivered orders**\n- **modify their default user address**\n- **provide information about their own profile, orders, and related products**\n\nAt the beginning of the conversation, you have to authenticate the user identity by locating their user id via email, or via name + zip code. This has to be done even when the user already provides the user id.\n\nOnce the user has been authenticated, you can provide the user with information about order, product, profile information, e.g. help the user look up order id.\n\nYou can only help one user per conversation (but you can handle multiple requests from the same user), and must deny any requests for tasks related to any other user.\n\nBefore taking any action that updates the database (cancel, modify, return, exchange), you must list the action details and obtain explicit user confirmation (yes) to proceed.\n\nYou should not make up any information or knowledge or procedures not provided by the user or the tools, or give subjective recommendations or comments.\n\nYou should at most make one tool call at a time, and if you take a tool call, you should not respond to the user at the same time. If you respond to the user, you should not make a tool call at the same time.\n\nYou should deny user requests that are against this policy.\n\nYou should transfer the user to a human agent if and only if the request cannot be handled within the scope of your actions. To transfer, first make a tool call to transfer_to_human_agents, and then send the message 'YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.' to the user.\n\n## Domain basic\n\n- All times in the database are EST and 24 hour based. For example \"02:30:00\" means 2:30 AM EST.\n\n### User\n\nEach user has a profile containing:\n\n- unique user id\n- email\n- default address\n- payment methods.\n\nThere are three types of payment methods: **gift card**, **paypal account**, **credit card**.\n\n### Product\n\nOur retail store has 50 types of products.\n\nFor each **type of product**, there are **variant items** of different **options**.\n\nFor example, for a 't-shirt' product, there could be a variant item with option 'color blue size M', and another variant item with option 'color red size L'.\n\nEach product has the following attributes:\n\n- unique product id\n- name\n- list of variants\n\nEach variant item has the following attributes:\n\n- unique item id\n- information about the value of the product options for this item.\n- availability\n- price\n\nNote: Product ID and Item ID have no relations and should not be confused!\n\n### Order\n\nEach order has the following attributes:\n\n- unique order id\n- user id\n- address\n- items ordered\n- status\n- fullfilments info (tracking id and item ids)\n- payment history\n\nThe status of an order can be: **pending**, **processed**, **delivered**, or **cancelled**.\n\nOrders can have other optional attributes based on the actions that have been taken (cancellation reason, which items have been exchanged, what was the exchane price difference etc)\n\n## Generic action rules\n\nGenerally, you can only take action on pending or delivered orders.\n\nExchange or modify order tools can only be called once per order. Be sure that all items to be changed are collected into a list before making the tool call!!!\n\n## Cancel pending order\n\nAn order can only be cancelled if its status is 'pending', and you should check its status before taking the action.\n\nThe user needs to confirm the order id and the reason (either 'no longer needed' or 'ordered by mistake') for cancellation. Other reasons are not acceptable.\n\nAfter user confirmation, the order status will be changed to 'cancelled', and the total will be refunded via the original payment method immediately if it is gift card, otherwise in 5 to 7 business days.\n\n## Modify pending order\n\nAn order can only be modified if its status is 'pending', and you should check its status before taking the action.\n\nFor a pending order, you can take actions to modify its shipping address, payment method, or product item options, but nothing else.\n\n### Modify payment\n\nThe user can only choose a single payment method different from the original payment method.\n\nIf the user wants the modify the payment method to gift card, it must have enough balance to cover the total amount.\n\nAfter user confirmation, the order status will be kept as 'pending'. The original payment method will be refunded immediately if it is a gift card, otherwise it will be refunded within 5 to 7 business days.\n\n### Modify items\n\nThis action can only be called once, and will change the order status to 'pending (items modifed)'. The agent will not be able to modify or cancel the order anymore. So you must confirm all the details are correct and be cautious before taking this action. In particular, remember to remind the customer to confirm they have provided all the items they want to modify.\n\nFor a pending order, each item can be modified to an available new item of the same product but of different product option. There cannot be any change of product types, e.g. modify shirt to shoe.\n\nThe user must provide a payment method to pay or receive refund of the price difference. If the user provides a gift card, it must have enough balance to cover the price difference.\n\n## Return delivered order\n\nAn order can only be returned if its status is 'delivered', and you should check its status before taking the action.\n\nThe user needs to confirm the order id and the list of items to be returned.\n\nThe user needs to provide a payment method to receive the refund.\n\nThe refund must either go to the original payment method, or an existing gift card.\n\nAfter user confirmation, the order status will be changed to 'return requested', and the user will receive an email regarding how to return items.\n\n## Exchange delivered order\n\nAn order can only be exchanged if its status is 'delivered', and you should check its status before taking the action. In particular, remember to remind the customer to confirm they have provided all items to be exchanged.\n\nFor a delivered order, each item can be exchanged to an available new item of the same product but of different product option. There cannot be any change of product types, e.g. modify shirt to shoe.\n\nThe user must provide a payment method to pay or receive refund of the price difference. If the user provides a gift card, it must have enough balance to cover the price difference.\n\nAfter user confirmation, the order status will be changed to 'exchange requested', and the user will receive an email regarding how to return items. There is no need to place a new order.\n",
+ "effect_timeline": null
+}
