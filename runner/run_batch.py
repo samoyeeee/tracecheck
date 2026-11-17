@@ -79,6 +79,12 @@ def is_done(path: Path) -> bool:
         return False
 
 
+def is_infra_exception(exc: Exception) -> bool:
+    from runner.gateway import is_overload
+    text = f"{type(exc).__name__}: {exc}"
+    return "RateLimitError" in text or is_overload(text) or "Timeout" in type(exc).__name__
+
+
 def record_crash(path: Path, task_id: str, trial: int, exc: Exception) -> None:
     """Keep a record of a crashed simulation.
 
@@ -87,16 +93,20 @@ def record_crash(path: Path, task_id: str, trial: int, exc: Exception) -> None:
     then counted as a failed run (reward 0) and reported separately - it is
     never silently dropped from the denominator.
     """
-    crashes = 1
+    previous = 0
     if path.exists():
         try:
-            crashes = json.loads(path.read_text()).get("crashes", 0) + 1
+            previous = json.loads(path.read_text()).get("crashes", 0)
         except json.JSONDecodeError:
             pass
+    # Provider congestion / rate limits say nothing about the agent: retry them
+    # forever on resume, never turn them into a counted failure.
+    infra_only = is_infra_exception(exc)
+    crashes = previous if infra_only else previous + 1
     reason = "agent_crash" if crashes >= MAX_CRASHES else INFRA
     path.write_text(json.dumps({
         "task_id": task_id, "trial": trial, "termination_reason": reason,
-        "crashes": crashes, "reward_info": {"reward": 0.0} if reason == "agent_crash" else None,
+        "crashes": crashes, "infra_only": infra_only, "reward_info": {"reward": 0.0} if reason == "agent_crash" else None,
         "info": {"error_type": type(exc).__name__, "error": str(exc)[:2000]}, "messages": [],
     }, indent=1))
 

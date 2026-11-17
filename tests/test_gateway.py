@@ -201,3 +201,25 @@ def test_shards_are_disjoint_and_cover_everything():
     assert shard_tasks(ids, parse_shard(None)) == ids
     with pytest.raises(ValueError):
         parse_shard("2/2")
+
+
+def test_overload_is_retried_long_and_never_counted_as_agent_failure(tmp_path):
+    from runner.gateway import is_overload
+    from runner.run_batch import MAX_CRASHES, record_crash
+    calls = []
+
+    def fn(**kw):
+        calls.append(1)
+        if len(calls) < 4:
+            err = RuntimeError("RateLimitError: 该模型当前访问量过大，请您稍后再试")
+            err.status_code = 429
+            raise err
+        return _ok()
+
+    _gateway(tmp_path, fn).completion(model="m", messages=[])
+    assert len(calls) == 4
+    assert is_overload("code 1305 overloaded") and not is_overload("1304 今日调用次数限额")
+    path = sim_path(tmp_path, "8", 0)
+    for _ in range(MAX_CRASHES + 2):
+        record_crash(path, "8", 0, RuntimeError("RateLimitError: 该模型当前访问量过大"))
+    assert not is_done(path)  # still pending, not a failed run

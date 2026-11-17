@@ -86,6 +86,7 @@ class GatewayConfig:
     judge_model: Optional[str] = None
     max_transient_retries: int = 6
     max_minute_retries: int = 8
+    max_overload_retries: int = 30
     max_malformed_retries: int = 2
     # USD per 1M tokens {model: [input, output]}; empty -> list price "unknown".
     list_prices: dict[str, list[float]] = field(default_factory=dict)
@@ -189,6 +190,14 @@ class RateLimiter:
 
 
 # -- 429 parsing ------------------------------------------------------------
+OVERLOAD = re.compile(r"访问量过大|\b1305\b|overloaded|try again later|稍后再试", re.I)
+
+
+def is_overload(text: str) -> bool:
+    """Provider-side congestion (e.g. Zhipu code 1305), as opposed to a quota limit."""
+    return bool(OVERLOAD.search(text)) and not re.search(r"quotaId|\b1304\b|今日", text)
+
+
 def parse_quota_error(text: str) -> dict:
     """Pull scope ("minute"/"day"), limit and retry delay out of a Gemini 429."""
     info: dict[str, Any] = {"scope": None, "limit": None, "retry_delay": None}
@@ -309,7 +318,7 @@ class Gateway:
             kwargs["messages"] = add_placeholder_signatures(kwargs["messages"])
         args = args[1:] if args else args
 
-        attempts = transient = minute_hits = malformed = 0
+        attempts = transient = minute_hits = malformed = overload_hits = 0
         waited = 0.0
         while True:
             waited += self.limiter.acquire(model)
@@ -328,11 +337,18 @@ class Gateway:
                         self.limiter.mark_exhausted(model)
                         self._log(self._row(requested, model, role, "daily_quota", attempts, waited, start))
                         raise DailyQuotaExhausted(f"{model}: server reports daily quota exhausted. {text[:300]}") from exc
-                    minute_hits += 1
-                    if minute_hits > self.config.max_minute_retries:
-                        self._log(self._row(requested, model, role, "rate_limited", attempts, waited, start))
-                        raise
-                    pause = (info["retry_delay"] or 30.0) + random.uniform(1, 3)
+                    if is_overload(text):  # server busy, not our quota: back off long, retry many times
+                        overload_hits += 1
+                        if overload_hits > self.config.max_overload_retries:
+                            self._log(self._row(requested, model, role, "overloaded", attempts, waited, start))
+                            raise
+                        pause = min(300.0, 15.0 * 2 ** min(overload_hits - 1, 5)) + random.uniform(0, 10)
+                    else:
+                        minute_hits += 1
+                        if minute_hits > self.config.max_minute_retries:
+                            self._log(self._row(requested, model, role, "rate_limited", attempts, waited, start))
+                            raise
+                        pause = (info["retry_delay"] or 30.0) + random.uniform(1, 3)
                 elif "MALFORMED_FUNCTION_CALL" in text:  # checked before 5xx: litellm wraps it as a 500
                     # The model emitted a broken tool call and litellm cannot
                     # parse the response. Retry a little; if it keeps happening
