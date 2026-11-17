@@ -32,3 +32,14 @@ def test_summary_counts_and_reasons():
     assert s["failed_run_reasons"] == {"db_mismatch": 1, "db_ok_but_nl_assertion_failed": 1,
                                        "terminated: max_steps": 1}
     assert s["tasks_by_successes_out_of_k"] == {"0": 0, "1": 0, "2": 1, "3": 0, "4": 1}
+
+
+def test_regression_statistics():
+    import random
+    from eval.eval_regression import holm, sign_flip_p
+    rng = random.Random(0)
+    assert sign_flip_p([0, 0, 0], rng) == 1.0
+    assert sign_flip_p([-1.0] * 12, rng) < 0.01          # consistent drop is significant
+    assert sign_flip_p([1, -1] * 6, rng) > 0.5            # balanced changes are not
+    adj = holm({"a": 0.01, "b": 0.02, "c": 0.5})
+    assert adj == {"a": 0.03, "b": 0.04, "c": 0.5}

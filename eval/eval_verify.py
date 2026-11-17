@@ -209,6 +209,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", required=True)
     ap.add_argument("--apply-review", action="store_true")
+    ap.add_argument("--triage-only", action="store_true",
+                    help="only write results/triage/<tag>.json (used for phase-4 batches)")
     args = ap.parse_args(argv)
     out_path = ROOT / "results" / "eval_verify.json"
     review_json = ROOT / "results" / "false_success_review.json"
@@ -231,6 +233,9 @@ def main(argv=None) -> int:
     triage_dir.mkdir(parents=True, exist_ok=True)
     (triage_dir / f"{args.tag}.json").write_text(
         json.dumps([r.to_dict() for r in reports], indent=1, ensure_ascii=False, default=str))
+    if args.triage_only:
+        print(f"{len(reports)} runs triaged -> results/triage/{args.tag}.json")
+        return 0
 
     result = {"tag": args.tag, "source_files": {
         "runs": f"results/runs/{args.tag}/", "triage": f"results/triage/{args.tag}.json"},
