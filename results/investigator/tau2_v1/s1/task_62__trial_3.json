@@ -1,0 +1,41 @@
+{
+ "prompt_hash": "bd5d268ed5c70de7",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 8,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Instruction/Plan Adherence Failure\",\n  \"evidence\": [\n    {\"step\": 8, \"quote\": \"Great! I found your account. Now I can help you with your order. What specific issue would you like assistance with today?\"},\n    {\"step\": 10, \"prompt\": true, \"quote\": \"To get the specific details about your order and the speaker, I'll need your order ID.\"}\n  ],\n  \"observed_facts\": [\n    \"The agent successfully retrieved the user ID 'chen_johnson_4204' via name and zip code in step 6.\",\n    \"Instead of checking user details to find the user's orders or listing orders, the agent asked the user for their order ID.\",\n    \"The user did not know their order ID and repeatedly asked the agent to look up the product information directly.\",\n    \"The agent repeatedly refused to look up the user's orders without an order ID.\"\n  ],\n  \"inference\": [\n    \"Once authenticated, the agent had access to tools like get_user_details or order lookup tools to find the user's orders without requiring the user to provide an order ID, but failed to do so due to poor planning or instruction adherence.\"\n  ],\n  \"needs_verification\": [\n    \"Whether the agent policy or available tools permit looking up user orders using only the user_id when the order ID is unknown.\"\n  ],\n  \"confidence\": 0.6,\n  \"abstain\": false,\n  \"summary\": \"The agent failed by demanding an order ID from the user after authentication instead of using available user details and lookup tools to find the user's recent orders.\"\n}",
+ "parsed": {
+  "critical_step": 8,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 8,
+    "quote": "Great! I found your account. Now I can help you with your order. What specific issue would you like assistance with today?"
+   },
+   {
+    "step": 10,
+    "prompt": true,
+    "quote": "To get the specific details about your order and the speaker, I'll need your order ID."
+   }
+  ],
+  "observed_facts": [
+   "The agent successfully retrieved the user ID 'chen_johnson_4204' via name and zip code in step 6.",
+   "Instead of checking user details to find the user's orders or listing orders, the agent asked the user for their order ID.",
+   "The user did not know their order ID and repeatedly asked the agent to look up the product information directly.",
+   "The agent repeatedly refused to look up the user's orders without an order ID."
+  ],
+  "inference": [
+   "Once authenticated, the agent had access to tools like get_user_details or order lookup tools to find the user's orders without requiring the user to provide an order ID, but failed to do so due to poor planning or instruction adherence."
+  ],
+  "needs_verification": [
+   "Whether the agent policy or available tools permit looking up user orders using only the user_id when the order ID is unknown."
+  ],
+  "confidence": 0.6,
+  "abstain": false,
+  "summary": "The agent failed by demanding an order ID from the user after authentication instead of using available user details and lookup tools to find the user's recent orders."
+ },
+ "usage": {
+  "prompt_tokens": 4635,
+  "completion_tokens": 393
+ }
+}

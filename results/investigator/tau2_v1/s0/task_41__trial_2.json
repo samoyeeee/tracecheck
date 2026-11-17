@@ -1,0 +1,38 @@
+{
+ "prompt_hash": "4abe1232d2eb3dfd",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n \"critical_step\": 20,\n \"failed_agent\": \"assistant\",\n \"category\": \"Instruction/Plan Adherence Failure\",\n \"evidence\": [\n  {\n   \"step\": 20,\n   \"quote\": \"Do you confirm you want me to update the address to 445 Maple Drive for both orders?\"\n  },\n  {\n   \"step\": \"Reference solution's database-changing actions\",\n   \"quote\": \"modify_user_address: NOT done by the agent\"\n  }\n ],\n \"observed_facts\": [\n  \"The user stated they want to update all order addresses and their user address.\",\n  \"The agent only updated the address for the two pending orders and forgot to call modify_user_address for the user profile.\"\n ],\n \"inference\": [\n  \"The agent failed to follow the user's requirement to update both the order addresses and the user's default address.\"\n ],\n \"needs_verification\": [\n  \"Whether the agent policy explicitly requires updating default user addresses when requested.\"\n ],\n \"confidence\": 0.8,\n \"abstain\": false,\n \"summary\": \"The agent failed to update the user's default address as requested, omitting the necessary modify_user_address tool call.\"\n}",
+ "parsed": {
+  "critical_step": 20,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 20,
+    "quote": "Do you confirm you want me to update the address to 445 Maple Drive for both orders?"
+   },
+   {
+    "step": "Reference solution's database-changing actions",
+    "quote": "modify_user_address: NOT done by the agent"
+   }
+  ],
+  "observed_facts": [
+   "The user stated they want to update all order addresses and their user address.",
+   "The agent only updated the address for the two pending orders and forgot to call modify_user_address for the user profile."
+  ],
+  "inference": [
+   "The agent failed to follow the user's requirement to update both the order addresses and the user's default address."
+  ],
+  "needs_verification": [
+   "Whether the agent policy explicitly requires updating default user addresses when requested."
+  ],
+  "confidence": 0.8,
+  "abstain": false,
+  "summary": "The agent failed to update the user's default address as requested, omitting the necessary modify_user_address tool call."
+ },
+ "usage": {
+  "prompt_tokens": 9946,
+  "completion_tokens": 282
+ }
+}

@@ -1,0 +1,35 @@
+{
+ "prompt_hash": "553fbeadcd129d7b",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 20,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Instruction/Plan Adherence Failure\",\n  \"evidence\": [\n    {\n      \"step\": 20,\n      \"quote\": \"Do you confirm you want me to update the address to 445 Maple Drive for both orders?\"\n    }\n  ],\n  \"observed_facts\": [\n    \"The simulated user wanted to update the order addresses and their user address.\",\n    \"The agent updated the address for both orders #W9583042 and #W4082615 but failed to call modify_user_address to update the user's default address.\",\n    \"The reference solution expects modify_user_address to be called.\"\n  ],\n  \"inference\": [\n    \"The agent forgot to check or update the user's profile address in addition to the order addresses, failing to follow the complete user intent and policy regarding user profile address modification.\"\n  ],\n  \"needs_verification\": [\n    \"Whether the agent's policy explicitly mandates modifying user profile address whenever order addresses are updated.\"\n  ],\n  \"confidence\": 0.6,\n  \"abstain\": false,\n  \"summary\": \"The agent failed to update the user's default profile address alongside the order addresses.\"\n}",
+ "parsed": {
+  "critical_step": 20,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 20,
+    "quote": "Do you confirm you want me to update the address to 445 Maple Drive for both orders?"
+   }
+  ],
+  "observed_facts": [
+   "The simulated user wanted to update the order addresses and their user address.",
+   "The agent updated the address for both orders #W9583042 and #W4082615 but failed to call modify_user_address to update the user's default address.",
+   "The reference solution expects modify_user_address to be called."
+  ],
+  "inference": [
+   "The agent forgot to check or update the user's profile address in addition to the order addresses, failing to follow the complete user intent and policy regarding user profile address modification."
+  ],
+  "needs_verification": [
+   "Whether the agent's policy explicitly mandates modifying user profile address whenever order addresses are updated."
+  ],
+  "confidence": 0.6,
+  "abstain": false,
+  "summary": "The agent failed to update the user's default profile address alongside the order addresses."
+ },
+ "usage": {
+  "prompt_tokens": 9946,
+  "completion_tokens": 300
+ }
+}

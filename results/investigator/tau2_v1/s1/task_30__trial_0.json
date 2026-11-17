@@ -1,0 +1,39 @@
+{
+ "prompt_hash": "033063ab46dc7726",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n \"critical_step\": 26,\n \"failed_agent\": \"assistant\",\n \"category\": \"Instruction/Plan Adherence Failure\",\n \"evidence\": [\n  {\n   \"step\": 26,\n   \"quote\": \"Sneaker - I don't see a sneaker in your order history. Could you provide the order ID for the sneaker?\"\n  },\n  {\n   \"step\": 27,\n   \"quote\": \"Yes, return the tablet and cancel the charger. Like I said, the sneaker is separate.\"\n  }\n],\n \"observed_facts\": [\n  \"The user requested to return the sneaker as part of their initial instructions and reiterated it.\",\n  \"At step 26, the agent falsely claimed it did not see a sneaker in the user's order history and asked for an order ID instead of looking up the correct order from user details.\",\n  \"The reference database check failed because the sneaker order (#W7449508) was never returned.\"\n],\n \"inference\": [\n  \"The agent failed to properly inspect all orders in the user's profile or search for the sneaker product, leading to the omission of the sneaker return from the final set of actions.\"\n],\n \"needs_verification\": [\n  \"Verify whether order #W7449508 contained the sneaker referred to by the user.\"\n],\n \"confidence\": 0.6,\n \"abstain\": false,\n \"summary\": \"The agent failed to locate and process the sneaker return requested by the user due to an adherence/search failure.\"\n}",
+ "parsed": {
+  "critical_step": 26,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 26,
+    "quote": "Sneaker - I don't see a sneaker in your order history. Could you provide the order ID for the sneaker?"
+   },
+   {
+    "step": 27,
+    "quote": "Yes, return the tablet and cancel the charger. Like I said, the sneaker is separate."
+   }
+  ],
+  "observed_facts": [
+   "The user requested to return the sneaker as part of their initial instructions and reiterated it.",
+   "At step 26, the agent falsely claimed it did not see a sneaker in the user's order history and asked for an order ID instead of looking up the correct order from user details.",
+   "The reference database check failed because the sneaker order (#W7449508) was never returned."
+  ],
+  "inference": [
+   "The agent failed to properly inspect all orders in the user's profile or search for the sneaker product, leading to the omission of the sneaker return from the final set of actions."
+  ],
+  "needs_verification": [
+   "Verify whether order #W7449508 contained the sneaker referred to by the user."
+  ],
+  "confidence": 0.6,
+  "abstain": false,
+  "summary": "The agent failed to locate and process the sneaker return requested by the user due to an adherence/search failure."
+ },
+ "usage": {
+  "prompt_tokens": 8646,
+  "completion_tokens": 347
+ }
+}

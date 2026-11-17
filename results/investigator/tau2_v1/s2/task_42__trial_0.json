@@ -1,0 +1,38 @@
+{
+ "prompt_hash": "886264fdf6e435ab",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n \"critical_step\": 13,\n \"failed_agent\": \"user\",\n \"category\": \"Underspecified User Intent\",\n \"evidence\": [\n  {\n   \"step\": 1,\n   \"quote\": \"I just made an order, but I think I typed my address wrong. Can you help me check that? Like I said, I'm Mei Patel.\"\n  },\n  {\n   \"step\": 13,\n   \"quote\": \"I think I typed the address wrong for the jigsaw order. That's the one I'm worried about. Can you just change the address on that order to 445 Maple Drive\"\n  }\n],\n \"observed_facts\": [\n  \"The user wanted to update the addresses of all orders and their user profile to 445 Maple Drive, but only explicitly asked to change the address for the jigsaw order (#W4082615).\",\n  \"The agent updated the address and items for order #W4082615 as requested, but never modified the address for the other order (#W9583042) or the user profile.\"\n ],\n \"inference\": [\n  \"Because the user's initial instructions were ambiguous and focused primarily on the jigsaw order, the agent failed to realize that the user also intended to update all other orders and the default user address.\"\n ],\n \"needs_verification\": [\n  \"Whether the agent should have proactively asked to update all orders and the profile address when the user mentioned their address was typed wrong globally.\"\n ],\n \"confidence\": 0.5,\n \"abstain\": false,\n \"summary\": \"The user's intent to update all orders and their user profile address was underspecified, leading the agent to only update the single mentioned jigsaw order.\"\n}",
+ "parsed": {
+  "critical_step": 13,
+  "failed_agent": "user",
+  "category": "Underspecified User Intent",
+  "evidence": [
+   {
+    "step": 1,
+    "quote": "I just made an order, but I think I typed my address wrong. Can you help me check that? Like I said, I'm Mei Patel."
+   },
+   {
+    "step": 13,
+    "quote": "I think I typed the address wrong for the jigsaw order. That's the one I'm worried about. Can you just change the address on that order to 445 Maple Drive"
+   }
+  ],
+  "observed_facts": [
+   "The user wanted to update the addresses of all orders and their user profile to 445 Maple Drive, but only explicitly asked to change the address for the jigsaw order (#W4082615).",
+   "The agent updated the address and items for order #W4082615 as requested, but never modified the address for the other order (#W9583042) or the user profile."
+  ],
+  "inference": [
+   "Because the user's initial instructions were ambiguous and focused primarily on the jigsaw order, the agent failed to realize that the user also intended to update all other orders and the default user address."
+  ],
+  "needs_verification": [
+   "Whether the agent should have proactively asked to update all orders and the profile address when the user mentioned their address was typed wrong globally."
+  ],
+  "confidence": 0.5,
+  "abstain": false,
+  "summary": "The user's intent to update all orders and their user profile address was underspecified, leading the agent to only update the single mentioned jigsaw order."
+ },
+ "usage": {
+  "prompt_tokens": 10536,
+  "completion_tokens": 397
+ }
+}

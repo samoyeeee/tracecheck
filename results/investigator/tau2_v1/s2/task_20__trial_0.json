@@ -1,0 +1,38 @@
+{
+ "prompt_hash": "f0d30f666ef11904",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 20,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Instruction/Plan Adherence Failure\",\n  \"evidence\": [\n    {\n      \"step\": 10,\n      \"quote\": \"Could you tell me which order number you're interested in upgrading, or would you like me to show you the details of all your orders first?\"\n    },\n    {\n      \"step\": 20,\n      \"quote\": \"Great news! I found one order that's still in pending status and can be upgraded: Order #W9911714\"\n    }\n  ],\n  \"observed_facts\": [\n    \"The user wanted to upgrade all items across their orders to the most expensive variants.\",\n    \"The agent only inspected and upgraded items in order #W9911714, completely missing that there were multiple orders (#W4967593, #W9911714, #W5733668) and multiple items within order #W9911714 that could have been checked and upgraded.\"\n  ],\n  \"inference\": [\n    \"The agent failed to follow the user's overarching goal of upgrading all possible items, stopping after modifying just a single item in one order.\"\n  ],\n  \"needs_verification\": [\n    \"Whether the agent should have checked product details for all items in all pending/eligible orders before modifying.\"\n  ],\n  \"confidence\": 0.5,\n  \"abstain\": false,\n  \"summary\": \"The agent failed to upgrade all items as requested by the user, stopping prematurely after modifying only a single item in one order.\"\n}",
+ "parsed": {
+  "critical_step": 20,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 10,
+    "quote": "Could you tell me which order number you're interested in upgrading, or would you like me to show you the details of all your orders first?"
+   },
+   {
+    "step": 20,
+    "quote": "Great news! I found one order that's still in pending status and can be upgraded: Order #W9911714"
+   }
+  ],
+  "observed_facts": [
+   "The user wanted to upgrade all items across their orders to the most expensive variants.",
+   "The agent only inspected and upgraded items in order #W9911714, completely missing that there were multiple orders (#W4967593, #W9911714, #W5733668) and multiple items within order #W9911714 that could have been checked and upgraded."
+  ],
+  "inference": [
+   "The agent failed to follow the user's overarching goal of upgrading all possible items, stopping after modifying just a single item in one order."
+  ],
+  "needs_verification": [
+   "Whether the agent should have checked product details for all items in all pending/eligible orders before modifying."
+  ],
+  "confidence": 0.5,
+  "abstain": false,
+  "summary": "The agent failed to upgrade all items as requested by the user, stopping prematurely after modifying only a single item in one order."
+ },
+ "usage": {
+  "prompt_tokens": 8998,
+  "completion_tokens": 382
+ }
+}

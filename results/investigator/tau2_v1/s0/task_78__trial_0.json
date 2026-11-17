@@ -1,0 +1,44 @@
+{
+ "prompt_hash": "4d692f2858df41b2",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 20,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Instruction/Plan Adherence Failure\",\n  \"evidence\": [\n    {\n      \"step\": 1,\n      \"quote\": \"First, I need to change the address on order #W5056519. It needs to be the same as order #W8277957.\"\n    },\n    {\n      \"step\": 20,\n      \"quote\": \"Is there anything else I can help you with today?\"\n    },\n    {\n      \"step\": 21,\n      \"quote\": \"No, that's all. Like I said, I need this fixed today. Thank you.\"\n    }\n  ],\n  \"observed_facts\": [\n    \"The user stated multiple requests at the beginning: modify address for order #W5056519, exchange items for order #W5056519, and cancel order #W5995614.\",\n    \"The agent handled the address change and item exchange for order #W5056519.\",\n    \"The agent completely missed the user's request to cancel order #W5995614 and instead asked if there was anything else, leading the user to finish the conversation prematurely.\",\n    \"The automated check shows order #W5995614 was left pending and uncancelled.\"\n  ],\n  \"inference\": [\n    \"The agent failed to keep track of all user requests mentioned in the initial prompt and forgot to process the cancellation of order #W5995614.\"\n  ],\n  \"needs_verification\": [\n    \"Whether the agent noticed order #W5995614 later or simply dropped the instruction due to conversation length/complexity.\"\n  ],\n  \"confidence\": 0.9,\n  \"abstain\": false,\n  \"summary\": \"The agent failed to follow the user's plan by completely omitting the cancellation request for order #W5995614 before concluding the conversation.\"\n}",
+ "parsed": {
+  "critical_step": 20,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 1,
+    "quote": "First, I need to change the address on order #W5056519. It needs to be the same as order #W8277957."
+   },
+   {
+    "step": 20,
+    "quote": "Is there anything else I can help you with today?"
+   },
+   {
+    "step": 21,
+    "quote": "No, that's all. Like I said, I need this fixed today. Thank you."
+   }
+  ],
+  "observed_facts": [
+   "The user stated multiple requests at the beginning: modify address for order #W5056519, exchange items for order #W5056519, and cancel order #W5995614.",
+   "The agent handled the address change and item exchange for order #W5056519.",
+   "The agent completely missed the user's request to cancel order #W5995614 and instead asked if there was anything else, leading the user to finish the conversation prematurely.",
+   "The automated check shows order #W5995614 was left pending and uncancelled."
+  ],
+  "inference": [
+   "The agent failed to keep track of all user requests mentioned in the initial prompt and forgot to process the cancellation of order #W5995614."
+  ],
+  "needs_verification": [
+   "Whether the agent noticed order #W5995614 later or simply dropped the instruction due to conversation length/complexity."
+  ],
+  "confidence": 0.9,
+  "abstain": false,
+  "summary": "The agent failed to follow the user's plan by completely omitting the cancellation request for order #W5995614 before concluding the conversation."
+ },
+ "usage": {
+  "prompt_tokens": 7295,
+  "completion_tokens": 473
+ }
+}

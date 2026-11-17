@@ -1,0 +1,39 @@
+{
+ "prompt_hash": "749ffe70852aaefa",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 8,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Instruction/Plan Adherence Failure\",\n  \"evidence\": [\n    {\"step\": 8, \"quote\": \"Great! I found your account. Now I can help you with your order. What specific issue would you like assistance with today?\"},\n    {\"step\": 10, \"prompt\": true, \"quote\": \"To get the specific details about your order and the speaker, I'll need your order ID.\"}\n  ],\n  \"observed_facts\": [\n    \"The user authenticated via name and zip code, resulting in user ID chen_johnson_4204.\",\n    \"The agent did not check the user's orders using get_user_details or list orders after authentication, instead asking the user for their order ID.\"\n  ],\n    \"inference\": [\"Had the agent checked the user's details or orders after finding the user ID, it could have automatically located the relevant order and answered the user's questions about the bluetooth speaker without demanding the order ID.\"],\n  \"needs_verification\": [\"Check if the agent policy or available tools allowed looking up user orders once the user ID was known.\"],\n  \"confidence\": 0.6,\n  \"abstain\": false,\n  \"summary\": \"The agent failed to look up the user's order information after authentication and repeatedly insisted on the user providing an order ID instead.\"\n}",
+ "parsed": {
+  "critical_step": 8,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 8,
+    "quote": "Great! I found your account. Now I can help you with your order. What specific issue would you like assistance with today?"
+   },
+   {
+    "step": 10,
+    "prompt": true,
+    "quote": "To get the specific details about your order and the speaker, I'll need your order ID."
+   }
+  ],
+  "observed_facts": [
+   "The user authenticated via name and zip code, resulting in user ID chen_johnson_4204.",
+   "The agent did not check the user's orders using get_user_details or list orders after authentication, instead asking the user for their order ID."
+  ],
+  "inference": [
+   "Had the agent checked the user's details or orders after finding the user ID, it could have automatically located the relevant order and answered the user's questions about the bluetooth speaker without demanding the order ID."
+  ],
+  "needs_verification": [
+   "Check if the agent policy or available tools allowed looking up user orders once the user ID was known."
+  ],
+  "confidence": 0.6,
+  "abstain": false,
+  "summary": "The agent failed to look up the user's order information after authentication and repeatedly insisted on the user providing an order ID instead."
+ },
+ "usage": {
+  "prompt_tokens": 4635,
+  "completion_tokens": 321
+ }
+}

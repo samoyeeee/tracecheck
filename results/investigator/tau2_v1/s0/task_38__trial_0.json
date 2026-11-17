@@ -1,0 +1,38 @@
+{
+ "prompt_hash": "907dc53c6dd6e494",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\"critical_step\": 14, \"failed_agent\": \"assistant\", \"category\": \"Intent-Plan Misalignment\", \"evidence\": [{\"step\": 1, \"quote\": \"Can we split the payment?\"}, {\"step\": 14, \"quote\": \"Here are your options: 1. Add funds... 2. Use a different... 3. Cancel the order...\"}], \"observed_facts\": [\"The user asked about splitting payment, or finding the most expensive item to cancel, or switching items to cheaper options, before resorting to cancelling the order.\", \"The agent skipped exploring the user's alternative queries regarding the most expensive item or switching items to cheaper options, jumping directly to cancellation.\"], \"inference\": [\"The agent failed to follow the user's multi-step fallback plan (checking the most expensive item/cancelling that item, or switching to cheapest options) as outlined in the user's intent, leading to an incomplete exploration before order cancellation.\"], \"needs_verification\": [\"Whether the policy required exploring item-level modifications before cancellation if requested by the user.\"], \"confidence\": 0.5, \"abstain\": false, \"summary\": \"The agent failed to address the user's intermediate options (finding the most expensive item or switching to cheaper options) and prematurely offered cancellation as the only next step.\"}",
+ "parsed": {
+  "critical_step": 14,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 1,
+    "quote": "Can we split the payment?"
+   },
+   {
+    "step": 14,
+    "quote": "Here are your options: 1. Add funds... 2. Use a different... 3. Cancel the order..."
+   }
+  ],
+  "observed_facts": [
+   "The user asked about splitting payment, or finding the most expensive item to cancel, or switching items to cheaper options, before resorting to cancelling the order.",
+   "The agent skipped exploring the user's alternative queries regarding the most expensive item or switching items to cheaper options, jumping directly to cancellation."
+  ],
+  "inference": [
+   "The agent failed to follow the user's multi-step fallback plan (checking the most expensive item/cancelling that item, or switching to cheapest options) as outlined in the user's intent, leading to an incomplete exploration before order cancellation."
+  ],
+  "needs_verification": [
+   "Whether the policy required exploring item-level modifications before cancellation if requested by the user."
+  ],
+  "confidence": 0.5,
+  "abstain": false,
+  "summary": "The agent failed to address the user's intermediate options (finding the most expensive item or switching to cheaper options) and prematurely offered cancellation as the only next step."
+ },
+ "usage": {
+  "prompt_tokens": 5829,
+  "completion_tokens": 277
+ }
+}

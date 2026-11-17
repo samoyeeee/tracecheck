@@ -1,0 +1,60 @@
+{
+ "prompt_hash": "145e5dc5f247f343",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n \"critical_step\": 20,\n \"failed_agent\": \"assistant\",\n \"category\": \"Instruction/Plan Adherence Failure\",\n \"evidence\": [\n  {\n   \"step\": 20,\n   \"agent\": \"assistant\",\n   \"quote\": \"Great news! I found one order that's still in pending status and can be upgraded: Order #W9911714\"\n  },\n  {\n   \"step\": 21,\n   \"user\": \"user\",\n   \"quote\": \"Okay, so I can upgrade the running shoes then. Yeah, I want to get the most expensive version available.\"\n  }\n],\n \"observed_facts\": [\n  {\n   \"step\": 10,\n   \"fact\": \"The user had three orders: #W4967593, #W9911714, and #W5733668.\"\n  },\n  {\n   \"step\": 14,\n   \"fact\": \"Order #W5733668 was processed and could not be modified.\"\n  },\n  {\n   \"step\": 17,\n   \"fact\": \"Order #W4967593 was processed and could not be modified.\"\n  },\n  {\n   \"step\": 28,\n   \"fact\": \"The agent only upgraded the running shoes on order #W9911714 instead of upgrading all items across all eligible orders as requested by the user.\"\n  }\n],\n \"inference\": [\n  {\n   \"step\": 20,\n   \"inference\": \"The agent failed to check the other orders or assumed only one item/order needed upgrading, stopping after the first available pending order and ignoring the user's overall goal to upgrade all items.\"\n  }\n],\n \"needs_verification\": [\n  {\n   \"step\": 20,\n   \"verification\": \"Whether the agent should have checked all pending orders and all items in them before proceeding with modifications.\"\n  }\n],\n \"confidence\": 0.6,\n \"abstain\": false,\n \"summary\": \"The agent failed to follow the user's intent to upgrade all items across all eligible orders, stopping after modifying only a single item in one pending order.\"\n}",
+ "parsed": {
+  "critical_step": 20,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 20,
+    "agent": "assistant",
+    "quote": "Great news! I found one order that's still in pending status and can be upgraded: Order #W9911714"
+   },
+   {
+    "step": 21,
+    "user": "user",
+    "quote": "Okay, so I can upgrade the running shoes then. Yeah, I want to get the most expensive version available."
+   }
+  ],
+  "observed_facts": [
+   {
+    "step": 10,
+    "fact": "The user had three orders: #W4967593, #W9911714, and #W5733668."
+   },
+   {
+    "step": 14,
+    "fact": "Order #W5733668 was processed and could not be modified."
+   },
+   {
+    "step": 17,
+    "fact": "Order #W4967593 was processed and could not be modified."
+   },
+   {
+    "step": 28,
+    "fact": "The agent only upgraded the running shoes on order #W9911714 instead of upgrading all items across all eligible orders as requested by the user."
+   }
+  ],
+  "inference": [
+   {
+    "step": 20,
+    "inference": "The agent failed to check the other orders or assumed only one item/order needed upgrading, stopping after the first available pending order and ignoring the user's overall goal to upgrade all items."
+   }
+  ],
+  "needs_verification": [
+   {
+    "step": 20,
+    "verification": "Whether the agent should have checked all pending orders and all items in them before proceeding with modifications."
+   }
+  ],
+  "confidence": 0.6,
+  "abstain": false,
+  "summary": "The agent failed to follow the user's intent to upgrade all items across all eligible orders, stopping after modifying only a single item in one pending order."
+ },
+ "usage": {
+  "prompt_tokens": 8998,
+  "completion_tokens": 518
+ }
+}

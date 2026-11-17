@@ -1,0 +1,38 @@
+{
+ "prompt_hash": "0245fd9fc1baca03",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 14,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Intent-Plan Misalignment\",\n  \"evidence\": [\n    {\n      \"step\": 1,\n      \"quote\": \"If not, you wonder what the most expensive item and its price, and if you can just cancel that item.\"\n    },\n    {\n      \"step\": 14,\n      \"quote\": \"Here are your options:\\n\\n1. Add funds to your existing card\\n2. Use a different payment method\\n3. Cancel the order\"\n    }\n  ],\n  \"observed_facts\": [\n    \"The user mentioned multiple conditional alternatives in their initial instructions, including checking the most expensive item or cancelling an item.\",\n    \"The agent jumped straight to options like adding funds, changing payment method, or cancelling the entire order, ignoring the intermediate fallback options requested by the user.\"\n  ],\n  \"inference\": [\n    \"The agent failed to address the user's multi-step contingency plan regarding checking the most expensive item or cancelling a single item before resorting to full order cancellation.\"\n  ],\n  \"needs_verification\": [\n    \"Whether the policy required the agent to present item-level cancellation or if the user's direct request to cancel at step 15 resolved the issue.\"\n  ],\n  \"confidence\": 0.5,\n  \"abstain\": false,\n  \"summary\": \"The agent failed to properly follow up on the user's conditional request regarding the most expensive item and single item cancellation options before moving to full order cancellation.\"\n}",
+ "parsed": {
+  "critical_step": 14,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 1,
+    "quote": "If not, you wonder what the most expensive item and its price, and if you can just cancel that item."
+   },
+   {
+    "step": 14,
+    "quote": "Here are your options:\n\n1. Add funds to your existing card\n2. Use a different payment method\n3. Cancel the order"
+   }
+  ],
+  "observed_facts": [
+   "The user mentioned multiple conditional alternatives in their initial instructions, including checking the most expensive item or cancelling an item.",
+   "The agent jumped straight to options like adding funds, changing payment method, or cancelling the entire order, ignoring the intermediate fallback options requested by the user."
+  ],
+  "inference": [
+   "The agent failed to address the user's multi-step contingency plan regarding checking the most expensive item or cancelling a single item before resorting to full order cancellation."
+  ],
+  "needs_verification": [
+   "Whether the policy required the agent to present item-level cancellation or if the user's direct request to cancel at step 15 resolved the issue."
+  ],
+  "confidence": 0.5,
+  "abstain": false,
+  "summary": "The agent failed to properly follow up on the user's conditional request regarding the most expensive item and single item cancellation options before moving to full order cancellation."
+ },
+ "usage": {
+  "prompt_tokens": 5829,
+  "completion_tokens": 355
+ }
+}

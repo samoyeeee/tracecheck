@@ -1,0 +1,40 @@
+{
+ "prompt_hash": "b9e6504215ac8d8f",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\n  \"critical_step\": 8,\n  \"failed_agent\": \"assistant\",\n  \"category\": \"Instruction/Plan Adherence Failure\",\n  \"evidence\": [\n    {\"step\": 8, \"quote\": \"Great! I found your account. Now I can help you with your order. What specific issue would you like assistance with today?\"},\n    {\"step\": 10, \"prompt\": true, \"quote\": \"To get the specific details about your order and the speaker, I'll need your order ID.\"}\n  ],\n  \"observed_facts\": [\n    \"The user was authenticated successfully in step 6 and step 7.\",\n    \"The user did not know the order ID in step 9 and step 11.\",\n    \"The agent failed to use available tools (like get_user_details) to find the user's orders after authentication, instead repeatedly demanding an order ID.\"\n  ],\n    \"inference\": [\"Once the user was authenticated, the agent should have checked the user's profile and orders using available tools rather than insisting the user provide an order ID they did not have.\"],\n  \"needs_verification\": [\"Whether the agent policy or available tools permit listing user orders given only the user ID.\"],\n  \"confidence\": 0.6,\n  \"abstain\": false,\n  \"summary\": \"The agent failed to look up the user's orders after authentication, incorrectly demanding an order ID that the user did not have.\"\n}",
+ "parsed": {
+  "critical_step": 8,
+  "failed_agent": "assistant",
+  "category": "Instruction/Plan Adherence Failure",
+  "evidence": [
+   {
+    "step": 8,
+    "quote": "Great! I found your account. Now I can help you with your order. What specific issue would you like assistance with today?"
+   },
+   {
+    "step": 10,
+    "prompt": true,
+    "quote": "To get the specific details about your order and the speaker, I'll need your order ID."
+   }
+  ],
+  "observed_facts": [
+   "The user was authenticated successfully in step 6 and step 7.",
+   "The user did not know the order ID in step 9 and step 11.",
+   "The agent failed to use available tools (like get_user_details) to find the user's orders after authentication, instead repeatedly demanding an order ID."
+  ],
+  "inference": [
+   "Once the user was authenticated, the agent should have checked the user's profile and orders using available tools rather than insisting the user provide an order ID they did not have."
+  ],
+  "needs_verification": [
+   "Whether the agent policy or available tools permit listing user orders given only the user ID."
+  ],
+  "confidence": 0.6,
+  "abstain": false,
+  "summary": "The agent failed to look up the user's orders after authentication, incorrectly demanding an order ID that the user did not have."
+ },
+ "usage": {
+  "prompt_tokens": 4635,
+  "completion_tokens": 323
+ }
+}
