@@ -1,0 +1,1374 @@
+{
+ "plan": "results/regression_plan.json",
+ "alpha": 0.05,
+ "permutations": 20000,
+ "pass_hat": {
+  "v1": {
+   "tasks": 114,
+   "tasks_with_k_trials": 114,
+   "runs": 456,
+   "pass^1": 0.3443,
+   "pass^2": 0.2412,
+   "pass^3": 0.1908,
+   "pass^4": 0.1579
+  },
+  "bug_auth": {
+   "tasks": 20,
+   "tasks_with_k_trials": 20,
+   "runs": 80,
+   "pass^1": 0.3125,
+   "pass^2": 0.275,
+   "pass^3": 0.2625,
+   "pass^4": 0.25
+  },
+  "bug_transfer": {
+   "tasks": 20,
+   "tasks_with_k_trials": 20,
+   "runs": 80,
+   "pass^1": 0.2875,
+   "pass^2": 0.2333,
+   "pass^3": 0.2125,
+   "pass^4": 0.2
+  },
+  "bug_noconfirm": {
+   "tasks": 20,
+   "tasks_with_k_trials": 20,
+   "runs": 80,
+   "pass^1": 0.2375,
+   "pass^2": 0.175,
+   "pass^3": 0.1625,
+   "pass^4": 0.15
+  },
+  "bug_param": {
+   "tasks": 20,
+   "tasks_with_k_trials": 20,
+   "runs": 80,
+   "pass^1": 0.225,
+   "pass^2": 0.1417,
+   "pass^3": 0.1125,
+   "pass^4": 0.1
+  },
+  "v1_rerun": {
+   "tasks": 114,
+   "tasks_with_k_trials": 114,
+   "runs": 456,
+   "pass^1": 0.3311,
+   "pass^2": 0.2427,
+   "pass^3": 0.2039,
+   "pass^4": 0.1754
+  },
+  "v2": {
+   "tasks": 114,
+   "tasks_with_k_trials": 114,
+   "runs": 456,
+   "pass^1": 0.3092,
+   "pass^2": 0.2266,
+   "pass^3": 0.1886,
+   "pass^4": 0.1667
+  }
+ },
+ "bugs": {
+  "bug_auth": {
+   "description": "Bug 1 (policy rule deleted): the authentication rule is removed from the policy.",
+   "tasks": [
+    "0",
+    "2",
+    "11",
+    "12",
+    "17",
+    "22",
+    "42",
+    "50",
+    "51",
+    "61",
+    "66",
+    "68",
+    "74",
+    "76",
+    "83",
+    "84",
+    "85",
+    "87",
+    "107",
+    "112"
+   ],
+   "expected_signature_rule": "policy_authenticate_first",
+   "detected": false,
+   "localised": false,
+   "worse_metrics": {},
+   "signature_metric": {
+    "base_rate": 0.0125,
+    "other_rate": 0.2,
+    "diff": 0.1875,
+    "p": 0.0921,
+    "p_holm": 1.0,
+    "significant": false,
+    "direction": "worse"
+   },
+   "success": {
+    "base_rate": 0.4125,
+    "other_rate": 0.3125,
+    "diff": -0.1,
+    "p": 0.2329,
+    "p_holm": 1.0,
+    "significant": false,
+    "direction": "worse"
+   },
+   "runs": 80,
+   "comparison": {
+    "tasks": 20,
+    "metrics_tested": 20,
+    "significant": {},
+    "success": {
+     "base_rate": 0.4125,
+     "other_rate": 0.3125,
+     "diff": -0.1,
+     "p": 0.2329,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "all_metrics": {
+     "abnormal_termination": {
+      "base_rate": 0.0,
+      "other_rate": 0.025,
+      "diff": 0.025,
+      "p": 0.5041,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_claimed_before_executed": {
+      "base_rate": 0.0,
+      "other_rate": 0.0125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_executed_but_differs": {
+      "base_rate": 0.1125,
+      "other_rate": 0.0875,
+      "diff": -0.025,
+      "p": 0.6237,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_not_executed": {
+      "base_rate": 0.0,
+      "other_rate": 0.025,
+      "diff": 0.025,
+      "p": 0.4976,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_unrequested_change": {
+      "base_rate": 0.075,
+      "other_rate": 0.0625,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_unverifiable": {
+      "base_rate": 0.15,
+      "other_rate": 0.1,
+      "diff": -0.05,
+      "p": 0.291,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_wrong_action": {
+      "base_rate": 0.0125,
+      "other_rate": 0.025,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_authenticate_first": {
+      "base_rate": 0.0125,
+      "other_rate": 0.2,
+      "diff": 0.1875,
+      "p": 0.0921,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_check_status_first": {
+      "base_rate": 0.0,
+      "other_rate": 0.0,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "policy_confirm_before_write": {
+      "base_rate": 0.05,
+      "other_rate": 0.0375,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_list_details_before_write": {
+      "base_rate": 0.0375,
+      "other_rate": 0.025,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_once_per_order": {
+      "base_rate": 0.0,
+      "other_rate": 0.0,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "policy_one_action_per_turn": {
+      "base_rate": 0.9,
+      "other_rate": 0.9125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_return_refund_method": {
+      "base_rate": 0.05,
+      "other_rate": 0.125,
+      "diff": 0.075,
+      "p": 0.2519,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_transfer_message": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_wrong_order_status": {
+      "base_rate": 0.0,
+      "other_rate": 0.0125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "repeated_call": {
+      "base_rate": 0.0,
+      "other_rate": 0.0,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "success": {
+      "base_rate": 0.4125,
+      "other_rate": 0.3125,
+      "diff": -0.1,
+      "p": 0.2329,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "tool_error": {
+      "base_rate": 0.1375,
+      "other_rate": 0.2375,
+      "diff": 0.1,
+      "p": 0.2787,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "transfer_to_human": {
+      "base_rate": 0.4,
+      "other_rate": 0.525,
+      "diff": 0.125,
+      "p": 0.2117,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     }
+    }
+   }
+  },
+  "bug_transfer": {
+   "description": "Bug 2 (vague tool description): transfer_to_human_agents loses its 'only transfer if' conditions.",
+   "tasks": [
+    "5",
+    "9",
+    "18",
+    "20",
+    "25",
+    "27",
+    "29",
+    "37",
+    "38",
+    "41",
+    "46",
+    "56",
+    "68",
+    "73",
+    "75",
+    "79",
+    "88",
+    "97",
+    "99",
+    "108"
+   ],
+   "expected_signature_rule": "transfer_to_human",
+   "detected": false,
+   "localised": false,
+   "worse_metrics": {},
+   "signature_metric": {
+    "base_rate": 0.275,
+    "other_rate": 0.325,
+    "diff": 0.05,
+    "p": 0.4939,
+    "p_holm": 1.0,
+    "significant": false,
+    "direction": "worse"
+   },
+   "success": {
+    "base_rate": 0.3,
+    "other_rate": 0.2875,
+    "diff": -0.0125,
+    "p": 1.0,
+    "p_holm": 1.0,
+    "significant": false,
+    "direction": "worse"
+   },
+   "runs": 80,
+   "comparison": {
+    "tasks": 20,
+    "metrics_tested": 20,
+    "significant": {},
+    "success": {
+     "base_rate": 0.3,
+     "other_rate": 0.2875,
+     "diff": -0.0125,
+     "p": 1.0,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "all_metrics": {
+     "abnormal_termination": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_claimed_before_executed": {
+      "base_rate": 0.0,
+      "other_rate": 0.0125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_executed_but_differs": {
+      "base_rate": 0.3,
+      "other_rate": 0.3125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_not_executed": {
+      "base_rate": 0.0,
+      "other_rate": 0.0125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_unrequested_change": {
+      "base_rate": 0.075,
+      "other_rate": 0.05,
+      "diff": -0.025,
+      "p": 0.4982,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_unverifiable": {
+      "base_rate": 0.1875,
+      "other_rate": 0.225,
+      "diff": 0.0375,
+      "p": 0.5114,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_wrong_action": {
+      "base_rate": 0.1125,
+      "other_rate": 0.1125,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "policy_authenticate_first": {
+      "base_rate": 0.025,
+      "other_rate": 0.0125,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_check_status_first": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_confirm_before_write": {
+      "base_rate": 0.1375,
+      "other_rate": 0.125,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_list_details_before_write": {
+      "base_rate": 0.0875,
+      "other_rate": 0.075,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_once_per_order": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0375,
+      "diff": 0.025,
+      "p": 0.7476,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_one_action_per_turn": {
+      "base_rate": 0.8875,
+      "other_rate": 0.8625,
+      "diff": -0.025,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_return_refund_method": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_transfer_message": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0125,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "policy_wrong_order_status": {
+      "base_rate": 0.0,
+      "other_rate": 0.0125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "repeated_call": {
+      "base_rate": 0.0,
+      "other_rate": 0.0125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "success": {
+      "base_rate": 0.3,
+      "other_rate": 0.2875,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "tool_error": {
+      "base_rate": 0.3,
+      "other_rate": 0.3,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "transfer_to_human": {
+      "base_rate": 0.275,
+      "other_rate": 0.325,
+      "diff": 0.05,
+      "p": 0.4939,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     }
+    }
+   }
+  },
+  "bug_noconfirm": {
+   "description": "Bug 3 (confirmation requirement removed): the 'confirm before writing' rule is deleted from the system prompt (the policy sentence and the same sentence in our instructions). Tool descriptions, written by the tool provider, still mention it.",
+   "tasks": [
+    "3",
+    "6",
+    "14",
+    "16",
+    "22",
+    "31",
+    "38",
+    "41",
+    "45",
+    "54",
+    "60",
+    "63",
+    "74",
+    "76",
+    "80",
+    "87",
+    "99",
+    "103",
+    "107",
+    "109"
+   ],
+   "expected_signature_rule": "policy_confirm_before_write",
+   "detected": false,
+   "localised": false,
+   "worse_metrics": {},
+   "signature_metric": {
+    "base_rate": 0.1375,
+    "other_rate": 0.2,
+    "diff": 0.0625,
+    "p": 0.4021,
+    "p_holm": 1.0,
+    "significant": false,
+    "direction": "worse"
+   },
+   "success": {
+    "base_rate": 0.2375,
+    "other_rate": 0.2375,
+    "diff": 0.0,
+    "p": 1.0,
+    "p_holm": 1.0,
+    "significant": false,
+    "direction": "same"
+   },
+   "runs": 80,
+   "comparison": {
+    "tasks": 20,
+    "metrics_tested": 20,
+    "significant": {},
+    "success": {
+     "base_rate": 0.2375,
+     "other_rate": 0.2375,
+     "diff": 0.0,
+     "p": 1.0,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "same"
+    },
+    "all_metrics": {
+     "abnormal_termination": {
+      "base_rate": 0.0,
+      "other_rate": 0.025,
+      "diff": 0.025,
+      "p": 0.5028,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_claimed_before_executed": {
+      "base_rate": 0.0,
+      "other_rate": 0.0125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_executed_but_differs": {
+      "base_rate": 0.275,
+      "other_rate": 0.2125,
+      "diff": -0.0625,
+      "p": 0.4302,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_not_executed": {
+      "base_rate": 0.0,
+      "other_rate": 0.0375,
+      "diff": 0.0375,
+      "p": 0.2523,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_unrequested_change": {
+      "base_rate": 0.15,
+      "other_rate": 0.125,
+      "diff": -0.025,
+      "p": 0.8153,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_unverifiable": {
+      "base_rate": 0.25,
+      "other_rate": 0.2375,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_wrong_action": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0625,
+      "diff": 0.05,
+      "p": 0.3108,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_authenticate_first": {
+      "base_rate": 0.0125,
+      "other_rate": 0.025,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_check_status_first": {
+      "base_rate": 0.0,
+      "other_rate": 0.0,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "policy_confirm_before_write": {
+      "base_rate": 0.1375,
+      "other_rate": 0.2,
+      "diff": 0.0625,
+      "p": 0.4021,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_list_details_before_write": {
+      "base_rate": 0.075,
+      "other_rate": 0.1625,
+      "diff": 0.0875,
+      "p": 0.2197,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_once_per_order": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_one_action_per_turn": {
+      "base_rate": 0.975,
+      "other_rate": 0.9875,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_return_refund_method": {
+      "base_rate": 0.0,
+      "other_rate": 0.0,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "policy_transfer_message": {
+      "base_rate": 0.0,
+      "other_rate": 0.0,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "policy_wrong_order_status": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0125,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "repeated_call": {
+      "base_rate": 0.0,
+      "other_rate": 0.0,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "success": {
+      "base_rate": 0.2375,
+      "other_rate": 0.2375,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "tool_error": {
+      "base_rate": 0.225,
+      "other_rate": 0.2125,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "transfer_to_human": {
+      "base_rate": 0.325,
+      "other_rate": 0.275,
+      "diff": -0.05,
+      "p": 0.3407,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     }
+    }
+   }
+  },
+  "bug_param": {
+   "description": "Bug 4 (wrong parameter description): modify_pending_order_items.new_item_ids is described as product ids instead of item ids.",
+   "tasks": [
+    "4",
+    "15",
+    "21",
+    "35",
+    "36",
+    "37",
+    "41",
+    "44",
+    "56",
+    "60",
+    "61",
+    "64",
+    "85",
+    "86",
+    "97",
+    "100",
+    "102",
+    "103",
+    "104",
+    "111"
+   ],
+   "expected_signature_rule": "tool_error",
+   "detected": false,
+   "localised": false,
+   "worse_metrics": {},
+   "signature_metric": {
+    "base_rate": 0.3125,
+    "other_rate": 0.2875,
+    "diff": -0.025,
+    "p": 0.6259,
+    "p_holm": 1.0,
+    "significant": false,
+    "direction": "better"
+   },
+   "success": {
+    "base_rate": 0.2625,
+    "other_rate": 0.225,
+    "diff": -0.0375,
+    "p": 0.3767,
+    "p_holm": 1.0,
+    "significant": false,
+    "direction": "worse"
+   },
+   "runs": 80,
+   "comparison": {
+    "tasks": 20,
+    "metrics_tested": 20,
+    "significant": {},
+    "success": {
+     "base_rate": 0.2625,
+     "other_rate": 0.225,
+     "diff": -0.0375,
+     "p": 0.3767,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "all_metrics": {
+     "abnormal_termination": {
+      "base_rate": 0.025,
+      "other_rate": 0.0125,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_claimed_before_executed": {
+      "base_rate": 0.0,
+      "other_rate": 0.0,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "claim_executed_but_differs": {
+      "base_rate": 0.2375,
+      "other_rate": 0.275,
+      "diff": 0.0375,
+      "p": 0.7572,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_not_executed": {
+      "base_rate": 0.0,
+      "other_rate": 0.0125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "claim_unrequested_change": {
+      "base_rate": 0.0375,
+      "other_rate": 0.025,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_unverifiable": {
+      "base_rate": 0.325,
+      "other_rate": 0.275,
+      "diff": -0.05,
+      "p": 0.6226,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "claim_wrong_action": {
+      "base_rate": 0.1125,
+      "other_rate": 0.125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_authenticate_first": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0125,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "policy_check_status_first": {
+      "base_rate": 0.0,
+      "other_rate": 0.0,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "policy_confirm_before_write": {
+      "base_rate": 0.1875,
+      "other_rate": 0.175,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_list_details_before_write": {
+      "base_rate": 0.05,
+      "other_rate": 0.0875,
+      "diff": 0.0375,
+      "p": 0.5964,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "policy_once_per_order": {
+      "base_rate": 0.0,
+      "other_rate": 0.0,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "policy_one_action_per_turn": {
+      "base_rate": 0.95,
+      "other_rate": 0.925,
+      "diff": -0.025,
+      "p": 0.4967,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_return_refund_method": {
+      "base_rate": 0.025,
+      "other_rate": 0.0,
+      "diff": -0.025,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_transfer_message": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0,
+      "diff": -0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "policy_wrong_order_status": {
+      "base_rate": 0.0125,
+      "other_rate": 0.0125,
+      "diff": 0.0,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "same"
+     },
+     "repeated_call": {
+      "base_rate": 0.0,
+      "other_rate": 0.0125,
+      "diff": 0.0125,
+      "p": 1.0,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "success": {
+      "base_rate": 0.2625,
+      "other_rate": 0.225,
+      "diff": -0.0375,
+      "p": 0.3767,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "worse"
+     },
+     "tool_error": {
+      "base_rate": 0.3125,
+      "other_rate": 0.2875,
+      "diff": -0.025,
+      "p": 0.6259,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     },
+     "transfer_to_human": {
+      "base_rate": 0.0875,
+      "other_rate": 0.05,
+      "diff": -0.0375,
+      "p": 0.4998,
+      "p_holm": 1.0,
+      "significant": false,
+      "direction": "better"
+     }
+    }
+   }
+  }
+ },
+ "false_alarms": {
+  "v1_rerun vs v1 on bug_auth tasks": {
+   "significant_metrics": [],
+   "metrics_tested": 20
+  },
+  "v1_rerun vs v1 on bug_transfer tasks": {
+   "significant_metrics": [],
+   "metrics_tested": 20
+  },
+  "v1_rerun vs v1 on bug_noconfirm tasks": {
+   "significant_metrics": [],
+   "metrics_tested": 20
+  },
+  "v1_rerun vs v1 on bug_param tasks": {
+   "significant_metrics": [],
+   "metrics_tested": 20
+  },
+  "v1_rerun vs v1 on all tasks": {
+   "significant_metrics": [],
+   "metrics_tested": 20,
+   "success": {
+    "base_rate": 0.3443,
+    "other_rate": 0.3311,
+    "diff": -0.0132,
+    "p": 0.6227,
+    "p_holm": 1.0,
+    "significant": false,
+    "direction": "worse"
+   }
+  }
+ },
+ "complete": true,
+ "false_alarm_total": 0,
+ "v2_vs_v1": {
+  "comparison": {
+   "tasks": 114,
+   "metrics_tested": 20,
+   "significant": {},
+   "success": {
+    "base_rate": 0.3443,
+    "other_rate": 0.3092,
+    "diff": -0.0351,
+    "p": 0.1728,
+    "p_holm": 1.0,
+    "significant": false,
+    "direction": "worse"
+   },
+   "all_metrics": {
+    "abnormal_termination": {
+     "base_rate": 0.0154,
+     "other_rate": 0.0132,
+     "diff": -0.0022,
+     "p": 1.0,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "better"
+    },
+    "claim_claimed_before_executed": {
+     "base_rate": 0.0044,
+     "other_rate": 0.0044,
+     "diff": 0.0,
+     "p": 1.0,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "same"
+    },
+    "claim_executed_but_differs": {
+     "base_rate": 0.1776,
+     "other_rate": 0.2039,
+     "diff": 0.0263,
+     "p": 0.2337,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "claim_not_executed": {
+     "base_rate": 0.0022,
+     "other_rate": 0.0197,
+     "diff": 0.0175,
+     "p": 0.0374,
+     "p_holm": 0.7106,
+     "significant": false,
+     "direction": "worse"
+    },
+    "claim_unrequested_change": {
+     "base_rate": 0.0746,
+     "other_rate": 0.0855,
+     "diff": 0.011,
+     "p": 0.5486,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "claim_unverifiable": {
+     "base_rate": 0.1491,
+     "other_rate": 0.136,
+     "diff": -0.0132,
+     "p": 0.5757,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "better"
+    },
+    "claim_wrong_action": {
+     "base_rate": 0.0526,
+     "other_rate": 0.0768,
+     "diff": 0.0241,
+     "p": 0.1186,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "policy_authenticate_first": {
+     "base_rate": 0.0044,
+     "other_rate": 0.0066,
+     "diff": 0.0022,
+     "p": 1.0,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "policy_check_status_first": {
+     "base_rate": 0.0088,
+     "other_rate": 0.0022,
+     "diff": -0.0066,
+     "p": 0.5,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "better"
+    },
+    "policy_confirm_before_write": {
+     "base_rate": 0.1491,
+     "other_rate": 0.1623,
+     "diff": 0.0132,
+     "p": 0.4752,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "policy_list_details_before_write": {
+     "base_rate": 0.0702,
+     "other_rate": 0.0724,
+     "diff": 0.0022,
+     "p": 1.0,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "policy_once_per_order": {
+     "base_rate": 0.0175,
+     "other_rate": 0.0329,
+     "diff": 0.0154,
+     "p": 0.172,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "policy_one_action_per_turn": {
+     "base_rate": 0.9013,
+     "other_rate": 0.9167,
+     "diff": 0.0154,
+     "p": 0.3611,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "policy_return_refund_method": {
+     "base_rate": 0.0307,
+     "other_rate": 0.0351,
+     "diff": 0.0044,
+     "p": 0.8076,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "policy_transfer_message": {
+     "base_rate": 0.0132,
+     "other_rate": 0.0,
+     "diff": -0.0132,
+     "p": 0.063,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "better"
+    },
+    "policy_wrong_order_status": {
+     "base_rate": 0.0088,
+     "other_rate": 0.0132,
+     "diff": 0.0044,
+     "p": 0.5057,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "repeated_call": {
+     "base_rate": 0.0066,
+     "other_rate": 0.0154,
+     "diff": 0.0088,
+     "p": 0.2898,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "success": {
+     "base_rate": 0.3443,
+     "other_rate": 0.3092,
+     "diff": -0.0351,
+     "p": 0.1728,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "tool_error": {
+     "base_rate": 0.2851,
+     "other_rate": 0.2961,
+     "diff": 0.011,
+     "p": 0.6766,
+     "p_holm": 1.0,
+     "significant": false,
+     "direction": "worse"
+    },
+    "transfer_to_human": {
+     "base_rate": 0.3311,
+     "other_rate": 0.2719,
+     "diff": -0.0592,
+     "p": 0.0077,
+     "p_holm": 0.155,
+     "significant": false,
+     "direction": "better"
+    }
+   }
+  },
+  "by_task_type": {
+   "per_task_noise_threshold": 0.5,
+   "noise_note": "95th percentile of |success-rate change| per task between v1_rerun and v1 (k=4 each)",
+   "tasks_beyond_threshold_in_v1_vs_v1": 2,
+   "by_type": {
+    "cancel": {
+     "tasks": 18,
+     "fixed": [],
+     "worse": [],
+     "unchanged": 18,
+     "v1_rate": 0.3056,
+     "v2_rate": 0.2917
+    },
+    "exchange": {
+     "tasks": 29,
+     "fixed": [
+      "52"
+     ],
+     "worse": [],
+     "unchanged": 28,
+     "v1_rate": 0.3534,
+     "v2_rate": 0.3707
+    },
+    "modify_items": {
+     "tasks": 35,
+     "fixed": [],
+     "worse": [
+      "44",
+      "56"
+     ],
+     "unchanged": 33,
+     "v1_rate": 0.2571,
+     "v2_rate": 0.1857
+    },
+    "modify_order_address": {
+     "tasks": 20,
+     "fixed": [],
+     "worse": [],
+     "unchanged": 20,
+     "v1_rate": 0.1875,
+     "v2_rate": 0.2
+    },
+    "modify_payment": {
+     "tasks": 1,
+     "fixed": [],
+     "worse": [],
+     "unchanged": 1,
+     "v1_rate": 0.75,
+     "v2_rate": 1.0
+    },
+    "modify_user_address": {
+     "tasks": 10,
+     "fixed": [],
+     "worse": [],
+     "unchanged": 10,
+     "v1_rate": 0.125,
+     "v2_rate": 0.125
+    },
+    "no_write": {
+     "tasks": 10,
+     "fixed": [],
+     "worse": [],
+     "unchanged": 10,
+     "v1_rate": 0.725,
+     "v2_rate": 0.775
+    },
+    "return": {
+     "tasks": 31,
+     "fixed": [],
+     "worse": [
+      "19",
+      "47"
+     ],
+     "unchanged": 29,
+     "v1_rate": 0.2581,
+     "v2_rate": 0.1774
+    }
+   },
+   "type_note": "a task with several kinds of write appears under each of them"
+  },
+  "release": {
+   "verdict": "需要再查",
+   "facts": [
+    "overall success 0.3443 -> 0.3092 (p_holm=1.0)",
+    "tasks beyond per-task noise: 1 better, 4 worse (v1 vs v1 itself: 2 beyond threshold)",
+    "significantly worse rule metrics: none"
+   ],
+   "rule": "可以上线 = success significantly better and no rule significantly worse; 不建议上线 = success significantly worse, or rules worse without a success gain; otherwise 需要再查"
+  }
+ },
+ "summary": {
+  "bugs_detected": "0/4",
+  "bugs_localised": "0/4",
+  "false_alarms_v1_vs_v1": 0,
+  "v2_release": "需要再查"
+ }
+}
