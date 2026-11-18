@@ -64,6 +64,46 @@ BUG_PARAM = AgentSpec(
                         "returned by get_product_details). Each one should match the item id in the same position."}},
 )
 
+# --- code-level bugs (phase 4b) ----------------------------------------------------
+# The phase-4 bugs above only edited text the model reads, and two of them did
+# not change behaviour at all (results/bug_mechanism_check.json). These two
+# change what the agent's tool-calling code sends, so they always take effect
+# whenever the affected tool is called with the affected argument.
+
+ADDRESS_TOOLS = ("modify_pending_order_address", "modify_user_address")
+ITEM_TOOLS = ("return_delivered_order_items", "exchange_delivered_order_items", "modify_pending_order_items")
+
+
+def drop_address2(name: str, args: dict) -> dict:
+    """Bug: the address line 2 is lost when an address is written."""
+    if name in ADDRESS_TOOLS and args.get("address2"):
+        args["address2"] = ""
+    return args
+
+
+def drop_last_item(name: str, args: dict) -> dict:
+    """Bug: off-by-one - the last item is dropped when several items are written at once."""
+    if name in ITEM_TOOLS and len(args.get("item_ids") or []) >= 2:
+        args["item_ids"] = list(args["item_ids"])[:-1]
+        if len(args.get("new_item_ids") or []) >= 2:
+            args["new_item_ids"] = list(args["new_item_ids"])[:-1]
+    return args
+
+
+BUG_ADDR2 = AgentSpec(
+    name="bug_addr2",
+    description="Bug 5 (code): the agent's tool-calling code empties address2 in "
+                "modify_pending_order_address / modify_user_address.",
+    call_transform=drop_address2,
+)
+
+BUG_DROPITEM = AgentSpec(
+    name="bug_dropitem",
+    description="Bug 6 (code): off-by-one in the agent's tool-calling code drops the last item when "
+                "a return / exchange / item modification covers two or more items.",
+    call_transform=drop_last_item,
+)
+
 # --- fix (phase 4) ----------------------------------------------------------------
 # Target: the most frequent agent-side problem in the phase-3 diagnoses of v1
 # failures (Instruction/Plan Adherence Failure): not searching the user's orders,
@@ -88,7 +128,7 @@ V2 = AgentSpec(
     instructions=INSTRUCTIONS_V2,
 )
 
-SPECS: dict[str, AgentSpec] = {spec.name: spec for spec in [V1, BUG_AUTH, BUG_TRANSFER, BUG_NOCONFIRM, BUG_PARAM, V2]}
+SPECS: dict[str, AgentSpec] = {spec.name: spec for spec in [V1, BUG_AUTH, BUG_TRANSFER, BUG_NOCONFIRM, BUG_PARAM, BUG_ADDR2, BUG_DROPITEM, V2]}
 
 
 def registered_name(version: str) -> str:

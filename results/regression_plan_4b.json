@@ -1,0 +1,68 @@
+{
+ "written_before_runs": true,
+ "seed": 405,
+ "k": 4,
+ "baseline": "existing v1 runs (results/runs/v1); noise control: existing v1_rerun runs",
+ "runs": {
+  "bug_addr2": {
+   "agent": "bug_addr2",
+   "tasks": [
+    "17",
+    "22",
+    "33",
+    "34",
+    "39",
+    "41",
+    "42",
+    "71",
+    "72",
+    "78",
+    "86",
+    "87",
+    "96",
+    "97",
+    "101",
+    "102",
+    "103",
+    "104",
+    "109",
+    "111"
+   ],
+   "eligible_pool_size": 23,
+   "description": "Bug 5 (code): the agent's tool-calling code empties address2 in modify_pending_order_address / modify_user_address."
+  },
+  "bug_dropitem": {
+   "agent": "bug_dropitem",
+   "tasks": [
+    "0",
+    "2",
+    "13",
+    "20",
+    "21",
+    "26",
+    "28",
+    "36",
+    "37",
+    "46",
+    "54",
+    "55",
+    "58",
+    "73",
+    "82",
+    "92",
+    "98",
+    "99",
+    "103",
+    "108"
+   ],
+   "eligible_pool_size": 26,
+   "description": "Bug 6 (code): off-by-one in the agent's tool-calling code drops the last item when a return / exchange / item modification covers two or more items."
+  }
+ },
+ "primary_metric": "false_success: per run, TraceCheck flags a claim of completion that the database does not back (claim status not_executed or executed_but_differs); aggregated per task as the mean over its k trials",
+ "test": "paired sign-flip permutation test over tasks on the per-task mean difference (bug - v1), 20,000 permutations, two-sided; Holm correction across the two bugs; alpha = 0.05",
+ "detected": "the primary metric rises significantly (after Holm)",
+ "localised": "in at least half of the bug runs flagged false_success, a flagged claim's database diff names the corrupted field (bug_addr2: a path ending in 'address2'; bug_dropitem: a path in return_items / exchange_items / exchange_new_items or an items[i].item_id)",
+ "false_alarms": "the same test on v1_rerun vs v1 on each bug's tasks; a significant result is a false alarm",
+ "reported_not_tested": "tau2 success rate per arm (context only)"
+}

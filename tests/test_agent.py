@@ -51,3 +51,14 @@ def test_patch_rejects_unknown_names(retail):
         bad = AgentSpec("x", "", param_descriptions={"cancel_pending_order": {"nope": "x"}})
         patch_tools(tools, bad)[0].openai_schema  # noqa: B018
         [t.openai_schema for t in patch_tools(tools, bad)]
+
+
+def test_code_level_bugs_rewrite_only_the_targeted_arguments():
+    from agent.versions import drop_address2, drop_last_item
+    a = drop_address2("modify_user_address", {"address1": "1 Main", "address2": "Apt 3", "zip": "1"})
+    assert a == {"address1": "1 Main", "address2": "", "zip": "1"}
+    assert drop_address2("cancel_pending_order", {"address2": "x"}) == {"address2": "x"}
+    r = drop_last_item("exchange_delivered_order_items",
+                       {"order_id": "#W1", "item_ids": ["a", "b"], "new_item_ids": ["c", "d"]})
+    assert r["item_ids"] == ["a"] and r["new_item_ids"] == ["c"]
+    assert drop_last_item("return_delivered_order_items", {"item_ids": ["a"]}) == {"item_ids": ["a"]}

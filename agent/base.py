@@ -60,6 +60,10 @@ class AgentSpec:
     tool_descriptions: dict[str, str] = field(default_factory=dict)
     # {tool_name: {param_name: new description}} - replaces a parameter description.
     param_descriptions: dict[str, dict[str, str]] = field(default_factory=dict)
+    # (tool_name, arguments) -> arguments. Rewrites the arguments of the tool
+    # calls the model produced before they reach the environment - a stand-in
+    # for a bug in the agent's own tool-calling code (phase 4b).
+    call_transform: Optional[Callable[[str, dict], dict]] = None
 
     def build_system_prompt(self, domain_policy: str) -> str:
         policy = self.policy_transform(domain_policy) if self.policy_transform else domain_policy
@@ -149,5 +153,8 @@ class TraceCheckAgent(LLMConfigMixin, HalfDuplexAgent[AgentState]):
             call_name="agent_response",
             **self.llm_args,
         )
+        if self.spec.call_transform:
+            for call in reply.tool_calls or []:
+                call.arguments = self.spec.call_transform(call.name, dict(call.arguments))
         state.messages.append(reply)
         return reply, state
