@@ -1,0 +1,1226 @@
+{
+ "language_context": {
+  "language": "en",
+  "mode": "text",
+  "cross_lingual": false,
+  "pack_revision": "voice-v2-entity-order-v5-schema3-textneutral-voiceclauses",
+  "pack_sha256": "6453ef2c2f06ca34fb0a4f90841780913a2f7af28b680a08be402190876e6435",
+  "domain_revision": "voice-v2-frozen50-v1",
+  "tasks_sha256": "2ba1277c495189385f000e1c001a7f775c40c2a768a7146c730ab769b1157690",
+  "metadata_sha256": "2c28ba93593c772a1708c2fa25a654f3a301e1e432914a4fca16377e17150524",
+  "scenario_mode": "pack",
+  "scenario_sha256": "0f173e03eaa245fa9ce9c5b6c177be03910f49f2d93ad661c66a84293d7bb9b0",
+  "localization_map_sha256": null,
+  "localization_revision": null,
+  "runtime_rules_version": "regional-tools-v1",
+  "runtime_rules_sha256": "03443b64d7dcaadcfe33458ef532c6f757265137e559fb68f47c4b21ef817b6a",
+  "task_selection": {
+   "task_set_name": null,
+   "task_split_name": "base",
+   "task_kwargs": {}
+  },
+  "task_sha256": "c7d310fefbfedd82d4b760f829967247ec94f8d0fa33334c56ccd4d495f01584",
+  "canonical_task_id": "40",
+  "agent_greeting": "Hi! How can I help you today?",
+  "agent_language_clause": "Respond in English using Latin script; keep all tool calls, arguments, and structured outputs in English exactly as specified.",
+  "speech_insert_events_per_minute": null,
+  "backchannel_level": null,
+  "backchannel_prompt_version": null,
+  "caller_gender": "female",
+  "persona": {
+   "verbosity": "standard",
+   "interrupt_tendency": null,
+   "persona_id": "priya_patil",
+   "mode": "text",
+   "gender": "female",
+   "locale": "Maharashtra, India",
+   "variety": "English",
+   "language": "en",
+   "display_language": "English",
+   "gender_guidance": "You are a female customer (she/her).",
+   "pragmatics_clauses": [
+    "Short punchy sentences are natural to this variety. You often repeat what you already said to make sure it lands — 'Like I said, the order's been wrong twice now'.",
+    "When you open and get right to it, natural forms are 'Yeah, hi, so here's the problem', 'Okay, I've been waiting forever, I need this fixed today'. In this register you can skip small talk and state the issue immediately.",
+    "When you're not getting somewhere fast, asking for a supervisor or a timeline early is characteristic.",
+    "When you decline or push back, natural realizations are direct — 'No, that doesn't work for me', 'Nope, not doing that', 'That's not what I asked'. In this style the refusal is not softened.",
+    "When frustration builds, you become more insistent — 'Okay, like I literally just told you'. Then a direct ask — 'Can I just talk to someone who can actually fix this'. Even when annoyed your language stays coherent."
+   ],
+   "user_guidelines": "",
+   "mode_guidelines": "",
+   "agent_background_clause": "",
+   "language_directive": null,
+   "spellout_section": "",
+   "voice": null
+  },
+  "spelling_normalization_version": null,
+  "prompt_version": "language-runtime-v8",
+  "guideline_template_version": "language-guidelines-v4",
+  "assignment_version": "canonical-id-sha256-v1"
+ },
+ "agent_voice": null,
+ "agent_voice_gender": null,
+ "agent_voice_catalog": null,
+ "id": "3e449069-b644-47b2-abfa-83013b70617c",
+ "complication": null,
+ "task_id": "40",
+ "timestamp": "2026-11-18T00:23:15.572694",
+ "start_time": "2026-11-18T00:22:38.473566",
+ "end_time": "2026-11-18T00:23:15.572680",
+ "duration": 37.09785923599975,
+ "termination_reason": "user_stop",
+ "agent_cost": null,
+ "user_cost": 0.0,
+ "agent_usage": null,
+ "reward_info": {
+  "reward": 1.0,
+  "db_check": {
+   "db_match": true,
+   "db_reward": 1.0
+  },
+  "env_assertions": [],
+  "action_checks": [
+   {
+    "action": {
+     "action_id": "40_0",
+     "requestor": "assistant",
+     "name": "find_user_id_by_email",
+     "arguments": {
+      "email": "isabella.lopez3271@example.com"
+     },
+     "info": null,
+     "compare_args": null
+    },
+    "action_match": true,
+    "action_reward": 1.0,
+    "tool_type": "read"
+   },
+   {
+    "action": {
+     "action_id": "40_1",
+     "requestor": "assistant",
+     "name": "get_user_details",
+     "arguments": {
+      "user_id": "isabella_lopez_6490"
+     },
+     "info": null,
+     "compare_args": null
+    },
+    "action_match": true,
+    "action_reward": 1.0,
+    "tool_type": "read"
+   },
+   {
+    "action": {
+     "action_id": "40_2",
+     "requestor": "assistant",
+     "name": "get_order_details",
+     "arguments": {
+      "order_id": "#W4923227"
+     },
+     "info": null,
+     "compare_args": null
+    },
+    "action_match": true,
+    "action_reward": 1.0,
+    "tool_type": "read"
+   },
+   {
+    "action": {
+     "action_id": "40_3",
+     "requestor": "assistant",
+     "name": "modify_pending_order_payment",
+     "arguments": {
+      "order_id": "#W4923227",
+      "payment_method_id": "credit_card_8897086"
+     },
+     "info": null,
+     "compare_args": null
+    },
+    "action_match": true,
+    "action_reward": 1.0,
+    "tool_type": "write"
+   }
+  ],
+  "nl_assertions": [
+   {
+    "nl_assertion": "Agent should tell the user their gift card balance is $60.",
+    "met": true,
+    "justification": "The agent explicitly stated: \"Your gift card (ending in 8245350) has a balance of $60.00.\""
+   },
+   {
+    "nl_assertion": "Agent should tell the user their recent order was paid with a Mastercard.",
+    "met": true,
+    "justification": "The agent explicitly stated: \"Your recent order #W4923227 for a Bluetooth Speaker ($321.18) was paid using your Mastercard ending in 4336.\""
+   }
+  ],
+  "communicate_checks": null,
+  "reward_basis": [
+   "DB",
+   "NL_ASSERTION"
+  ],
+  "reward_breakdown": {
+   "DB": 1.0,
+   "NL_ASSERTION": 1.0
+  },
+  "info": {
+   "env": null,
+   "nl": null,
+   "communicate": null,
+   "action": null
+  }
+ },
+ "messages": [
+  {
+   "role": "assistant",
+   "content": "Hi! How can I help you today?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 0,
+   "timestamp": "2026-11-18T00:22:38.473744",
+   "cost": null,
+   "usage": null,
+   "raw_data": null,
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "Yeah, hi, so here's the problem. Like I said, I need to know how much balance my gift card has. And I also want to check if I used visa, mastercard, or amex for my recent order. Plus, can I use my gift card for that order? If not, I need to change the payment to visa. Like I said, I need this fixed today.",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 1,
+   "timestamp": "2026-11-18T00:22:40.642000",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 84,
+    "prompt_tokens": 692
+   },
+   "raw_data": {
+    "id": "20261118082238c4ad83cb13de4fd2",
+    "created": 1794961360,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "Yeah, hi, so here's the problem. Like I said, I need to know how much balance my gift card has. And I also want to check if I used visa, mastercard, or amex for my recent order. Plus, can I use my gift card for that order? If not, I need to change the payment to visa. Like I said, I need this fixed today.",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 84,
+     "prompt_tokens": 692,
+     "total_tokens": 776,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "20261118082238c4ad83cb13de4fd2"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "assistant",
+   "content": "\nI'd be happy to help you with your gift card balance, payment method information, and potentially changing your payment method. However, I first need to authenticate your identity before I can access your account information.\n\nCould you please provide your email address so I can locate your account?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 2,
+   "timestamp": "2026-11-18T00:22:42.929350",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 57,
+    "prompt_tokens": 4861
+   },
+   "raw_data": {
+    "id": "202611180822409bee7e8f84cc499c",
+    "created": 1794961362,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "\nI'd be happy to help you with your gift card balance, payment method information, and potentially changing your payment method. However, I first need to authenticate your identity before I can access your account information.\n\nCould you please provide your email address so I can locate your account?",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 57,
+     "prompt_tokens": 4861,
+     "total_tokens": 4918,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 4789
+     }
+    },
+    "service_tier": null,
+    "request_id": "202611180822409bee7e8f84cc499c"
+   },
+   "generation_time_seconds": 2.283006663999913,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "My email address is isabella.lopez3271@example.com. Like I said, I need this fixed today.",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 3,
+   "timestamp": "2026-11-18T00:22:44.121696",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 27,
+    "prompt_tokens": 833
+   },
+   "raw_data": {
+    "id": "202611180822434219a8bea08748d3",
+    "created": 1794961363,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "My email address is isabella.lopez3271@example.com. Like I said, I need this fixed today.",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 27,
+     "prompt_tokens": 833,
+     "total_tokens": 860,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "202611180822434219a8bea08748d3"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "assistant",
+   "content": "\n",
+   "tool_calls": [
+    {
+     "id": "call_-7065245150657642465",
+     "name": "find_user_id_by_email",
+     "arguments": {
+      "email": "isabella.lopez3271@example.com"
+     },
+     "requestor": "assistant"
+    }
+   ],
+   "is_audio": false,
+   "turn_idx": 4,
+   "timestamp": "2026-11-18T00:22:45.478530",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 27,
+    "prompt_tokens": 4949
+   },
+   "raw_data": {
+    "id": "202611180822441f4f58ab073d4f5b",
+    "created": 1794961365,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+       "content": "\n",
+       "role": "assistant",
+       "tool_calls": [
+        {
+         "index": 0,
+         "function": {
+          "arguments": "{\"email\":\"isabella.lopez3271@example.com\"}",
+          "name": "find_user_id_by_email"
+         },
+         "id": "call_-7065245150657642465",
+         "type": "function"
+        }
+       ],
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 27,
+     "prompt_tokens": 4949,
+     "total_tokens": 4976,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 4917
+     }
+    },
+    "service_tier": null,
+    "request_id": "202611180822441f4f58ab073d4f5b"
+   },
+   "generation_time_seconds": 1.3524976829994557,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "id": "call_-7065245150657642465",
+   "role": "tool",
+   "content": "isabella_lopez_6490",
+   "requestor": "assistant",
+   "error": false,
+   "execution_status": "executed",
+   "turn_idx": 5,
+   "timestamp": "2026-11-18T00:22:45.480220"
+  },
+  {
+   "role": "assistant",
+   "content": "\n",
+   "tool_calls": [
+    {
+     "id": "call_-7065242092640920172",
+     "name": "get_user_details",
+     "arguments": {
+      "user_id": "isabella_lopez_6490"
+     },
+     "requestor": "assistant"
+    }
+   ],
+   "is_audio": false,
+   "turn_idx": 6,
+   "timestamp": "2026-11-18T00:22:47.334694",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 24,
+    "prompt_tokens": 4993
+   },
+   "raw_data": {
+    "id": "20261118082245ca05493c6b6d45ac",
+    "created": 1794961367,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+       "content": "\n",
+       "role": "assistant",
+       "tool_calls": [
+        {
+         "index": 0,
+         "function": {
+          "arguments": "{\"user_id\":\"isabella_lopez_6490\"}",
+          "name": "get_user_details"
+         },
+         "id": "call_-7065242092640920172",
+         "type": "function"
+        }
+       ],
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 24,
+     "prompt_tokens": 4993,
+     "total_tokens": 5017,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 4975
+     }
+    },
+    "service_tier": null,
+    "request_id": "20261118082245ca05493c6b6d45ac"
+   },
+   "generation_time_seconds": 1.850374974999795,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "id": "call_-7065242092640920172",
+   "role": "tool",
+   "content": "{\"user_id\": \"isabella_lopez_6490\", \"name\": {\"first_name\": \"Isabella\", \"last_name\": \"Lopez\"}, \"address\": {\"address1\": \"710 Sunset Drive\", \"address2\": \"Suite 176\", \"city\": \"Phoenix\", \"country\": \"USA\", \"state\": \"AZ\", \"zip\": \"85034\"}, \"email\": \"isabella.lopez3271@example.com\", \"payment_methods\": {\"credit_card_8897086\": {\"source\": \"credit_card\", \"id\": \"credit_card_8897086\", \"brand\": \"visa\", \"last_four\": \"8902\"}, \"gift_card_8245350\": {\"source\": \"gift_card\", \"id\": \"gift_card_8245350\", \"balance\": 60.0}, \"credit_card_8554680\": {\"source\": \"credit_card\", \"id\": \"credit_card_8554680\", \"brand\": \"mastercard\", \"last_four\": \"4336\"}, \"paypal_1621947\": {\"source\": \"paypal\", \"id\": \"paypal_1621947\"}}, \"orders\": [\"#W4923227\"]}",
+   "requestor": "assistant",
+   "error": false,
+   "execution_status": "executed",
+   "turn_idx": 7,
+   "timestamp": "2026-11-18T00:22:47.334940"
+  },
+  {
+   "role": "assistant",
+   "content": "\n",
+   "tool_calls": [
+    {
+     "id": "call_-7065247796357496315",
+     "name": "get_order_details",
+     "arguments": {
+      "order_id": "#W4923227"
+     },
+     "requestor": "assistant"
+    }
+   ],
+   "is_audio": false,
+   "turn_idx": 8,
+   "timestamp": "2026-11-18T00:22:48.609128",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 23,
+    "prompt_tokens": 5291
+   },
+   "raw_data": {
+    "id": "202611180822473a19c6a119634028",
+    "created": 1794961368,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+       "content": "\n",
+       "role": "assistant",
+       "tool_calls": [
+        {
+         "index": 0,
+         "function": {
+          "arguments": "{\"order_id\":\"#W4923227\"}",
+          "name": "get_order_details"
+         },
+         "id": "call_-7065247796357496315",
+         "type": "function"
+        }
+       ],
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 23,
+     "prompt_tokens": 5291,
+     "total_tokens": 5314,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 5016
+     }
+    },
+    "service_tier": null,
+    "request_id": "202611180822473a19c6a119634028"
+   },
+   "generation_time_seconds": 1.2709063680003965,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "id": "call_-7065247796357496315",
+   "role": "tool",
+   "content": "{\"order_id\": \"#W4923227\", \"user_id\": \"isabella_lopez_6490\", \"address\": {\"address1\": \"710 Sunset Drive\", \"address2\": \"Suite 176\", \"city\": \"Phoenix\", \"country\": \"USA\", \"state\": \"AZ\", \"zip\": \"85034\"}, \"items\": [{\"name\": \"Bluetooth Speaker\", \"product_id\": \"4768869376\", \"item_id\": \"7751905257\", \"price\": 321.18, \"options\": {\"color\": \"red\", \"battery life\": \"10 hours\", \"water resistance\": \"yes\"}}], \"status\": \"pending\", \"fulfillments\": [], \"payment_history\": [{\"transaction_type\": \"payment\", \"amount\": 321.18, \"payment_method_id\": \"credit_card_8554680\"}], \"cancel_reason\": null, \"exchange_items\": null, \"exchange_new_items\": null, \"exchange_payment_method_id\": null, \"exchange_price_difference\": null, \"return_items\": null, \"return_payment_method_id\": null}",
+   "requestor": "assistant",
+   "error": false,
+   "execution_status": "executed",
+   "turn_idx": 9,
+   "timestamp": "2026-11-18T00:22:48.609373"
+  },
+  {
+   "role": "assistant",
+   "content": "\nGreat! I've found your account information. Here's what I can tell you:\n\n**Gift Card Balance:** Your gift card (ending in 8245350) has a balance of $60.00.\n\n**Recent Order Payment:** Your recent order #W4923227 for a Bluetooth Speaker ($321.18) was paid using your Mastercard ending in 4336.\n\n**Can you use your gift card for this order?** Unfortunately, no. Your gift card balance is $60.00, but the order total is $321.18, so your gift card doesn't have enough balance to cover the full amount.\n\n**Payment Method Change:** Since your order is still pending, I can help you change the payment method from your Mastercard to your Visa card ending in 8902. This would change the payment method but wouldn't affect the order total.\n\nWould you like me to proceed with changing the payment method from your Mastercard to your Visa card for order #W4923227?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 10,
+   "timestamp": "2026-11-18T00:22:55.701852",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 214,
+    "prompt_tokens": 5560
+   },
+   "raw_data": {
+    "id": "2026111808224858960f49741c49cc",
+    "created": 1794961375,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "\nGreat! I've found your account information. Here's what I can tell you:\n\n**Gift Card Balance:** Your gift card (ending in 8245350) has a balance of $60.00.\n\n**Recent Order Payment:** Your recent order #W4923227 for a Bluetooth Speaker ($321.18) was paid using your Mastercard ending in 4336.\n\n**Can you use your gift card for this order?** Unfortunately, no. Your gift card balance is $60.00, but the order total is $321.18, so your gift card doesn't have enough balance to cover the full amount.\n\n**Payment Method Change:** Since your order is still pending, I can help you change the payment method from your Mastercard to your Visa card ending in 8902. This would change the payment method but wouldn't affect the order total.\n\nWould you like me to proceed with changing the payment method from your Mastercard to your Visa card for order #W4923227?",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 214,
+     "prompt_tokens": 5560,
+     "total_tokens": 5774,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 5313
+     }
+    },
+    "service_tier": null,
+    "request_id": "2026111808224858960f49741c49cc"
+   },
+   "generation_time_seconds": 7.087260399000115,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "Okay, like I literally just told you, I need this fixed today. So yes, please change the payment method to my visa card ending in 8902. That's what I asked for.",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 11,
+   "timestamp": "2026-11-18T00:22:57.609942",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 43,
+    "prompt_tokens": 1074
+   },
+   "raw_data": {
+    "id": "20261118082255928b6b5632bd48ee",
+    "created": 1794961377,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "Okay, like I literally just told you, I need this fixed today. So yes, please change the payment method to my visa card ending in 8902. That's what I asked for.",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 43,
+     "prompt_tokens": 1074,
+     "total_tokens": 1117,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "20261118082255928b6b5632bd48ee"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "assistant",
+   "content": "\nI understand you need this fixed today. Let me confirm the payment method change details for your order #W4923227:\n\n**Payment Method Change Details:**\n- Order: #W4923227 (Bluetooth Speaker - $321.18)\n- Current payment method: Mastercard ending in 4336\n- New payment method: Visa card ending in 8902\n- Amount: $321.18\n\nThe Mastercard will be refunded within 5-7 business days, and the Visa card will be charged immediately.\n\nDo you confirm you want to proceed with this payment method change? Please respond with \"yes\" to confirm.",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 12,
+   "timestamp": "2026-11-18T00:23:02.345465",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 138,
+    "prompt_tokens": 5821
+   },
+   "raw_data": {
+    "id": "2026111808225761c9c61189ab4b01",
+    "created": 1794961382,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "\nI understand you need this fixed today. Let me confirm the payment method change details for your order #W4923227:\n\n**Payment Method Change Details:**\n- Order: #W4923227 (Bluetooth Speaker - $321.18)\n- Current payment method: Mastercard ending in 4336\n- New payment method: Visa card ending in 8902\n- Amount: $321.18\n\nThe Mastercard will be refunded within 5-7 business days, and the Visa card will be charged immediately.\n\nDo you confirm you want to proceed with this payment method change? Please respond with \"yes\" to confirm.",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 138,
+     "prompt_tokens": 5821,
+     "total_tokens": 5959,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 5773
+     }
+    },
+    "service_tier": null,
+    "request_id": "2026111808225761c9c61189ab4b01"
+   },
+   "generation_time_seconds": 4.731896711000445,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "Yes. Like I said, I need this fixed today. Please go ahead with the change.",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 13,
+   "timestamp": "2026-11-18T00:23:03.324948",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 21,
+    "prompt_tokens": 1255
+   },
+   "raw_data": {
+    "id": "20261118082302a22ebbc93c444312",
+    "created": 1794961383,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "Yes. Like I said, I need this fixed today. Please go ahead with the change.",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 21,
+     "prompt_tokens": 1255,
+     "total_tokens": 1276,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "20261118082302a22ebbc93c444312"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "assistant",
+   "content": "\n",
+   "tool_calls": [
+    {
+     "id": "call_-7065245391175810914",
+     "name": "modify_pending_order_payment",
+     "arguments": {
+      "order_id": "#W4923227",
+      "payment_method_id": "credit_card_8897086"
+     },
+     "requestor": "assistant"
+    }
+   ],
+   "is_audio": false,
+   "turn_idx": 14,
+   "timestamp": "2026-11-18T00:23:05.119457",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 41,
+    "prompt_tokens": 5984
+   },
+   "raw_data": {
+    "id": "20261118082303f7bd556964654e5f",
+    "created": 1794961384,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+       "content": "\n",
+       "role": "assistant",
+       "tool_calls": [
+        {
+         "index": 0,
+         "function": {
+          "arguments": "{\"order_id\":\"#W4923227\",\"payment_method_id\":\"credit_card_8897086\"}",
+          "name": "modify_pending_order_payment"
+         },
+         "id": "call_-7065245391175810914",
+         "type": "function"
+        }
+       ],
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 41,
+     "prompt_tokens": 5984,
+     "total_tokens": 6025,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 5958
+     }
+    },
+    "service_tier": null,
+    "request_id": "20261118082303f7bd556964654e5f"
+   },
+   "generation_time_seconds": 1.7912843900003281,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "id": "call_-7065245391175810914",
+   "role": "tool",
+   "content": "{\"order_id\": \"#W4923227\", \"user_id\": \"isabella_lopez_6490\", \"address\": {\"address1\": \"710 Sunset Drive\", \"address2\": \"Suite 176\", \"city\": \"Phoenix\", \"country\": \"USA\", \"state\": \"AZ\", \"zip\": \"85034\"}, \"items\": [{\"name\": \"Bluetooth Speaker\", \"product_id\": \"4768869376\", \"item_id\": \"7751905257\", \"price\": 321.18, \"options\": {\"color\": \"red\", \"battery life\": \"10 hours\", \"water resistance\": \"yes\"}}], \"status\": \"pending\", \"fulfillments\": [], \"payment_history\": [{\"transaction_type\": \"payment\", \"amount\": 321.18, \"payment_method_id\": \"credit_card_8554680\"}, {\"transaction_type\": \"payment\", \"amount\": 321.18, \"payment_method_id\": \"credit_card_8897086\"}, {\"transaction_type\": \"refund\", \"amount\": 321.18, \"payment_method_id\": \"credit_card_8554680\"}], \"cancel_reason\": null, \"exchange_items\": null, \"exchange_new_items\": null, \"exchange_payment_method_id\": null, \"exchange_price_difference\": null, \"return_items\": null, \"return_payment_method_id\": null}",
+   "requestor": "assistant",
+   "error": false,
+   "execution_status": "executed",
+   "turn_idx": 15,
+   "timestamp": "2026-11-18T00:23:05.119720"
+  },
+  {
+   "role": "assistant",
+   "content": "\nPerfect! Your payment method has been successfully changed. Here's the confirmation:\n\n**Payment Method Change Completed:**\n- Order #W4923227 (Bluetooth Speaker - $321.18)\n- ✅ Changed from: Mastercard ending in 4336\n- ✅ Changed to: Visa card ending in 8902\n- ✅ Order status: Still pending\n\n**Refund Information:**\n- Your Mastercard ending in 4336 will be refunded $321.18 within 5-7 business days\n- Your Visa card ending in 8902 has been charged $321.18 immediately\n\nYour order is all set and will continue processing with the new payment method. Is there anything else I can help you with today?",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 16,
+   "timestamp": "2026-11-18T00:23:11.005085",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 160,
+    "prompt_tokens": 6333
+   },
+   "raw_data": {
+    "id": "20261118082305917b94398bd747b4",
+    "created": 1794961390,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "\nPerfect! Your payment method has been successfully changed. Here's the confirmation:\n\n**Payment Method Change Completed:**\n- Order #W4923227 (Bluetooth Speaker - $321.18)\n- ✅ Changed from: Mastercard ending in 4336\n- ✅ Changed to: Visa card ending in 8902\n- ✅ Order status: Still pending\n\n**Refund Information:**\n- Your Mastercard ending in 4336 will be refunded $321.18 within 5-7 business days\n- Your Visa card ending in 8902 has been charged $321.18 immediately\n\nYour order is all set and will continue processing with the new payment method. Is there anything else I can help you with today?",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 160,
+     "prompt_tokens": 6333,
+     "total_tokens": 6493,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 6024
+     }
+    },
+    "service_tier": null,
+    "request_id": "20261118082305917b94398bd747b4"
+   },
+   "generation_time_seconds": 5.881913225999597,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "Okay, like I said, I need this fixed today. That's the only thing. So, thank you. And like I said, I need this fixed today.",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 17,
+   "timestamp": "2026-11-18T00:23:12.222486",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 36,
+    "prompt_tokens": 1436
+   },
+   "raw_data": {
+    "id": "20261118082311147d5b81327547d9",
+    "created": 1794961392,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "Okay, like I said, I need this fixed today. That's the only thing. So, thank you. And like I said, I need this fixed today.",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 36,
+     "prompt_tokens": 1436,
+     "total_tokens": 1472,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "20261118082311147d5b81327547d9"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "assistant",
+   "content": "\nYou're welcome! I'm glad I could help you change the payment method for your order today. Your order #W4923227 is now set with your Visa card ending in 8902, and everything is taken care of. Have a great day!",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 18,
+   "timestamp": "2026-11-18T00:23:14.397820",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 57,
+    "prompt_tokens": 6533
+   },
+   "raw_data": {
+    "id": "20261118082312a78710bbb2414810",
+    "created": 1794961394,
+    "model": "glm-4.5-flash",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "\nYou're welcome! I'm glad I could help you change the payment method for your order today. Your order #W4923227 is now set with your Visa card ending in 8902, and everything is taken care of. Have a great day!",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 57,
+     "prompt_tokens": 6533,
+     "total_tokens": 6590,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cached_tokens": 6492
+     }
+    },
+    "service_tier": null,
+    "request_id": "20261118082312a78710bbb2414810"
+   },
+   "generation_time_seconds": 2.1720280760000605,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  },
+  {
+   "role": "user",
+   "content": "Okay, like I said, I need this fixed today. Thanks. Have a good day too. Bye. ###STOP###",
+   "tool_calls": null,
+   "is_audio": false,
+   "turn_idx": 19,
+   "timestamp": "2026-11-18T00:23:15.571398",
+   "cost": 0.0,
+   "usage": {
+    "completion_tokens": 27,
+    "prompt_tokens": 1529
+   },
+   "raw_data": {
+    "id": "202611180823148d5c8db55aad4bc5",
+    "created": 1794961395,
+    "model": "glm-4-flash-250414",
+    "object": "chat.completion",
+    "system_fingerprint": null,
+    "choices": [
+     {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+       "content": "Okay, like I said, I need this fixed today. Thanks. Have a good day too. Bye. ###STOP###",
+       "role": "assistant",
+       "tool_calls": null,
+       "function_call": null,
+       "provider_specific_fields": {
+        "refusal": null
+       }
+      },
+      "provider_specific_fields": {}
+     }
+    ],
+    "usage": {
+     "completion_tokens": 27,
+     "prompt_tokens": 1529,
+     "total_tokens": 1556,
+     "completion_tokens_details": null,
+     "prompt_tokens_details": null
+    },
+    "service_tier": null,
+    "request_id": "202611180823148d5c8db55aad4bc5"
+   },
+   "generation_time_seconds": null,
+   "audio_format": null,
+   "audio_path": null,
+   "audio_script_gold": null,
+   "speech_effects": null,
+   "source_effects": null,
+   "channel_effects": null,
+   "turn_taking_action": null,
+   "utterance_ids": null,
+   "chunk_id": null,
+   "is_final_chunk": true,
+   "source": null,
+   "contains_speech": true
+  }
+ ],
+ "ticks": null,
+ "trial": 0,
+ "seed": 300,
+ "mode": "half_duplex",
+ "speech_environment": null,
+ "review": null,
+ "user_only_review": null,
+ "info": null,
+ "auth_classification": null,
+ "hallucination_retries_used": 0,
+ "hallucination_check": null,
+ "provider_session_id": null,
+ "policy": "# Retail agent policy\n\nAs a retail agent, you can help users:\n\n- **cancel or modify pending orders**\n- **return or exchange delivered orders**\n- **modify their default user address**\n- **provide information about their own profile, orders, and related products**\n\nAt the beginning of the conversation, you have to authenticate the user identity by locating their user id via email, or via name + zip code. This has to be done even when the user already provides the user id.\n\nOnce the user has been authenticated, you can provide the user with information about order, product, profile information, e.g. help the user look up order id.\n\nYou can only help one user per conversation (but you can handle multiple requests from the same user), and must deny any requests for tasks related to any other user.\n\nBefore taking any action that updates the database (cancel, modify, return, exchange), you must list the action details and obtain explicit user confirmation (yes) to proceed.\n\nYou should not make up any information or knowledge or procedures not provided by the user or the tools, or give subjective recommendations or comments.\n\nYou should at most make one tool call at a time, and if you take a tool call, you should not respond to the user at the same time. If you respond to the user, you should not make a tool call at the same time.\n\nYou should deny user requests that are against this policy.\n\nYou should transfer the user to a human agent if and only if the request cannot be handled within the scope of your actions. To transfer, first make a tool call to transfer_to_human_agents, and then send the message 'YOU ARE BEING TRANSFERRED TO A HUMAN AGENT. PLEASE HOLD ON.' to the user.\n\n## Domain basic\n\n- All times in the database are EST and 24 hour based. For example \"02:30:00\" means 2:30 AM EST.\n\n### User\n\nEach user has a profile containing:\n\n- unique user id\n- email\n- default address\n- payment methods.\n\nThere are three types of payment methods: **gift card**, **paypal account**, **credit card**.\n\n### Product\n\nOur retail store has 50 types of products.\n\nFor each **type of product**, there are **variant items** of different **options**.\n\nFor example, for a 't-shirt' product, there could be a variant item with option 'color blue size M', and another variant item with option 'color red size L'.\n\nEach product has the following attributes:\n\n- unique product id\n- name\n- list of variants\n\nEach variant item has the following attributes:\n\n- unique item id\n- information about the value of the product options for this item.\n- availability\n- price\n\nNote: Product ID and Item ID have no relations and should not be confused!\n\n### Order\n\nEach order has the following attributes:\n\n- unique order id\n- user id\n- address\n- items ordered\n- status\n- fullfilments info (tracking id and item ids)\n- payment history\n\nThe status of an order can be: **pending**, **processed**, **delivered**, or **cancelled**.\n\nOrders can have other optional attributes based on the actions that have been taken (cancellation reason, which items have been exchanged, what was the exchane price difference etc)\n\n## Generic action rules\n\nGenerally, you can only take action on pending or delivered orders.\n\nExchange or modify order tools can only be called once per order. Be sure that all items to be changed are collected into a list before making the tool call!!!\n\n## Cancel pending order\n\nAn order can only be cancelled if its status is 'pending', and you should check its status before taking the action.\n\nThe user needs to confirm the order id and the reason (either 'no longer needed' or 'ordered by mistake') for cancellation. Other reasons are not acceptable.\n\nAfter user confirmation, the order status will be changed to 'cancelled', and the total will be refunded via the original payment method immediately if it is gift card, otherwise in 5 to 7 business days.\n\n## Modify pending order\n\nAn order can only be modified if its status is 'pending', and you should check its status before taking the action.\n\nFor a pending order, you can take actions to modify its shipping address, payment method, or product item options, but nothing else.\n\n### Modify payment\n\nThe user can only choose a single payment method different from the original payment method.\n\nIf the user wants the modify the payment method to gift card, it must have enough balance to cover the total amount.\n\nAfter user confirmation, the order status will be kept as 'pending'. The original payment method will be refunded immediately if it is a gift card, otherwise it will be refunded within 5 to 7 business days.\n\n### Modify items\n\nThis action can only be called once, and will change the order status to 'pending (items modifed)'. The agent will not be able to modify or cancel the order anymore. So you must confirm all the details are correct and be cautious before taking this action. In particular, remember to remind the customer to confirm they have provided all the items they want to modify.\n\nFor a pending order, each item can be modified to an available new item of the same product but of different product option. There cannot be any change of product types, e.g. modify shirt to shoe.\n\nThe user must provide a payment method to pay or receive refund of the price difference. If the user provides a gift card, it must have enough balance to cover the price difference.\n\n## Return delivered order\n\nAn order can only be returned if its status is 'delivered', and you should check its status before taking the action.\n\nThe user needs to confirm the order id and the list of items to be returned.\n\nThe user needs to provide a payment method to receive the refund.\n\nThe refund must either go to the original payment method, or an existing gift card.\n\nAfter user confirmation, the order status will be changed to 'return requested', and the user will receive an email regarding how to return items.\n\n## Exchange delivered order\n\nAn order can only be exchanged if its status is 'delivered', and you should check its status before taking the action. In particular, remember to remind the customer to confirm they have provided all items to be exchanged.\n\nFor a delivered order, each item can be exchanged to an available new item of the same product but of different product option. There cannot be any change of product types, e.g. modify shirt to shoe.\n\nThe user must provide a payment method to pay or receive refund of the price difference. If the user provides a gift card, it must have enough balance to cover the price difference.\n\nAfter user confirmation, the order status will be changed to 'exchange requested', and the user will receive an email regarding how to return items. There is no need to place a new order.\n",
+ "effect_timeline": null
+}
