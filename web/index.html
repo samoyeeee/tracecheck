@@ -3,89 +3,172 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TraceCheck 总览</title>
+<title>TraceCheck 分析</title>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/common.js"></script>
+<script src="assets/card.js"></script>
 </head>
 <body>
 <header class="top"><div class="in">
   <span class="brand">TraceCheck</span>
-  <nav><a href="index.html">总览</a><a href="audit.html">问题审计卡</a><a href="regression.html">回归对比</a></nav>
+  <nav><a href="index.html">分析一条记录</a><a href="audit.html">案例库</a><a href="overview.html">评测总览</a><a href="regression.html">回归对比</a></nav>
 </div></header>
-<main id="app"><p class="note">加载中…</p></main>
+<main>
+  <h1>这条 agent 运行记录，哪一步出错了？</h1>
+  <p class="sub">把一条客服 agent 的运行记录交给 TraceCheck，它分三层检查：
+    <b>① 规则检查</b>（有没有违反政策、工具报错）→ <b>② 数据库核验</b>（agent 说“办好了”的事，数据库里是不是真的办对了）→
+    <b>③ 调查 agent</b>（读完整条记录，指出最早的关键错误和证据；没把握就弃权）。前两层是确定性的程序，第三层是模型。</p>
+
+  <div id="mode"></div>
+
+  <div class="panel" id="input">
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-tab="sample">选一条样例</button>
+      <button class="tab" data-tab="upload">上传文件</button>
+      <button class="tab" data-tab="paste">粘贴 JSON</button>
+    </div>
+    <div class="tabpane" data-pane="sample"><select id="sample" style="width:100%"></select></div>
+    <div class="tabpane" data-pane="upload" hidden>
+      <input type="file" id="file" accept=".json,application/json">
+      <p class="note">τ²-bench retail 的单次运行记录（例如 <code>results/runs/v1/task_2__trial_0.json</code>），需要有 <code>task_id</code> 和 <code>messages</code>。</p>
+    </div>
+    <div class="tabpane" data-pane="paste" hidden>
+      <textarea id="paste" rows="6" style="width:100%; font-family: var(--mono); font-size: 12.5px" placeholder='{"task_id": "2", "messages": [...], ...}'></textarea>
+    </div>
+    <div class="decide" style="margin-top:10px">
+      <label><input type="checkbox" id="useInv" checked> 运行调查 agent（第 ③ 层，调用 3 次模型）</label>
+      <button class="primary" id="go">开始分析</button>
+    </div>
+    <div id="progress" class="pipeline"></div>
+  </div>
+
+  <div id="result" style="margin-top:14px"></div>
+</main>
 <script>
-function bars(counts, total) {
-  const max = Math.max(...Object.values(counts), 1);
-  return `<div class="bars">${Object.entries(counts).map(([k, n]) => `
-    <div class="row"><div>${k}</div>
-      <div class="track"><div class="fill" style="width:${(n / max) * 100}%"></div></div>
-      <div class="n">${n}${total ? ` <span class="note">${pct(n / total, 0)}</span>` : ""}</div></div>`).join("")}</div>`;
+let LOCAL = null, AUDIT = null;
+
+const STAGES = [["rules", "① 规则检查"], ["db", "② 数据库核验"], ["inv", "③ 调查 agent"]];
+function progress(state) {  // state: {rules: "done"|"run"|"skip"|"fail", ...}
+  document.getElementById("progress").innerHTML = STAGES.map(([k, label]) => {
+    const s = state[k] || "wait";
+    const txt = { wait: "等待", run: "运行中…", done: "完成", skip: "未运行", fail: "失败", pre: "预先运行" }[s];
+    return `<span class="stage ${s}">${label}：${txt}</span>`;
+  }).join("");
 }
 
-const REASON_ZH = {
-  db_mismatch: "数据库结果与标准答案不一致",
-  db_ok_but_nl_assertion_failed: "数据库一致，但回复内容不达标",
-  "terminated: max_steps": "超过最大步数被终止",
-  "terminated: too_many_errors": "错误过多被终止",
-};
+function showError(msg) { document.getElementById("result").innerHTML = `<div class="banner bad">${esc(msg)}</div>`; }
 
-loadData("overview").then((o) => {
-  const b = o.baseline, v = o.verify, c = o.categories, cost = o.cost.v;
-  const acc = c.investigator_accuracy.v;
-  document.getElementById("app").innerHTML = `
-    <h1>总览</h1>
-    <p class="sub">τ²-bench retail，114 个任务 × 每个 ${b.k.v} 次。被测 agent：${esc(o.models.agent)}；
-      用户模拟：${esc(o.models.user)}；评委：${esc(o.models.judge)}；调查器：${esc(o.models.investigator)}。
-      页面上所有数字都来自真实运行，点“来源”可看原始文件。</p>
+function headerFor(c, note) {
+  return `<div class="panel" style="margin-bottom:12px">
+    <div><b>任务 ${esc(c.task_id)}${c.trial !== null && c.trial !== undefined ? `，第 ${c.trial} 次运行` : ""}</b> ${note}</div>
+    <div class="note">用户目标：${esc(c.user_goal)}</div>
+    <div style="margin-top:6px">${verdictLine(c)}</div></div>`;
+}
 
-    <div class="grid tiles">
-      <div class="panel tile"><div class="label">基线成功率 pass^1 ${src(b.pass1.src)}</div>
-        <div class="value">${pct(b.pass1.v)}</div><div class="hint">${b.successful_runs.v} / ${b.runs.v} 次运行成功</div></div>
-      <div class="panel tile"><div class="label">pass^4（4 次全成功）${src(b.pass4.src)}</div>
-        <div class="value">${pct(b.pass4.v)}</div><div class="hint">衡量稳定性</div></div>
-      <div class="panel tile"><div class="label">失败运行 ${src(b.failed_runs.src)}</div>
-        <div class="value">${b.failed_runs.v}</div><div class="hint">τ² 判定 reward &lt; 1</div></div>
-      <div class="panel tile"><div class="label">失败中有异常信号 ${src(v.any_signal.src)}</div>
-        <div class="value">${pct(v.any_signal.v.rate)}</div>
-        <div class="hint">${v.any_signal.v.n}/${v.any_signal.v.of}；成功运行误标 ${nOf(v.any_signal.v.flagged_passing_runs)}</div></div>
-      <div class="panel tile"><div class="label">假成功（说办好了但没办对）${src(v.false_success.src)}</div>
-        <div class="value">${v.false_success.v.n}</div>
-        <div class="hint">占失败 ${pct(v.false_success.v.rate)}；人工抽查准确率：${v.precision.v === null ? "未测" : pct(v.precision.v)}</div></div>
-      <div class="panel tile"><div class="label">总花费 ${src(o.cost.src)}</div>
-        <div class="value">$${cost.billed_usd.toFixed(2)}</div>
-        <div class="hint">${cost.calls.toLocaleString()} 次模型调用，免费档</div></div>
-    </div>
+// One-line answer to "what went wrong", built only from what the layers found.
+function verdictLine(c) {
+  const t = c.tau2, d = c.diagnosis, bits = [];
+  if (t.reward === 1) bits.push(`<span class="tag good">τ² 判定成功</span>`);
+  else bits.push(`<span class="tag bad">τ² 判定失败</span>`);
+  if (t.false_success) bits.push(`<span class="tag bad">假成功：说办好了但没办对</span>`);
+  const v = c.findings.filter((f) => f.severity === "violation");
+  if (v.length) bits.push(`<span class="tag bad">${v.length} 条违规</span>`);
+  if (d && !d.abstain) bits.push(`<span class="tag">调查 agent：步骤 ${d.critical_step} · ${esc(CATEGORY_ZH[d.category] || d.category)}</span>`);
+  if (d && d.abstain) bits.push(`<span class="tag warn">调查 agent 弃权</span>`);
+  return bits.join(" ");
+}
 
-    <h2>失败原因（τ² 自带判定）${src(b.failed_reasons.src)}</h2>
-    <div class="panel">${bars(Object.fromEntries(Object.entries(b.failed_reasons.v).map(([k, n]) => [REASON_ZH[k] || k, n])), b.failed_runs.v)}</div>
+function show(c, note, pending) {
+  document.getElementById("result").innerHTML = renderCard(c, { header: headerFor(c, note), pending });
+  const d = c.diagnosis;
+  const first = d && d.critical_step !== null ? d.critical_step
+    : (c.claims[0] || c.findings.find((f) => f.severity === "violation") || {}).step;
+  if (first !== undefined) setTimeout(() => scrollTimelineTo(first), 30);
+}
 
-    <h2>按失败类别分布（AI 推断）${src(c.answered_by_category.src)}</h2>
-    <div class="panel">
-      <p class="note" style="margin-top:0">每个有失败的任务取 1 条未被规则解释的失败轨迹，共 ${c.candidates.v} 条，已诊断 ${c.diagnosed.v} 条。
-        调查器 3 次采样一致且证据可在原文找到才作答，否则弃权。
-        作答 ${c.answered.v} 条，弃权 ${c.abstained.v} 条。另有 ${c.errors.v} 条在 3 次采样里至少有 1 次回复无法解析。</p>
-      <h3>作答的 ${c.answered.v} 条</h3>
-      ${bars(Object.fromEntries(Object.entries(c.answered_by_category.v).map(([k, n]) => [zhCat(k), n])), c.answered.v)}
-      <div class="banner warn" style="margin-top:12px">
-        <b>可信度提示：</b>同一调查器在 AgentRx 人工标注测试集上，作答时类别正确率 ${nOf(acc.category_answered)}，
-        关键步骤（±1 步）正确率 ${nOf(acc.step_within_1_answered)}，弃权率 ${nOf(acc.abstain)}。
-        所以这里的分布只能当方向参考，不是结论。${src(c.investigator_accuracy.src)}
-      </div>
-      <p class="note">同一批轨迹让调查器重跑一次（输入只多了一条“转人工”观察）：两次都作答的
-        ${c.stability.v.answered_in_both} 条里，类别和关键步骤一致 ${c.stability.v.answered_in_both_same_category_and_step} 条；
-        但“作答还是弃权”只有 ${c.stability.v.abstain_decision_same}/${c.stability.v.without_parse_errors_in_either} 条一致。${src(c.stability.src)}</p>
-    </div>
+async function post(url, body) {
+  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const data = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
 
-    <h2>花费明细 ${src(o.cost.src)}</h2>
-    <div class="panel scroll-x"><table>
-      <tr><th>模型</th><th class="num">调用次数</th><th class="num">成功</th><th class="num">tokens</th></tr>
-      ${Object.entries(cost.by_model).map(([m, r]) => `<tr><td>${esc(m)}</td><td class="num">${r.calls.toLocaleString()}</td>
-        <td class="num">${(r.ok || 0).toLocaleString()}</td><td class="num">${r.tokens.toLocaleString()}</td></tr>`).join("")}
-      <tr><th>合计</th><th class="num">${cost.calls.toLocaleString()}</th><th></th><th class="num">${cost.tokens.toLocaleString()}</th></tr>
-    </table>
-    <p class="note">全部使用免费档，实际账单 $${cost.billed_usd.toFixed(2)}。</p></div>
-  `;
-}).catch((e) => fail(document.getElementById("app"), e));
+async function readInput() {
+  const tab = document.querySelector(".tab.on").dataset.tab;
+  if (tab === "sample") return { sample: document.getElementById("sample").value };
+  if (tab === "upload") {
+    const f = document.getElementById("file").files[0];
+    if (!f) throw new Error("请先选择一个 JSON 文件。");
+    return { trajectory: JSON.parse(await f.text()) };
+  }
+  const text = document.getElementById("paste").value.trim();
+  if (!text) throw new Error("请先粘贴一条运行记录。");
+  try { return { trajectory: JSON.parse(text) }; } catch (e) { throw new Error(`不是合法的 JSON：${e.message}`); }
+}
+
+async function run() {
+  const go = document.getElementById("go");
+  go.disabled = true;
+  try {
+    const input = await readInput();
+    const useInv = document.getElementById("useInv").checked && !document.getElementById("useInv").disabled;
+    if (!LOCAL) {  // online demo: pre-computed results only
+      const c = AUDIT.cases.find((x) => x.id === input.sample);
+      progress({ rules: "pre", db: "pre", inv: "pre" });
+      return show(c, `<span class="tag warn">预先运行的结果</span> ${src(c.file)}`);
+    }
+    progress({ rules: "run", db: "run" });
+    document.getElementById("result").innerHTML = "";
+    const body = input.sample ? { file: input.sample } : { trajectory: input.trajectory };
+    const { case: c, token } = await post("/api/analyze", body);
+    progress({ rules: "done", db: "done", inv: useInv ? "run" : "skip" });
+    const note = input.sample ? src(input.sample) : `<span class="note">（你上传的记录）</span>`;
+    show(c, note, useInv ? `<span class="note">调查 agent 正在读这条记录（3 次采样，约 10–60 秒）…</span>` : "");
+    if (!useInv) return;
+    try {
+      const { case: full } = await post("/api/investigate", { token });
+      progress({ rules: "done", db: "done", inv: "done" });
+      show(full, note);
+    } catch (e) {
+      progress({ rules: "done", db: "done", inv: "fail" });
+      show(c, note, `<div class="banner bad">调查 agent 失败：${esc(e.message)}</div>`);
+    }
+  } catch (e) {
+    progress({});
+    showError(e.message);
+  } finally { go.disabled = false; }
+}
+
+document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("on", x === b));
+  document.querySelectorAll(".tabpane").forEach((p) => { p.hidden = p.dataset.pane !== b.dataset.tab; });
+}));
+document.getElementById("go").addEventListener("click", run);
+
+(async () => {
+  try {
+    const res = await fetch("/api/status");
+    LOCAL = res.ok ? await res.json() : null;
+  } catch { LOCAL = null; }
+  const mode = document.getElementById("mode"), sel = document.getElementById("sample"), inv = document.getElementById("useInv");
+  if (LOCAL) {
+    mode.innerHTML = `<div class="banner good" style="margin-bottom:12px">本地模式：会对你选的记录实时运行 TraceCheck。
+      调查 agent：${LOCAL.investigator ? `已启用（${esc(LOCAL.model)}，用你本机的 key，会记入 results/cost_log.csv）` : "未启用，需要设置环境变量 GEMINI_API_KEY 后重启"}。</div>`;
+    if (!LOCAL.investigator) { inv.checked = false; inv.disabled = true; }
+    const { samples } = await (await fetch("/api/samples")).json();
+    const TAG_ZH = { v1: "v1", v2: "v2", bug_addr2: "埋 bug：清空地址第二行", bug_dropitem: "埋 bug：漏掉最后一件" };
+    sel.innerHTML = samples.map((s) => `<option value="${esc(s.file)}">${esc(TAG_ZH[s.tag] || s.tag)} · 任务 ${esc(s.task_id)} · 第 ${s.trial} 次 · ${s.success ? "成功" : "失败"}${s.false_success ? " · 假成功" : ""}</option>`).join("");
+  } else {
+    AUDIT = await loadData("audit");
+    mode.innerHTML = `<div class="banner warn" style="margin-bottom:12px"><b>线上展示版：</b>这里不能分析新记录，因为调查 agent 要调用模型，公开网页不能放 API key。
+      下面只能选预先分析好的 ${AUDIT.cases.length} 条记录，看到的都是<b>预先运行的结果</b>。
+      想分析自己的记录：在本地运行 <code>python -m web.serve</code>（见 README）。</div>`;
+    document.querySelectorAll('.tab[data-tab="upload"], .tab[data-tab="paste"]').forEach((b) => { b.disabled = true; b.title = "仅本地模式可用"; });
+    inv.disabled = true;
+    sel.innerHTML = AUDIT.cases.map((c) => `<option value="${esc(c.id)}">任务 ${esc(c.task_id)} · 第 ${c.trial} 次 · ${c.diagnosis.abstain ? "调查 agent 弃权" : esc(CATEGORY_ZH[c.diagnosis.category] || c.diagnosis.category)}</option>`).join("");
+  }
+  progress({});
+})();
 </script>
 </body>
 </html>

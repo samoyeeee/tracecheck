@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TraceCheck 审计卡</title>
+<title>TraceCheck 案例库</title>
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/common.js"></script>
+<script src="assets/card.js"></script>
 </head>
 <body>
 <header class="top"><div class="in">
   <span class="brand">TraceCheck</span>
-  <nav><a href="index.html">总览</a><a href="audit.html">问题审计卡</a><a href="regression.html">回归对比</a></nav>
+  <nav><a href="index.html">分析一条记录</a><a href="audit.html">案例库</a><a href="overview.html">评测总览</a><a href="regression.html">回归对比</a></nav>
 </div></header>
 <main id="app"><p class="note">加载中…</p></main>
 <script>
@@ -19,118 +20,39 @@ const STORE = "tracecheck.audit.decisions";
 function readDecisions() { try { return JSON.parse(localStorage.getItem(STORE) || "{}"); } catch { return {}; } }
 function writeDecisions(d) { try { localStorage.setItem(STORE, JSON.stringify(d)); return true; } catch { return false; } }
 
-const ROLE_ZH = { assistant: "Agent", user: "用户", tool: "工具结果", system: "系统" };
 let DATA, idx = 0, filter = "all";
-
-function stepLink(s) { return s === null || s === undefined ? "" : `<button class="steplink" data-step="${s}">步骤 ${s}</button>`; }
 
 function visible() {
   return DATA.cases.filter((c) => filter === "all" || (filter === "answered" ? !c.diagnosis.abstain : c.diagnosis.abstain));
 }
 
-function renderTimeline(c) {
-  const d = c.diagnosis;
-  const flagged = new Set(c.findings.map((f) => f.step).concat(c.claims.map((x) => x.step)));
-  return c.timeline.map((m) => {
-    const cls = ["step", m.role === "tool" ? "tool" : "", m.step === d.critical_step && !d.abstain ? "critical" : "",
-                 flagged.has(m.step) ? "flagged" : ""].join(" ");
-    const marks = [
-      m.step === d.critical_step ? `<span class="tag ${d.abstain ? "warn" : "bad"}">${d.abstain ? "候选关键步（已弃权）" : "AI 判定的关键失败步"}</span>` : "",
-      m.error ? `<span class="tag bad">工具报错</span>` : "",
-      ...c.findings.filter((f) => f.step === m.step).map((f) => `<span class="tag ${f.severity === "violation" ? "bad" : "warn"}">${esc(zhRule(f.rule))}</span>`),
-      ...c.claims.filter((x) => x.step === m.step).map((x) => `<span class="tag bad">${esc(CLAIM_ZH[x.status] || x.status)}</span>`),
-    ].join(" ");
-    const calls = m.calls.map((k) => `<div class="call">→ ${esc(k.name)}(${esc(JSON.stringify(k.args))})</div>`).join("");
-    return `<div class="${cls}" id="step-${m.step}">
-      <div class="head"><span>步骤 ${m.step}</span><span class="role">${ROLE_ZH[m.role] || esc(m.role)}</span>${marks}</div>
-      ${m.text ? `<div class="body">${esc(m.text)}</div>` : ""}${calls}</div>`;
-  }).join("");
-}
-
-function renderFacts(c) {
-  const t = c.tau2, items = [];
-  items.push(`τ² 判定：reward = ${t.reward}，结束方式 ${esc(t.termination)}，数据库${t.db_match ? "一致" : "<b>不一致</b>"}。`);
-  if (t.false_success) items.push(`<b>假成功：</b>agent 告诉用户已办好，但数据库不支持这个说法。`);
-  for (const x of c.claims) items.push(`${stepLink(x.step)} 声明“${esc(x.sentence)}” → <b>${esc(CLAIM_ZH[x.status] || x.status)}</b>。<div class="note">${esc(x.reason)}</div>`);
-  for (const f of c.findings) items.push(`${stepLink(f.step)} 规则 <b>${esc(zhRule(f.rule))}</b>（${f.severity === "violation" ? "违规" : f.severity === "info" ? "观察" : "提醒"}）：${esc(f.message)}`
-    + (f.policy ? `<div class="quote">政策原文：${esc(f.policy)}</div>` : ""));
-  for (const d of c.db_diff.slice(0, 4)) items.push(`数据库差异：${esc(d.table)} ${esc(d.id)}：` + (d.fields || []).slice(0, 4).map((f) =>
-    `<code>${esc(f.path)}</code> 实际 ${esc(JSON.stringify(f.final))}，应为 ${esc(JSON.stringify(f.expected))}`).join("；"));
-  for (const e of c.diagnosis.evidence || []) if (e.valid) items.push(`${stepLink(e.step)} 原文引用（已逐字核对）：<div class="quote">${esc(e.quote)}</div>`);
-  return items;
-}
-
-function renderInfer(c) {
-  const d = c.diagnosis, items = [];
-  if (d.error) items.push(`<span class="tag warn">3 次采样中有回复无法解析</span> <span class="note">${esc(d.error)}</span>`);
-  items.push(`类别：${zhCat(d.category)}`);
-  items.push(`关键步骤：${stepLink(d.critical_step) || "—"}；责任方：${esc(d.failed_agent || "—")}`);
-  items.push(`置信度（3 次采样一致率）：<b>${d.confidence === null ? "—" : pct(d.confidence, 0)}</b> ${d.abstain ? '<span class="tag warn">已弃权</span>' : '<span class="tag good">作答</span>'}`);
-  if (d.summary) items.push(`摘要：${esc(d.summary)}`);
-  for (const s of d.inference || []) items.push(esc(s));
-  if ((d.observed_facts || []).length) items.push(`<span class="note">调查器自述的“事实”（模型生成，未逐条程序核验）：</span><ul class="tight">${d.observed_facts.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>`);
-  return items;
-}
-
-function renderCheck(c) {
-  const d = c.diagnosis, items = [];
-  if (d.abstain) items.push(`<b>弃权原因：</b>${esc(d.abstain_reason)}`);
-  for (const e of d.evidence || []) if (!e.valid) items.push(`${stepLink(e.step)} 这条引用在原文中找不到，不能当证据：<div class="quote">${esc(e.quote)}</div>`);
-  for (const s of d.needs_verification || []) items.push(esc(s));
-  if (!items.length) items.push(`<span class="note">无</span>`);
-  return items;
-}
-
-function col(cls, title, items) {
-  return `<div class="panel col ${cls}"><h3>${title} <span class="count">${items.length}</span></h3>
-    ${items.map((s) => `<div class="item">${s}</div>`).join("")}</div>`;
-}
-
 function render() {
-  const list = visible();
-  const app = document.getElementById("app");
-  if (!list.length) { app.querySelector("#card").innerHTML = `<p class="note">没有符合条件的案例。</p>`; return; }
+  const list = visible(), card = document.getElementById("card");
+  if (!list.length) { card.innerHTML = `<p class="note">没有符合条件的案例。</p>`; return; }
   idx = Math.max(0, Math.min(idx, list.length - 1));
   const c = list[idx], decisions = readDecisions(), mine = decisions[c.id] || {};
   document.getElementById("pick").innerHTML = list.map((x, i) =>
     `<option value="${i}" ${i === idx ? "selected" : ""}>任务 ${esc(x.task_id)} · 第 ${x.trial} 次 · ${x.diagnosis.abstain ? "弃权" : esc(CATEGORY_ZH[x.diagnosis.category] || x.diagnosis.category || "—")}${decisions[x.id] ? " ✓" : ""}</option>`).join("");
-  document.getElementById("card").innerHTML = `
-    <div class="panel" style="margin-bottom:12px">
+  card.innerHTML = renderCard(c, {
+    header: `<div class="panel" style="margin-bottom:12px">
       <div><b>任务 ${esc(c.task_id)}，第 ${c.trial} 次运行</b> ${src(c.file)} <span class="note">诊断 ${src(DATA.src_diagnoses)} 规则与核验 ${src(DATA.src_triage)}</span></div>
-      <div class="note">用户目标：${esc(c.user_goal)}</div>
-    </div>
-    <div class="audit">
-      <div class="panel timeline" id="tl">${renderTimeline(c)}</div>
-      <div>
-        <div class="cols">
-          ${col("fact", "已观察事实", renderFacts(c))}
-          ${col("infer", "AI 推断", renderInfer(c))}
-          ${col("check", "仍需核实", renderCheck(c))}
-        </div>
-        <div class="panel decide">
-          <button class="primary" data-decide="accept">接受诊断</button>
-          <button data-decide="reject">驳回诊断</button>
-          <textarea id="memo" placeholder="备注（可选）">${esc(mine.note || "")}</textarea>
-          <div class="note" style="width:100%">${mine.verdict ? `你的判断：<b>${mine.verdict === "accept" ? "接受" : "驳回"}</b>（${esc(mine.at)}）` : "尚未判断"}。只保存在这个浏览器里。</div>
-        </div>
-      </div>
-    </div>`;
-}
-
-function jump(step) {
-  const el = document.getElementById(`step-${step}`);
-  if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "center" });
-  el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 1400);
+      <div class="note">用户目标：${esc(c.user_goal)}</div></div>`,
+    extra: `<div class="panel decide">
+      <button class="primary" data-decide="accept">接受诊断</button>
+      <button data-decide="reject">驳回诊断</button>
+      <textarea id="memo" placeholder="备注（可选）">${esc(mine.note || "")}</textarea>
+      <div class="note" style="width:100%">${mine.verdict ? `你的判断：<b>${mine.verdict === "accept" ? "接受" : "驳回"}</b>（${esc(mine.at)}）` : "尚未判断"}。只保存在这个浏览器里。</div></div>`,
+  });
+  if (c.diagnosis.critical_step !== null) setTimeout(() => scrollTimelineTo(c.diagnosis.critical_step), 30);
 }
 
 loadData("audit").then((data) => {
   DATA = data;
   const app = document.getElementById("app");
   app.innerHTML = `
-    <h1>问题审计卡</h1>
-    <p class="sub">v1 的失败轨迹，每个任务取 1 条（未被规则解释的失败轨迹），共 ${data.cases.length} 条。
-      左边是逐步时间线，红框是 AI 判定的关键失败步，黄边是规则或核验标出的步骤；点“步骤 N”可跳转。</p>
+    <h1>案例库</h1>
+    <p class="sub">TraceCheck 预先分析好的 ${data.cases.length} 条失败记录（v1 客服 agent，每个任务取 1 条规则没能解释的失败）。
+      这里可以逐条审阅调查 agent 的结论，接受或驳回。要分析新的记录，去“分析一条记录”。</p>
     <div class="audit-bar">
       <button id="prev">← 上一条</button>
       <select id="pick"></select>
@@ -140,10 +62,9 @@ loadData("audit").then((data) => {
     </div>
     <div id="card"></div>`;
   app.addEventListener("click", (e) => {
-    const s = e.target.closest(".steplink"); if (s) return jump(s.dataset.step);
     const d = e.target.closest("[data-decide]");
     if (d) {
-      const list = visible(), c = list[idx], all = readDecisions();
+      const c = visible()[idx], all = readDecisions();
       all[c.id] = { verdict: d.dataset.decide, note: document.getElementById("memo").value, at: new Date().toISOString().slice(0, 16).replace("T", " ") };
       if (!writeDecisions(all)) alert("浏览器禁止了本地存储，判断没有保存。");
       return render();
@@ -158,11 +79,6 @@ loadData("audit").then((data) => {
   document.getElementById("pick").addEventListener("change", (e) => { idx = +e.target.value; render(); });
   document.getElementById("filter").addEventListener("change", (e) => { filter = e.target.value; idx = 0; render(); });
   render();
-  const c = visible()[idx];
-  if (c && c.diagnosis.critical_step !== null) setTimeout(() => {
-    const tl = document.getElementById("tl"), el = document.getElementById(`step-${c.diagnosis.critical_step}`);
-    if (tl && el) tl.scrollTop = el.offsetTop - tl.offsetTop - 40;
-  }, 50);
 }).catch((e) => fail(document.getElementById("app"), e));
 </script>
 </body>

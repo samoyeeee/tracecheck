@@ -20,7 +20,6 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 OUT = ROOT / "web" / "data"
-MAX_TEXT = 1500          # clip long tool results in the audit timeline
 
 
 def load(path: str):
@@ -94,42 +93,19 @@ def overview() -> dict:
 
 # --- audit cards -----------------------------------------------------------------
 
-def timeline(run: dict) -> list[dict]:
-    out = []
-    for i, m in enumerate(run.get("messages") or []):
-        text = (m.get("content") or "").strip()
-        if len(text) > MAX_TEXT:
-            text = text[:MAX_TEXT] + f" …（已截断，原文 {len(text)} 字符）"
-        out.append({"step": i, "role": m.get("role"), "text": text, "error": bool(m.get("error")),
-                    "calls": [{"name": c["name"], "args": c.get("arguments")} for c in m.get("tool_calls") or []]})
-    return out
-
-
 def audit() -> dict:
-    d = load("results/diagnoses/v1.json")
-    triage = {r["file"]: r for r in load("results/triage/v1.json")}
+    """Pre-computed demo: the v1 failures the investigator diagnosed (same card as live analysis)."""
+    from triage.pipeline import DIAGNOSIS_FIELDS, case_from_report
     from triage.trajectory import from_tau2
 
+    d = load("results/diagnoses/v1.json")
+    triage = {r["file"]: r for r in load("results/triage/v1.json")}
     cases = []
     for key, x in sorted(d["diagnoses"].items(), key=lambda kv: int(kv[0].split("_")[1])):
-        run = load(x["file"])
-        t = triage[x["file"]]
-        findings = [f for f in t["findings"] if f["severity"] != "warning" or f["rule_id"] != "policy_one_action_per_turn"]
-        cases.append({
-            "id": key, "file": x["file"], "task_id": t["task_id"], "trial": t["trial"],
-            "user_goal": from_tau2(ROOT / x["file"]).user_goal,
-            "tau2": {"reward": t["tau2_reward"], "termination": t["termination_reason"],
-                     "db_match": t["tau2_db_match"], "false_success": t["false_success"]},
-            "timeline": timeline(run),
-            "findings": [{"rule": f["rule_id"], "severity": f["severity"], "step": f["step"],
-                          "message": f["message"], "policy": f.get("policy_quote")} for f in findings],
-            "claims": [c for c in t["claims"] if c["status"] != "verified"],
-            "db_diff": t["db_diff"],
-            "diagnosis": {k: x.get(k) for k in ("critical_step", "failed_agent", "category", "evidence",
-                                                "observed_facts", "inference", "needs_verification",
-                                                "confidence", "abstain", "abstain_reason", "summary",
-                                                "model", "prompt_version", "error")},
-        })
+        case = case_from_report(triage[x["file"]], load(x["file"]), from_tau2(ROOT / x["file"]).user_goal)
+        case["id"] = key
+        case["diagnosis"] = {k: x.get(k) for k in DIAGNOSIS_FIELDS}
+        cases.append(case)
     return {"src_diagnoses": "results/diagnoses/v1.json", "src_triage": "results/triage/v1.json",
             "selection": d["selection"], "cases": cases}
 
