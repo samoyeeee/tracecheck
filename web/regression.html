@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TraceCheck 回归对比</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+  <span class="brand">TraceCheck</span>
+  <nav><a href="index.html">总览</a><a href="audit.html">问题审计卡</a><a href="regression.html">回归对比</a></nav>
+</div></header>
+<main id="app"><p class="note">加载中…</p></main>
+<script>
+const TYPE_ZH = {
+  cancel: "取消订单", exchange: "换货", modify_items: "修改商品", modify_order_address: "改订单地址",
+  modify_payment: "改支付方式", modify_user_address: "改用户地址", no_write: "只查询不写库", return: "退货",
+};
+const VERDICT_CLS = { "可以上线": "good", "需要再查": "warn", "不建议上线": "bad" };
+const BUG_ZH = {
+  bug_auth: "删掉政策里“先验证用户身份”的规则",
+  bug_transfer: "把“转人工”工具的说明改模糊，去掉“只在以下情况转人工”的条件",
+  bug_noconfirm: "删掉“写数据库前要先列明细并等用户确认”的规则（工具说明里仍有提及）",
+  bug_param: "把修改商品工具的参数说明写错（商品 ID 写成产品 ID）",
+  bug_addr2: "工具调用代码把“地址第二行”清空（改订单地址 / 改用户地址）",
+  bug_dropitem: "工具调用代码差一错误：一次退货 / 换货 / 改商品涉及 2 件以上时漏掉最后一件",
+};
+// The release facts are stored in English in results/eval_regression.json; show them in Chinese.
+function factsZh(rel) {
+  return rel.facts.map((f) => {
+    let m;
+    if ((m = f.match(/overall success ([\d.]+) -> ([\d.]+) \(p_holm=([\d.]+)\)/)))
+      return `总成功率 ${pct(+m[1])} → ${pct(+m[2])}（校正后 p = ${(+m[3]).toFixed(3)}，不显著）`;
+    if ((m = f.match(/(\d+) better, (\d+) worse \(v1 vs v1 itself: (\d+) beyond/)))
+      return `超出单任务噪声的任务：${m[1]} 个变好，${m[2]} 个变差（v1 自己重跑也有 ${m[3]} 个超出）`;
+    if (/significantly worse rule metrics: none/.test(f)) return "显著变差的规则指标：无";
+    return f;
+  });
+}
+const p = (x) => (x === null || x === undefined ? "—" : x < 0.001 ? "<0.001" : x.toFixed(3));
+
+loadData("regression").then((r) => {
+  const rel = r.release.v, s = r.success.v, noise = r.noise.v, fa = r.false_alarms.v, sum = r.summary.v;
+  const rows = Object.entries(r.by_type.v).sort((a, b) => b[1].tasks - a[1].tasks);
+  document.getElementById("app").innerHTML = `
+    <h1>回归对比</h1>
+    <p class="sub">同一套任务上比较 agent 的不同版本。检验方法在运行前登记好，跑完后没有改动
+      ${src(r.plans[0])}${src(r.plans[1])}。</p>
+
+    <div class="banner ${VERDICT_CLS[rel.verdict] || "warn"}">
+      <div class="note">v2 发布建议 ${src(r.release.src)}</div>
+      <div class="verdict">${esc(rel.verdict)}</div>
+      <ul class="tight">${factsZh(rel).map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
+      <div class="note">判定规则（运行前定好）：成功率显著提升且没有规则指标显著变差 → 可以上线；
+        成功率显著下降，或规则指标变差而成功率没提升 → 不建议上线；其他情况 → 需要再查。</div>
+    </div>
+
+    <h2>v1 vs v2：总成功率 ${src(r.success.src)}</h2>
+    <div class="grid tiles">
+      <div class="panel tile"><div class="label">v1 成功率</div><div class="value">${pct(s.v1)}</div><div class="hint">114 任务 × 4 次</div></div>
+      <div class="panel tile"><div class="label">v2 成功率</div><div class="value">${pct(s.v2)}</div>
+        <div class="hint">配对置换检验 p = ${p(s.p)}，校正后 ${p(s.p_holm)}，不显著</div></div>
+      <div class="panel tile"><div class="label">同版本重跑的误报 ${src(r.false_alarms.src)}</div><div class="value">${fa.phase4 + fa.phase4b}</div>
+        <div class="hint">v1 重跑 vs v1，所有检验都不显著</div></div>
+      <div class="panel tile"><div class="label">单任务噪声阈值 ${src(r.noise.src)}</div><div class="value">${pct(noise.per_task_noise_threshold, 0)}</div>
+        <div class="hint">v1 自己重跑，${noise.tasks_beyond_threshold_in_v1_vs_v1} 个任务的变化超过它</div></div>
+    </div>
+
+    <h2>按任务类型 ${src(r.by_type.src)}</h2>
+    <div class="panel scroll-x"><table>
+      <tr><th>类型</th><th class="num">任务数</th><th class="num">v1</th><th class="num">v1 重跑</th><th class="num">v2</th>
+        <th>超出噪声的改善</th><th>超出噪声的退化</th></tr>
+      ${rows.map(([k, v]) => `<tr><td>${TYPE_ZH[k] || esc(k)}</td><td class="num">${v.tasks}</td>
+        <td class="num">${pct(v.v1_rate)}</td><td class="num">${pct(v.v1_rerun_rate)}</td><td class="num">${pct(v.v2_rate)}</td>
+        <td>${v.fixed.length ? v.fixed.map((t) => `<span class="tag good">任务 ${esc(t)}</span>`).join(" ") : '<span class="note">—</span>'}</td>
+        <td>${v.worse.length ? v.worse.map((t) => `<span class="tag bad">任务 ${esc(t)}</span>`).join(" ") : '<span class="note">—</span>'}</td></tr>`).join("")}
+    </table>
+    <p class="note">“超出噪声”指单个任务 4 次成功率的变化超过 ${pct(noise.per_task_noise_threshold, 0)}（v1 自己重跑时 |变化| 的第 95 百分位）。
+      一个任务若包含多种写操作，会在每种类型下各算一次。“v1 重跑”一列用来对照：同一个版本重跑也会有这么大的波动。</p></div>
+
+    <h2>埋入已知 bug，看 TraceCheck 能否发现 ${src(r.summary.src)}</h2>
+    <div class="panel scroll-x"><table>
+      <tr><th>bug</th><th>轮次</th><th>检验指标</th><th class="num">v1 → bug</th><th class="num">校正后 p</th>
+        <th>检出</th><th>定位</th><th class="num">τ² 成功率 v1 → bug</th></tr>
+      ${r.bugs.map((b) => `<tr><td><b>${esc(b.name)}</b><div class="note">${esc(BUG_ZH[b.name] || b.description)}</div></td>
+        <td>${b.round === "4" ? "第一轮<div class=note>改提示词</div>" : "补实验<div class=note>改代码</div>"}</td>
+        <td>${esc(zhRule(b.metric))}</td>
+        <td class="num">${pct(b.base_rate)} → ${pct(b.other_rate)}</td><td class="num">${p(b.p_holm)}</td>
+        <td>${b.detected ? '<span class="tag good">是</span>' : '<span class="tag bad">否</span>'}</td>
+        <td>${b.detected && b.localised ? '<span class="tag good">是</span>' : '<span class="tag bad">否</span>'}
+          ${b.localisation ? `<div class="note">指向被改字段：bug 版 ${pct(b.localisation[0], 0)}，v1 ${pct(b.localisation[1], 0)}</div>` : ""}</td>
+        <td class="num">${pct(b.success[0])} → ${pct(b.success[1])} ${src(b.src)}</td></tr>`).join("")}
+    </table>
+    <div class="note">
+      <p>第一轮（只改提示词）：检出 ${esc(sum.phase4.bugs_detected)}。事后核对发现其中两个 bug 几乎没有改变 agent 的行为，
+        另外每次比较要对 20 个指标做多重校正，影响集中在少数任务时判不出显著 ${src(r.mechanism_src)}。</p>
+      <p>补实验（改工具调用代码、每个 bug 只检验一个事先指定的指标）：检出 ${esc(sum.phase4b.bugs_detected)}，定位 ${esc(sum.phase4b.bugs_localised)}。
+        注意“定位”标准偏宽：未改动的 v1 在同样任务上也有不少差异落在同一字段上。</p>
+    </div></div>
+
+    <h2>各版本 pass^k ${src(r.pass_hat.src)}</h2>
+    <div class="panel scroll-x"><table>
+      <tr><th>版本</th><th class="num">任务</th><th class="num">pass^1</th><th class="num">pass^2</th><th class="num">pass^3</th><th class="num">pass^4</th></tr>
+      ${Object.entries(r.pass_hat.v).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="num">${v.tasks}</td>
+        ${[1, 2, 3, 4].map((i) => `<td class="num">${pct(v["pass^" + i])}</td>`).join("")}</tr>`).join("")}
+    </table><p class="note">bug 版本只跑了各自 20 个任务，不能和 114 个任务的版本直接比较。</p></div>
+  `;
+}).catch((e) => fail(document.getElementById("app"), e));
+</script>
+</body>
+</html>

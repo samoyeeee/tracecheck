@@ -1,0 +1,34 @@
+{
+ "prompt_hash": "4a4c487235fd0ab5",
+ "prompt_version": "v3",
+ "arm": "C",
+ "raw": "{\"critical_step\": 10, \"failed_agent\": \"assistant\", \"category\": \"Intent-Plan Misalignment\", \"evidence\": [{\"step\": 10, \"quote\": \"Let me check your recent orders to help you with the changes you need. | CALL get_order_details\"}], \"observed_facts\": [\"The user has multiple orders listed in their profile: '#W9810810', '#W9034102', '#W3964602', '#W3730488'.\", \"The agent only fetched the details for order #W9810810 and assumed it was the correct order to modify.\"], \"inference\": [\"The agent failed to check all orders belonging to the user when the user mentioned 'modify my laptop order', leading to examining the wrong order (#W9810810 instead of #W3730488 which contained the laptop) and subsequently failing the entire task.\"], \"needs_verification\": [\"Whether checking all orders of the user would have immediately revealed the correct order containing the laptop.\"], \"confidence\": 0.5, \"abstain\": false, \"summary\": \"The agent inspected only the first order returned in the user profile instead of checking all orders to find the one containing the laptop.\"}",
+ "parsed": {
+  "critical_step": 10,
+  "failed_agent": "assistant",
+  "category": "Intent-Plan Misalignment",
+  "evidence": [
+   {
+    "step": 10,
+    "quote": "Let me check your recent orders to help you with the changes you need. | CALL get_order_details"
+   }
+  ],
+  "observed_facts": [
+   "The user has multiple orders listed in their profile: '#W9810810', '#W9034102', '#W3964602', '#W3730488'.",
+   "The agent only fetched the details for order #W9810810 and assumed it was the correct order to modify."
+  ],
+  "inference": [
+   "The agent failed to check all orders belonging to the user when the user mentioned 'modify my laptop order', leading to examining the wrong order (#W9810810 instead of #W3730488 which contained the laptop) and subsequently failing the entire task."
+  ],
+  "needs_verification": [
+   "Whether checking all orders of the user would have immediately revealed the correct order containing the laptop."
+  ],
+  "confidence": 0.5,
+  "abstain": false,
+  "summary": "The agent inspected only the first order returned in the user profile instead of checking all orders to find the one containing the laptop."
+ },
+ "usage": {
+  "prompt_tokens": 5937,
+  "completion_tokens": 281
+ }
+}

@@ -1,38 +1,34 @@
 {
- "prompt_hash": "05f42996511ca6e6",
+ "prompt_hash": "b11e9663e6f63cff",
  "prompt_version": "v3",
  "arm": "C",
- "raw": "{\n  \"critical_step\": 5,\n  \"failed_agent\": \"user\",\n  \"category\": \"Underspecified User Intent\",\n  \"evidence\": [\n    {\n      \"step\": 5,\n      \"quote\": \"Oh, right, the zip code! Yeah, that's 85033. My name's Fatima Taylor. So, like, if you need the old Florida one, it's 32169\"\n    },\n    {\n      \"step\": 7,\n      \"quote\": \"Error: User not found\"\n    }\n  ],\n  \"observed_facts\": [\n    \"The user provided the name 'Fatima Taylor' and zip code '85033', which failed authentication because the account is registered under the old Florida zip code.\",\n    \"The agent correctly attempted to authenticate the user using name and zip code, resulting in a user not found error.\"\n  ],\n  \"inference\": [\n    \"The user gave incorrect information for authentication by providing their new zip code instead of the zip code currently on file, making it impossible for the agent to authenticate them.\"\n  ],\n  \"needs_verification\": [\n    \"Whether the user could have remembered their email or old zip code if prompted differently.\"\n  ],\n  \"confidence\": 0.8,\n  \"abstain\": false,\n  \"summary\": \"The user provided the wrong zip code for authentication, preventing the agent from verifying their identity and proceeding with the requests.\"\n}",
+ "raw": "{\n \"critical_step\": 12,\n \"failed_agent\": \"assistant\",\n \"category\": \"Intent Not Supported\",\n \"evidence\": [\n  {\n   \"step\": 12,\n   \"quote\": \"I'll need to transfer you to a human agent who may have additional verification options available\"\n  }\n ],\n \"observed_facts\": [\n  \"The user could not authenticate via email or name + zip code because she forgot her email and her account was registered under a different address/zip code.\",\n  \"The agent properly followed policy by refusing to bypass authentication and eventually transferred the user to a human agent because the request could not be handled within the scope of available tools/actions without authentication.\"\n ],\n \"inference\": [\n  \"The conversation failed because the user lacked the necessary information to authenticate, requiring human intervention which falls under Intent Not Supported / unresolvable standard flow.\"\n ],\n \"needs_verification\": [\n  \"Verify whether the user's inability to authenticate should be classified as Underspecified User Intent or Intent Not Supported.\"\n ],\n \"confidence\": 0.5,\n \"abstain\": false,\n \"summary\": \"The task failed because the user could not be authenticated due to missing information, leading the agent to transfer the user to a human agent.\"\n}",
  "parsed": {
-  "critical_step": 5,
-  "failed_agent": "user",
-  "category": "Underspecified User Intent",
+  "critical_step": 12,
+  "failed_agent": "assistant",
+  "category": "Intent Not Supported",
   "evidence": [
    {
-    "step": 5,
-    "quote": "Oh, right, the zip code! Yeah, that's 85033. My name's Fatima Taylor. So, like, if you need the old Florida one, it's 32169"
-   },
-   {
-    "step": 7,
-    "quote": "Error: User not found"
+    "step": 12,
+    "quote": "I'll need to transfer you to a human agent who may have additional verification options available"
    }
   ],
   "observed_facts": [
-   "The user provided the name 'Fatima Taylor' and zip code '85033', which failed authentication because the account is registered under the old Florida zip code.",
-   "The agent correctly attempted to authenticate the user using name and zip code, resulting in a user not found error."
+   "The user could not authenticate via email or name + zip code because she forgot her email and her account was registered under a different address/zip code.",
+   "The agent properly followed policy by refusing to bypass authentication and eventually transferred the user to a human agent because the request could not be handled within the scope of available tools/actions without authentication."
   ],
   "inference": [
-   "The user gave incorrect information for authentication by providing their new zip code instead of the zip code currently on file, making it impossible for the agent to authenticate them."
+   "The conversation failed because the user lacked the necessary information to authenticate, requiring human intervention which falls under Intent Not Supported / unresolvable standard flow."
   ],
   "needs_verification": [
-   "Whether the user could have remembered their email or old zip code if prompted differently."
+   "Verify whether the user's inability to authenticate should be classified as Underspecified User Intent or Intent Not Supported."
   ],
-  "confidence": 0.8,
+  "confidence": 0.5,
   "abstain": false,
-  "summary": "The user provided the wrong zip code for authentication, preventing the agent from verifying their identity and proceeding with the requests."
+  "summary": "The task failed because the user could not be authenticated due to missing information, leading the agent to transfer the user to a human agent."
  },
  "usage": {
-  "prompt_tokens": 4371,
-  "completion_tokens": 335
+  "prompt_tokens": 4395,
+  "completion_tokens": 283
  }
 }
