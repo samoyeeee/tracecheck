@@ -44,7 +44,7 @@ export default function ImportDialog({ status, index, onAnalyse, onOpen }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm"><Upload size={15} />导入记录</Button>
+        <Button size="sm" className="bg-ink hover:bg-ink2 rounded-lg"><Upload size={15} />导入运行记录</Button>
       </DialogTrigger>
       <DialogContent
         title="导入一条 agent 运行记录"

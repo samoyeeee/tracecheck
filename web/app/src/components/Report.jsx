@@ -1,357 +1,348 @@
-import { Fragment, useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Bot, Check, ChevronDown, CircleHelp, ExternalLink, Sparkles, User, Wrench, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import ReviewBar from "@/components/ReviewBar";
 import Markdown from "@/components/Markdown";
 
 export const REPO = "https://github.com/samoyeeee/tracecheck/blob/main/";
 
-export function Source({ path, label = "来源" }) {
+export function Source({ path, label = "来源", className }) {
   if (!path) return null;
+  return <a href={REPO + path} target="_blank" rel="noopener" title={path}
+            className={cn("text-ink3 underline-offset-2 hover:text-ai hover:underline", className)}>{label}</a>;
+}
+
+const Tag = ({ tone = "fail", className, children }) => (
+  <span className={cn("inline-block rounded-full px-2 text-xs font-medium leading-relaxed whitespace-nowrap", {
+    fail: "bg-fail-soft text-fail", ai: "bg-ai-soft text-ai", check: "bg-check-soft text-check", pass: "bg-pass-soft text-pass",
+  }[tone], className)}>{children}</span>
+);
+
+const StepBtn = ({ step, onJump, className }) => step === null || step === undefined ? null : (
+  <button onClick={() => onJump(step)}
+          className={cn("mr-1.5 rounded bg-paper px-1.5 font-mono text-[11.5px] text-ink2 hover:text-ai cursor-pointer", className)}>{step}</button>
+);
+
+const Panel = ({ className, ...p }) => <section className={cn("rounded-[14px] border border-line bg-sheet px-5 py-5 sm:px-[22px]", className)} {...p} />;
+
+// --- onboarding --------------------------------------------------------------------------------
+
+function Intro() {
+  const [show, setShow] = useState(() => { try { return !localStorage.getItem("tc_intro"); } catch { return true; } });
+  if (!show) return null;
+  const steps = [["先看结论", "Agent 哪里没办好，一句话写在最上面。"],
+                 ["再核对证据", "点任何步骤编号，下方对话记录会跳到那一步。"],
+                 ["最后给出判断", "用底部的按钮确认、修改或驳回，然后自动进入下一条。"]];
   return (
-    <a href={REPO + path} target="_blank" rel="noopener" title={path}
-       className="inline-flex items-center gap-0.5 text-xs text-zinc-400 hover:text-ai">
-      {label}<ExternalLink size={11} />
-    </a>
+    <section aria-label="使用说明" className="mb-5 flex items-start gap-3 rounded-[14px] border border-line bg-sheet px-4 py-3 md:grid md:grid-cols-[1fr_auto] md:gap-4 md:px-6 md:py-5">
+      <div className="flex-1">
+        <h3 className="text-[13.5px] font-bold md:mb-2.5 md:text-base">
+          <span className="md:hidden">复核台：确认 AI 的诊断对不对。点步骤编号可跳到对话。</span>
+          <span className="hidden md:inline">这里是 Agent 失败记录的复核台。你只需要做一件事：确认 AI 的诊断对不对。</span>
+        </h3>
+        <ol className="hidden gap-4 md:grid md:grid-cols-3">
+          {steps.map(([b, t], i) => (
+            <li key={b} className="relative pl-[30px] text-[13.5px] text-ink2">
+              <span className="absolute left-0 top-px grid h-[21px] w-[21px] place-items-center rounded-full bg-ink text-xs font-bold text-white">{i + 1}</span>
+              <b className="block font-medium text-ink">{b}</b>{t}
+            </li>
+          ))}
+        </ol>
+      </div>
+      <button onClick={() => { setShow(false); try { localStorage.setItem("tc_intro", "1"); } catch { /* ok */ } }}
+              className="self-start px-2 py-1 text-[13px] text-ink3 hover:text-ink cursor-pointer">知道了</button>
+    </section>
   );
 }
 
-function StepLink({ step, onJump, className }) {
-  if (step === null || step === undefined) return null;
+// --- verdict ----------------------------------------------------------------------------------------
+
+function Verdict({ r }) {
+  const [orig, setOrig] = useState(false);
+  const v = r.verdict;
+  const version = r.file.split("/").slice(-2, -1)[0];
   return (
-    <button onClick={() => onJump(step)}
-            className={cn("shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-600 hover:bg-ai-soft hover:text-ai cursor-pointer", className)}>
-      步骤 {step}
-    </button>
+    <>
+      <div className="mb-2 flex flex-wrap gap-x-3.5 gap-y-1 text-[13px] text-ink3">
+        <span>任务 {r.task_id} · 第 {r.trial} 次运行</span>
+        <span>Agent 版本：{version}</span>
+        <Source path={r.file} label={r.file.split("/").pop()} className="font-mono text-[12.5px]" />
+      </div>
+      <h1 className="mb-2.5 max-w-[34ch] text-[23px] leading-[1.3] font-black tracking-[-0.015em] sm:text-[30px]">
+        <span className={cn("mr-2.5 inline-block -rotate-2 rounded-md border-[2.5px] px-2.5 align-[4px] text-[18px] sm:text-[22px]",
+                            v.tone === "good" ? "border-pass text-pass" : "border-fail text-fail")}>{v.kind}</span>
+        {v.headline}
+      </h1>
+      {v.sub && <p className="mb-1.5 max-w-[72ch] text-ink2">{v.sub}</p>}
+      <p className="mt-2.5 max-w-[80ch] text-[13.5px] text-ink2">
+        用户想做的事：{r.goal.zh || r.goal.original}
+        {r.goal.zh && <button onClick={() => setOrig(!orig)} aria-expanded={orig} className="ml-1.5 text-[13px] text-ai cursor-pointer">{orig ? "收起原文" : "看原文"}</button>}
+        {orig && <span className="mt-1.5 block text-[13px] text-ink3">{r.goal.original}</span>}
+      </p>
+    </>
   );
 }
 
-// ① conclusion ---------------------------------------------------------------------------
+// --- tape: the whole run at a glance ------------------------------------------------------------------
 
-function Label({ caption, label }) {
+function Tape({ r, onJump, active }) {
+  const color = { user: "var(--color-usr)", agent: "var(--color-ink)", tool: "var(--color-tool)" };
+  const height = { tool: "55%", agent: "80%", user: "100%" };
   return (
-    <div className="min-w-0">
-      <div className="text-[11px] text-zinc-500">{caption}</div>
-      <Badge tone={label.tone} className="mt-0.5 px-2.5 py-1 text-sm">{label.text}</Badge>
-    </div>
-  );
-}
-
-function Conclusion({ r }) {
-  const [showGoal, setShowGoal] = useState(false);
-  const L = r.verdict.labels;
-  return (
-    <Card className={cn("border-l-4", r.tau2.reward === 1 ? "border-l-pass" : "border-l-fail")}>
-      <CardContent className="pt-4">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500">
-          <span>任务 {r.task_id} · 第 {r.trial} 次运行</span>
-          <Source path={r.file} label={r.file} />
+    <section aria-label="运行记录概览" className="mt-6 mb-7">
+      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-sm font-bold">整次运行 · {r.tape.length} 步</h3>
+        <div className="flex gap-3 text-xs text-ink3">
+          {[["用户", color.user], ["Agent 回复", color.agent], ["工具调用", color.tool], ["出错", "var(--color-fail)"]].map(([l, c]) => (
+            <span key={l} className="inline-flex items-center gap-1"><i className="inline-block h-[9px] w-[9px] rounded-[2px]" style={{ background: c }} />{l}</span>
+          ))}
         </div>
-        <p className="mt-2 text-lg font-semibold leading-snug sm:text-xl">{r.verdict.sentence}</p>
-        <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
-          <Label caption="任务结果" label={L.task} />
-          <Label caption="失败类型" label={L.kind} />
-          <Label caption="AI 定位" label={L.ai} />
-        </div>
-        <div className="mt-3 text-sm text-zinc-700">
-          <span className="text-zinc-500">用户目标：</span>
-          {r.goal.zh || r.goal.original}
-          {r.goal.zh && (
-            <button onClick={() => setShowGoal(!showGoal)} className="ml-2 text-xs text-zinc-400 hover:text-ai cursor-pointer">
-              {showGoal ? "收起原文" : "原文"}
-            </button>
-          )}
-          {showGoal && <div className="mt-1 text-xs text-zinc-500">{r.goal.original}</div>}
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div className="flex h-[46px] items-end gap-[3px]">
+        {r.tape.map((t) => (
+          <button key={t.step} onClick={() => onJump(t.step)} aria-label={`第 ${t.step} 步`}
+                  className={cn("relative min-w-[4px] flex-1 rounded-t-[3px] transition-opacity hover:opacity-100 cursor-pointer",
+                                t.key || active === t.step ? "opacity-100" : "opacity-45",
+                                t.crit && "outline-2 outline-offset-2 outline-fail")}
+                  style={{ background: t.error ? "var(--color-fail)" : color[t.kind], height: height[t.kind] }}>
+            {t.crit && <span className="absolute bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2 text-[11px] font-bold whitespace-nowrap text-fail">根源 {t.step}</span>}
+          </button>
+        ))}
+      </div>
+      <div className="mt-1 flex justify-between text-[11.5px] text-ink3"><span>开始</span><span>点击任意一格跳到那一步</span><span>结束</span></div>
+    </section>
   );
 }
 
-// ② expected vs actual -----------------------------------------------------------------------
+// --- what differs ---------------------------------------------------------------------------------------
 
-const ROW_TONE = {
-  ok: { row: "", tag: <Badge tone="good"><Check size={12} />一致</Badge> },
-  bad: { row: "bg-fail-soft/60", tag: <Badge tone="bad"><X size={12} />不一致</Badge> },
-  check: { row: "bg-check-soft/60", tag: <Badge tone="warn"><CircleHelp size={12} />待核实</Badge> },
+const ITEM_STATUS = {
+  ok: { box: "bg-paper", ic: "bg-pass-soft text-pass", mark: "✓", r: "text-ink2" },
+  missing: { box: "bg-fail-soft", ic: "bg-fail text-white", mark: "!", r: "font-medium text-fail" },
+  extra: { box: "bg-fail-soft", ic: "bg-fail text-white", mark: "+", r: "font-medium text-fail" },
 };
 
-function Comparison({ r }) {
+function Diff({ r }) {
   const rows = r.comparison;
   const groups = useMemo(() => {
     const g = {};
     rows.forEach((x) => (g[x.entity] ||= []).push(x));
     return Object.entries(g);
   }, [rows]);
-  const bad = rows.filter((x) => !x.match).length;
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>期望 vs 实际</CardTitle>
-        <span className="text-xs text-zinc-500">
-          标准答案的数据库状态与运行结束时的数据库对比，只列本任务相关字段 · {bad ? `${bad} 处不一致` : "全部一致"}
-        </span>
-      </CardHeader>
-      <CardContent>
-        {rows.length === 0 ? (
-          <p className="text-sm text-zinc-500">这个任务不需要改数据库，Agent 也没有改动任何记录。</p>
-        ) : (
-          <>
-          <div className="space-y-2 md:hidden">
-            {groups.map(([entity, list]) => (
-              <div key={entity}>
-                <div className="mb-1 text-xs font-medium text-zinc-500">{entity}</div>
-                {list.map((x) => (
-                  <div key={x.field} className={cn("mb-2 rounded-lg border border-zinc-200 p-3 text-sm", ROW_TONE[x.status].row)}>
-                    <div className="flex items-center justify-between font-medium">{x.field_zh}{ROW_TONE[x.status].tag}</div>
-                    <div className="mt-1.5 text-xs text-zinc-500">用户要求 / 期望</div><div>{x.expected}</div>
-                    <div className="mt-1.5 text-xs text-zinc-500">数据库实际</div><div>{x.actual}</div>
-                    {x.missing?.length > 0 && <div className="mt-0.5 text-xs text-fail">缺少：{x.missing.join("、")}</div>}
-                    {x.extra?.length > 0 && <div className="mt-0.5 text-xs text-fail">多出：{x.extra.join("、")}</div>}
-                  </div>
-                ))}
+    <Panel aria-labelledby="diffH">
+      <h3 id="diffH" className="mb-1 text-base font-bold">差在哪</h3>
+      <p className="mb-3.5 text-[13px] text-ink3">标准答案里的数据库 vs 运行结束时的数据库，只列本任务相关字段</p>
+      {rows.length === 0 && <p className="text-sm text-ink2">这个任务不需要改数据库，Agent 也没有改动任何记录。</p>}
+      {groups.map(([entity, list]) => (
+        <div key={entity} className="mb-3 last:mb-0">
+          <div className="mb-1.5 text-xs font-medium text-ink3">{entity}</div>
+          {list.filter((x) => x.items).map((x) => (
+            <div key={x.field} className="mb-2">
+              <div className="mb-1 text-[12.5px] text-ink2">{x.field_zh}：用户要求的 vs 实际的</div>
+              <div className="grid gap-2">
+                {x.items.map((it) => {
+                  const s = ITEM_STATUS[it.status];
+                  return (
+                    <div key={it.id} className={cn("grid grid-cols-[22px_1fr_auto] items-center gap-2.5 rounded-[10px] px-3 py-2.5", s.box)}>
+                      <span className={cn("grid h-[22px] w-[22px] place-items-center rounded-full text-[13px] font-bold", s.ic)}>{s.mark}</span>
+                      <div><div className="font-medium">{it.name}</div>{it.options && <div className="text-[12.5px] text-ink2">{it.options}</div>}</div>
+                      <span className={cn("text-right text-[12.5px]", s.r)}>{{ ok: "一致", missing: "缺少", extra: "多出" }[it.status]}</span>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-          </div>
-          <div className="hidden md:block">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs text-zinc-500">
-                  <th className="px-2 py-1.5 font-medium">字段</th>
-                  <th className="px-2 py-1.5 font-medium">用户要求 / 期望状态</th>
-                  <th className="px-2 py-1.5 font-medium">数据库实际状态</th>
-                  <th className="px-2 py-1.5 font-medium">是否一致</th>
-                </tr>
-              </thead>
-              <tbody>
-                {groups.map(([entity, list]) => (
-                  <Fragment key={entity}>
-                    <tr><td colSpan={4} className="px-2 pt-2 text-xs font-medium text-zinc-500">{entity}</td></tr>
-                    {list.map((x) => (
-                      <tr key={entity + x.field} className={cn("border-t border-zinc-100 align-top", ROW_TONE[x.status].row)}>
-                        <td className="px-2 py-2 font-medium whitespace-nowrap">{x.field_zh}</td>
-                        <td className="px-2 py-2">{x.expected}</td>
-                        <td className="px-2 py-2">
-                          {x.actual}
-                          {x.missing?.length > 0 && <div className="mt-0.5 text-xs text-fail">缺少：{x.missing.join("、")}</div>}
-                          {x.extra?.length > 0 && <div className="mt-0.5 text-xs text-fail">多出：{x.extra.join("、")}</div>}
-                        </td>
-                        <td className="px-2 py-2">{ROW_TONE[x.status].tag}</td>
-                      </tr>
-                    ))}
-                  </Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+            </div>
+          ))}
+          {list.filter((x) => !x.items).map((x) => (
+            <div key={x.field} className={cn("mt-2 flex flex-wrap justify-between gap-x-3 border-t border-line px-0.5 py-2 text-[13.5px] text-ink2",
+                                             x.status !== "ok" && "rounded-md border-t-0 px-2", x.status === "bad" && "bg-fail-soft", x.status === "check" && "bg-check-soft")}>
+              <span>{x.field_zh}</span>
+              <b className="text-right font-medium text-ink">
+                {x.match ? x.actual : <>实际「{x.actual}」<span className="font-normal text-ink2"> · 应为「{x.expected}」</span></>}
+                <Tag tone={{ ok: "pass", bad: "fail", check: "check" }[x.status]} className="ml-1.5">{{ ok: "一致", bad: "不一致", check: "待核实" }[x.status]}</Tag>
+              </b>
+            </div>
+          ))}
+        </div>
+      ))}
+    </Panel>
   );
 }
 
-// ③ causal chain --------------------------------------------------------------------------------
+// --- how it went wrong -------------------------------------------------------------------------------------
 
 function Chain({ r, onJump, pendingAi }) {
   const chain = r.chain || [];
+  const crit = r.ai && !r.ai.abstain ? r.ai.critical_step : null;
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>因果链</CardTitle>
-        <span className="text-xs text-zinc-500">调查 agent 给出的“从哪一步错，到最后结果”的链条；虚线框是推断</span>
-      </CardHeader>
-      <CardContent>
-        {chain.length === 0 ? (
-          <p className="text-sm text-zinc-500">{pendingAi ? "调查 agent 运行中…" : r.ai ? "调查 agent 没有给出因果链。" : "没有运行调查 agent。"}</p>
-        ) : (
-          <ol className="flex flex-col gap-2 md:flex-row md:items-stretch">
-            {chain.map((link, i) => (
-              <li key={i} className="flex flex-col gap-2 md:flex-1 md:flex-row md:items-center">
-                <button
-                  onClick={() => link.step !== null && onJump(link.step)}
-                  disabled={link.step === null}
-                  className={cn(
-                    "flex-1 rounded-lg border p-3 text-left text-sm transition-colors",
-                    link.inferred ? "border-dashed border-ai/50 bg-white" : "border-zinc-200 bg-zinc-50",
-                    link.step === r.ai?.critical_step && "border-fail/60 bg-fail-soft/50",
-                    link.step !== null && "hover:border-ai cursor-pointer",
-                  )}
-                >
-                  <div className="mb-1 flex items-center gap-1.5 text-xs">
-                    <span className="font-mono text-zinc-500">{link.step !== null ? `步骤 ${link.step}` : "最终结果"}</span>
-                    {link.inferred && <Badge tone="ai">推断</Badge>}
-                  </div>
-                  <div className="leading-snug">{link.text}</div>
-                </button>
-                {i < chain.length - 1 && <ArrowRight size={16} className="mx-auto shrink-0 rotate-90 text-zinc-400 md:rotate-0" />}
-              </li>
-            ))}
-          </ol>
-        )}
-      </CardContent>
-    </Card>
+    <Panel aria-labelledby="chainH">
+      <h3 id="chainH" className="mb-1 text-base font-bold">怎么错的</h3>
+      <p className="mb-3.5 text-[13px] text-ink3">从最早的错误到最后的结果。虚线是 AI 推断，实心是记录里能看到的。</p>
+      {chain.length === 0 && <p className="text-sm text-ink2">{pendingAi ? "调查 agent 运行中…" : r.ai ? "调查 agent 没有给出因果链。" : "没有运行调查 agent。"}</p>}
+      <ol className="relative">
+        {chain.map((l, i) => {
+          const root = l.step !== null && l.step === crit;
+          return (
+            <li key={i} className="relative pb-4 pl-[30px] last:pb-0">
+              {i < chain.length - 1 && <span className="absolute top-[22px] bottom-0 left-[9px] w-0.5 bg-line" />}
+              <span className={cn("absolute top-[3px] left-0 h-5 w-5 rounded-full border-2 bg-sheet",
+                                  root ? "border-fail bg-fail" : l.inferred ? "border-dashed border-ai" : "border-ink3")} />
+              {l.step !== null
+                ? <button onClick={() => onJump(l.step)} className={cn("text-[12.5px] font-medium underline underline-offset-[3px] cursor-pointer", root ? "text-fail" : "text-ink2")}>
+                    第 {l.step} 步{root && " · 根源"}</button>
+                : <span className="text-[12.5px] text-ink2">结果</span>}
+              {l.inferred && <span className="ml-1.5 text-xs text-ai">AI 推断</span>}
+              <p className="mt-px text-sm">{l.text}</p>
+            </li>
+          );
+        })}
+      </ol>
+    </Panel>
   );
 }
 
-// ④ three columns ---------------------------------------------------------------------------------
+// --- evidence in three kinds ---------------------------------------------------------------------------------
 
-function Column({ tone, icon, title, hint, children }) {
-  const border = { fact: "border-t-zinc-700", ai: "border-t-ai", check: "border-t-check" }[tone];
+function Col({ color, dashed, title, desc, children }) {
   return (
-    <Card className={cn("flex flex-col border-t-4", border)}>
-      <CardHeader className="pb-1">
-        <CardTitle className="flex items-center gap-1.5">{icon}{title}</CardTitle>
-        <span className="text-xs text-zinc-500">{hint}</span>
-      </CardHeader>
-      <CardContent className="flex flex-1 flex-col">{children}</CardContent>
-    </Card>
+    <div className="border-b border-line px-5 py-[18px] last:border-0 md:border-r md:border-b-0">
+      <h4 className="mb-0.5 flex items-center gap-2 text-sm font-bold">
+        <i className={cn("inline-block rounded-[2px]", dashed ? "h-2 w-2 border-2 border-dashed" : "h-2.5 w-2.5")}
+           style={dashed ? { borderColor: color } : { background: color }} />{title}
+      </h4>
+      <p className="mb-3 text-[12.5px] text-ink3">{desc}</p>
+      {children}
+    </div>
   );
 }
 
-function Line({ step, onJump, children, tone }) {
-  return (
-    <li className="flex items-start gap-2 py-1.5 text-sm">
-      <StepLink step={step} onJump={onJump} className="mt-0.5" />
-      <span className={cn("line-clamp-2", tone === "violation" && "text-fail")} title={typeof children === "string" ? children : undefined}>
-        {children}
-      </span>
-    </li>
-  );
-}
-
-const SEV = { violation: "违规", warning: "提醒", info: "观察" };
-
-function Facts({ r, onJump }) {
-  const t = r.tau2;
-  return (
-    <ul className="divide-y divide-zinc-100">
-      <Line step={null} onJump={onJump} tone={t.reward === 1 ? "" : "violation"}>
-        {t.reward === 1 ? "τ² 判定成功" : `τ² 判定失败：${t.db_match ? "数据库正确，但回复内容不达标" : "数据库最终状态与标准答案不一致"}`}
-      </Line>
-      {r.facts.map((f) => (
-        <li key={f.step} className="flex items-start gap-2 py-1.5 text-sm">
-          <StepLink step={f.step} onJump={onJump} className="mt-0.5" />
-          <div className="min-w-0 space-y-0.5">
-            {f.items.map((x, i) => (
-              <div key={i} className={cn("line-clamp-2", x.severity === "violation" && "text-fail")}>
-                {x.text}<span className="ml-1 text-xs text-zinc-400">{SEV[x.severity]}</span>
-              </div>
-            ))}
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function AiColumn({ r, onJump, pendingAi }) {
+function Evidence({ r, onJump, pendingAi }) {
   const a = r.ai;
-  if (!a) return <p className="text-sm text-zinc-500">{pendingAi ? "调查 agent 运行中…" : "没有运行调查 agent。"}</p>;
+  const li = "text-[13.5px] leading-[1.55]";
   return (
     <>
-      <div className="mb-2 flex flex-wrap items-center gap-2 text-sm">
-        {a.abstain ? <Badge tone="warn">拿不准，已弃权</Badge> : <Badge tone="ai">作答</Badge>}
-        <span>置信度 <b>{a.confidence !== null ? a.confidence.toFixed(2) : "—"}</b></span>
-        <span className="text-xs text-zinc-500">（3 次独立判断中 {a.agree} 一致）</span>
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-base font-bold">证据分三类</h3>
+        <span className="text-[13px] text-ink3">确定的、AI 猜的、谁都不确定的，分开放</span>
       </div>
-      <ul className="divide-y divide-zinc-100">
-        <Line step={a.critical_step} onJump={onJump}>关键失败：{a.category_zh}；责任方：{a.failed_agent_zh}</Line>
-        {a.summary && <Line step={null} onJump={onJump}>{a.summary}</Line>}
-        {a.inference.map((s, i) => <Line key={i} step={null} onJump={onJump}>{s}</Line>)}
-        {a.evidence.map((e, i) => (
-          <Line key={"e" + i} step={e.step} onJump={onJump}>
-            <span className="text-zinc-500">证据（已逐字核对）：</span>“{e.quote}”
-          </Line>
-        ))}
-      </ul>
-      <div className="mt-auto pt-3"><ReviewBar r={r} /></div>
+      <section aria-label="证据" className="mb-7 grid overflow-hidden rounded-[14px] border border-line bg-sheet md:grid-cols-3">
+        <Col color="var(--color-ink)" title="记录里能看到的" desc="来自数据库核验和规则检查，确定">
+          <ul className="grid gap-2.5">
+            <li className={li}>{r.tau2.reward === 1 ? "τ² 判定成功。" : `τ² 判定失败：${r.tau2.db_match ? "数据库正确，但回复内容不达标" : "数据库最终状态与标准答案不一致"}。`}</li>
+            {r.facts.map((f) => f.items.map((x, i) => (
+              <li key={`${f.step}-${i}`} className={li}><StepBtn step={i === 0 ? f.step : null} onJump={onJump} />
+                {i > 0 && <span className="mr-1.5 inline-block w-[22px]" />}
+                <span className={x.severity === "violation" ? "text-fail" : ""}>{x.text}</span>
+                {x.severity !== "violation" && <span className="ml-1 text-xs text-ink3">{{ warning: "提醒", info: "观察" }[x.severity]}</span>}
+              </li>
+            )))}
+          </ul>
+        </Col>
+        <Col color="var(--color-ai)" dashed title="AI 的判断" desc="调查 Agent 给出，可能出错">
+          {!a ? <p className="text-sm text-ink2">{pendingAi ? "调查 agent 运行中…" : "没有运行调查 agent。"}</p> : (
+            <>
+              <ul className="grid gap-2.5">
+                <li className={li}><StepBtn step={a.critical_step} onJump={onJump} />
+                  {a.abstain ? "拿不准。" : "根源："}{a.category_zh}；责任方：{a.failed_agent_zh}</li>
+                {a.summary && <li className={li}>{a.summary}</li>}
+                {a.inference.map((s, i) => <li key={i} className={li}>{s}</li>)}
+                {a.evidence.map((e, i) => (
+                  <li key={"e" + i} className={cn(li, "text-ink2")}><StepBtn step={e.step} onJump={onJump} />原文（已逐字核对）：“{e.quote.length > 120 ? e.quote.slice(0, 120) + "…" : e.quote}”</li>
+                ))}
+              </ul>
+              <div className="mt-3.5 border-t border-line pt-3 text-[13px] text-ink2">
+                3 次独立分析，{a.samples.filter((s) => s.agrees).length} 次都指向{a.critical_step !== null ? `第 ${a.critical_step} 步` : "同一结论"}
+                <div className="my-1.5 flex gap-1">
+                  {a.samples.map((s, i) => (
+                    <span key={i} title={`第 ${s.step} 步 · ${s.category_zh}`}
+                          className={cn("h-2 w-[26px] rounded-[2px]", s.agrees ? "bg-ai" : "bg-line")} />
+                  ))}
+                </div>
+                <span className="text-xs text-ink3">{a.abstain ? "3 次不一致或缺少证据，所以 AI 弃权，交给你判断" : "一致不等于正确，这正是需要你复核的原因"}</span>
+              </div>
+            </>
+          )}
+        </Col>
+        <Col color="var(--color-check)" title="还不确定的" desc="程序和模型都给不出答案">
+          {r.checks.length === 0 ? <p className="text-sm text-ink2">{pendingAi ? "等待调查 agent…" : "没有。"}</p> : (
+            <ul className="grid gap-2.5">
+              {r.checks.map((c, i) => <li key={i} className={li}><StepBtn step={c.step} onJump={onJump} />{c.text}</li>)}
+            </ul>
+          )}
+        </Col>
+      </section>
     </>
   );
 }
 
-function Checks({ r, onJump, pendingAi }) {
-  if (!r.checks.length)
-    return <p className="text-sm text-zinc-500">{pendingAi ? "等待调查 agent…" : "没有需要额外核实的地方。"}</p>;
-  return (
-    <ul className="divide-y divide-zinc-100">
-      {r.checks.map((c, i) => <Line key={i} step={c.step} onJump={onJump}>{c.text}</Line>)}
-    </ul>
-  );
-}
-
-// ⑤ timeline ---------------------------------------------------------------------------------------
+// --- conversation and tool calls ----------------------------------------------------------------------------------
 
 const CLAIM_ZH = {
-  executed_but_differs: "声称已完成 · 结果不符", not_executed: "声称已完成 · 未执行",
-  unrequested_change: "改了没要求的内容", wrong_action: "操作类型不对",
-  claimed_before_executed: "先声称后执行", unverifiable: "声称已完成 · 无法核验",
+  executed_but_differs: "声称已完成，但与数据库不符", not_executed: "声称已完成，但没有执行",
+  unrequested_change: "改了用户没要求的内容", wrong_action: "操作类型不对",
+  claimed_before_executed: "先声称、后执行", unverifiable: "声称已完成，无法核验",
 };
 
-function ToolCard({ c }) {
+function LongText({ text, className }) {
+  const [more, setMore] = useState(false);
+  const long = text.length > 260 || text.split("\n").length > 7;
+  return (
+    <div className={className}>
+      <div className={cn("relative", long && !more && "max-h-32 overflow-hidden")}>
+        <Markdown text={text} />
+        {long && !more && <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[var(--fade)]" />}
+      </div>
+      {long && <button onClick={() => setMore(!more)} className="text-[12px] text-ai cursor-pointer">{more ? "收起" : "展开全文"}</button>}
+    </div>
+  );
+}
+
+// Raw JSON is not in the page at all until asked for.
+function RawData({ raw }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className={cn("rounded-lg border bg-white text-sm", c.ok ? "border-zinc-200" : "border-fail/40")}>
-      <button onClick={() => setOpen(!open)} className="flex w-full items-start gap-2 px-3 py-2 text-left cursor-pointer">
-        <Wrench size={14} className={cn("mt-0.5 shrink-0", c.write ? "text-zinc-900" : "text-zinc-400")} />
-        <span className="min-w-0 flex-1">
-          <b className="font-medium">调用 {c.name_zh}</b>：{c.summary}
-          <span className={cn("ml-1", c.ok ? "text-pass" : "text-fail")}>→ {c.result}</span>
-        </span>
-        <ChevronDown size={15} className={cn("mt-0.5 shrink-0 text-zinc-400 transition-transform", open && "rotate-180")} />
-      </button>
-      {open && (
-        <pre className="max-h-80 overflow-auto border-t border-zinc-100 bg-zinc-50 px-3 py-2 font-mono text-[11px] leading-relaxed text-zinc-600">
-          {c.raw}
-        </pre>
-      )}
-    </div>
+    <>
+      <button onClick={() => setOpen(!open)} aria-expanded={open} className="mt-1 text-[12.5px] text-ai cursor-pointer">
+        {open ? "收起原始数据" : "看原始数据"}</button>
+      {open && <pre className="mt-1.5 max-h-[220px] overflow-auto rounded-md bg-paper p-2.5 font-mono text-[11.5px] whitespace-pre-wrap">{raw}</pre>}
+    </>
   );
 }
 
-function Bubble({ e }) {
-  const [orig, setOrig] = useState(false);
-  const [more, setMore] = useState(false);
-  const isUser = e.role === "user";
-  if (!e.text) return null;
-  const text = orig || !e.zh ? e.text : e.zh;
-  const long = text.length > 220 || text.split("\n").length > 6;
-  const link = isUser ? "text-zinc-400 hover:text-white" : "text-zinc-400 hover:text-ai";
+function Msg({ e, crit }) {
+  const user = e.role === "user";
   return (
-    <div className={cn("max-w-[92%] rounded-2xl px-3.5 py-2 text-sm sm:max-w-[80%]",
-                       isUser ? "ml-auto rounded-tr-sm bg-zinc-800 text-zinc-50" : "rounded-tl-sm bg-white ring-1 ring-zinc-200")}>
-      <div className={cn("relative", long && !more && "max-h-28 overflow-hidden")}>
-        <Markdown text={text} />
-        {long && !more && <div className={cn("absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t", isUser ? "from-zinc-800" : "from-white")} />}
-      </div>
-      <div className="mt-1 flex gap-3 text-[11px]">
-        {long && <button onClick={() => setMore(!more)} className={cn("cursor-pointer", link)}>{more ? "收起" : "展开全文"}</button>}
-        {e.zh && <button onClick={() => setOrig(!orig)} className={cn("cursor-pointer", link)}>{orig ? "看中文（机器翻译）" : "机器翻译 · 看原文"}</button>}
-      </div>
-    </div>
-  );
-}
-
-function Step({ e, critical }) {
-  const isUser = e.role === "user";
-  const label = { user: "用户", assistant: "Agent", tool: "工具", system: "系统" }[e.role] || e.role;
-  return (
-    <div id={`step-${e.step}`} className={cn("scroll-mt-20 rounded-xl p-2", critical && "bg-fail-soft/60 ring-2 ring-fail")}>
-      <div className={cn("mb-1 flex flex-wrap items-center gap-1.5 text-xs text-zinc-500", isUser && "justify-end")}>
-        {isUser ? <User size={13} /> : <Bot size={13} />}
-        <span>{label}</span>
-        <span className="font-mono">步骤 {e.step}</span>
-        {critical && <Badge tone="bad">关键失败步骤</Badge>}
-        {e.claim && <Badge tone={e.claim === "unverifiable" ? "warn" : "bad"}>{CLAIM_ZH[e.claim]}</Badge>}
-        {e.rules.map((x) => <Badge key={x} tone="warn"><AlertTriangle size={11} />{x}</Badge>)}
-      </div>
-      <div className="space-y-1.5">
-        <Bubble e={e} />
-        {e.calls.map((c, i) => <ToolCard key={i} c={c} />)}
+    <div id={`s${e.step}`} className="grid scroll-mt-24 grid-cols-[34px_1fr] items-start gap-3 rounded-xl p-1 sm:grid-cols-[54px_1fr]">
+      <span className="pt-3 text-right font-mono text-[11.5px] text-ink3">{e.step}</span>
+      <div className="grid gap-2">
+        {e.text && (
+          <div style={{ "--fade": user ? "#e9ece7" : "#fff" }}
+               className={cn("max-w-[70ch] rounded-xl px-3.5 py-[11px]", user ? "bg-[#e9ece7]" : "border border-line bg-sheet",
+                             e.claim && "shadow-[inset_0_0_0_1px_var(--color-fail)]")}>
+            <div className="mb-0.5 flex flex-wrap items-center gap-2 text-xs text-ink3">
+              {user ? "用户（模拟）" : "Agent"}
+              {e.claim && <Tag tone={e.claim === "unverifiable" ? "check" : "fail"}>{CLAIM_ZH[e.claim]}</Tag>}
+              {e.rules.map((x) => <Tag key={x} tone="check">{x}</Tag>)}
+            </div>
+            <LongText text={e.text} />
+            {e.zh && <LongText text={e.zh} className="mt-1.5 border-t border-dashed border-line pt-1.5 text-[12.5px] text-ink2" />}
+            {e.zh && <span className="text-[11.5px] text-ink3">机器翻译</span>}
+          </div>
+        )}
+        {e.calls.map((c, i) => (
+          <div key={i} className={cn("max-w-[70ch] rounded-lg border border-line border-l-[3px] border-l-tool px-3.5 py-2.5",
+                                     crit && "border-2 border-l-[5px] border-fail border-l-fail")}>
+            <div className="mb-0.5 flex flex-wrap items-center gap-2 text-xs text-ink3">
+              工具 · <span className="font-mono">{c.name}</span>
+              {crit && <Tag tone="fail">AI 判定的根源</Tag>}
+              {!e.text && e.rules.map((x) => <Tag key={x} tone="check">{x}</Tag>)}
+            </div>
+            <div className="text-[13.5px]"><b className="font-medium">{c.name_zh}</b>：{c.summary}</div>
+            <div className={cn("text-[13.5px]", c.ok ? "text-ink2" : "font-medium text-fail")}>
+              {c.result_step !== null && <span className="mr-1 font-mono text-[11.5px] text-ink3">{c.result_step}</span>}→ {c.result}
+            </div>
+            <RawData raw={c.raw} />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -362,92 +353,84 @@ function Timeline({ r, keyOnly, setKeyOnly }) {
   const crit = r.ai && !r.ai.abstain ? r.ai.critical_step : null;
   const items = [];
   let hidden = [];
-  const flush = () => {
-    if (hidden.length) items.push({ gap: hidden.length, from: hidden[0], to: hidden[hidden.length - 1] });
-    hidden = [];
-  };
+  const flush = () => { if (hidden.length) items.push({ gap: true, from: hidden[0], to: hidden.at(-1) }); hidden = []; };
   for (const e of r.timeline) {
     if (keyOnly && keys.size && !keys.has(e.step)) hidden.push(e.step);
     else { flush(); items.push(e); }
   }
   flush();
+  const seg = (on) => cn("rounded-md px-3 py-1 text-[13px] cursor-pointer", on ? "bg-sheet font-medium text-ink shadow-[0_1px_2px_rgba(24,32,43,.08)]" : "text-ink2");
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>时间线</CardTitle>
-        <Switch id="key-only" checked={keyOnly} onCheckedChange={setKeyOnly} label={keyOnly ? "只看关键步骤" : "看完整记录"} />
-      </CardHeader>
-      <CardContent className="space-y-1">
+    <section aria-labelledby="tlH">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <h3 id="tlH" className="text-base font-bold">对话和工具调用</h3>
+        <div role="group" aria-label="显示范围" className="inline-flex rounded-lg bg-[#e4e7e2] p-[3px]">
+          <button aria-pressed={keyOnly} className={seg(keyOnly)} onClick={() => setKeyOnly(true)}>只看关键步骤</button>
+          <button aria-pressed={!keyOnly} className={seg(!keyOnly)} onClick={() => setKeyOnly(false)}>完整记录</button>
+        </div>
+      </div>
+      <div className="grid gap-2.5">
         {items.map((e) => e.gap ? (
-          <button key={`gap-${e.from}`} onClick={() => setKeyOnly(false)}
-                  className="w-full rounded-md py-1.5 text-center text-xs text-zinc-400 hover:bg-zinc-100 cursor-pointer">
-            ⋯ 省略步骤 {e.from}–{e.to}（{e.gap} 条），点此看完整记录 ⋯
-          </button>
-        ) : <Step key={e.step} e={e} critical={e.step === crit} />)}
-      </CardContent>
-    </Card>
+          <div key={`g${e.from}`} className="rounded-lg border border-dashed border-line p-1 text-center text-[12.5px] text-ink3">
+            省略了第 {e.from}–{e.to} 步 · <button onClick={() => setKeyOnly(false)} className="text-ai cursor-pointer">展开完整记录</button>
+          </div>
+        ) : <Msg key={e.step} e={e} crit={e.step === crit} />)}
+      </div>
+    </section>
   );
 }
 
-// ⑥ footer -------------------------------------------------------------------------------------------
-
 function Footer({ r }) {
-  const f = r.footer;
-  const calls = f.new_calls || {};
+  const f = r.footer, n = f.new_calls || {};
   return (
-    <footer className="mt-2 space-y-1 border-t border-zinc-200 pt-4 text-xs text-zinc-500">
-      <div>
-        调查 agent：{f.investigator ? `${f.investigator}（prompt ${f.prompt_version}，3 次采样投票）` : "未运行"} ·
-        翻译：{f.translator || "未运行"} ·
-        生成本报告时新产生的调用：调查 {calls.investigator_web ?? 0} 次、翻译 {calls.translate_web ?? 0} 次（其余来自缓存） ·
-        花费 ${(f.billed_usd ?? 0).toFixed(2)}（免费档） <Source path={f.cost_log} />
-      </div>
-      <div>原始记录：<Source path={r.file} label={r.file} />{f.investigator_cache && <> · 调查 agent 原始回复：{f.investigator_cache}</>}
+    <footer className="mt-8 space-y-1 text-xs text-ink3">
+      <div>调查 agent：{f.investigator ? `${f.investigator}，prompt ${f.prompt_version}，3 次采样投票` : "未运行"} ·
+        翻译：{f.translator || "未运行"} · 生成本报告时新调用：调查 {n.investigator_web ?? 0} 次、翻译 {n.translate_web ?? 0} 次（其余来自缓存） ·
+        花费 ${(f.billed_usd ?? 0).toFixed(2)}，免费档 <Source path={f.cost_log} label="cost_log.csv" /></div>
+      <div>原始记录 <Source path={r.file} label={r.file} />{f.investigator_cache && <> · 调查 agent 原始回复 {f.investigator_cache}</>}
         {f.generated_at && <> · 生成于 {f.generated_at}</>}</div>
     </footer>
   );
 }
 
-// page ----------------------------------------------------------------------------------------------------
+// --- page --------------------------------------------------------------------------------------------------------------
 
 export default function Report({ report: r, pendingAi }) {
   const [keyOnly, setKeyOnly] = useState(true);
-  // tool results are folded into their call's card: jump to the call instead
-  const stepTarget = useMemo(() => {
+  const [active, setActive] = useState(null);
+  useEffect(() => { setKeyOnly(true); setActive(null); }, [r.id]);
+  // a tool result is shown inside its call's card: jump to the call
+  const target = useMemo(() => {
     const m = {};
     r.timeline.forEach((e) => e.calls.forEach((c) => { if (c.result_step !== null) m[c.result_step] = e.step; }));
     return m;
   }, [r]);
 
   function jump(step) {
-    const target = stepTarget[step] ?? step;
+    const t = target[step] ?? step;
+    setActive(step);
     const go = () => {
-      const el = document.getElementById(`step-${target}`);
+      const el = document.getElementById(`s${t}`);
       if (!el) return;
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
       el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
     };
-    if (keyOnly && !r.key_steps.includes(target)) { setKeyOnly(false); setTimeout(go, 60); } else go();
+    if (keyOnly && !r.key_steps.includes(t)) { setKeyOnly(false); setTimeout(go, 60); } else go();
   }
 
   return (
-    <div className="space-y-4">
-      <Conclusion r={r} />
-      <Comparison r={r} />
-      <Chain r={r} onJump={jump} pendingAi={pendingAi} />
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Column tone="fact" icon={<Check size={16} />} title="已观察事实" hint="规则检查和数据库核验的结果，确定">
-          <Facts r={r} onJump={jump} />
-        </Column>
-        <Column tone="ai" icon={<Sparkles size={16} className="text-ai" />} title="AI 推断" hint="调查 agent 的判断，可能出错">
-          <AiColumn r={r} onJump={jump} pendingAi={pendingAi} />
-        </Column>
-        <Column tone="check" icon={<CircleHelp size={16} className="text-check" />} title="仍需核实" hint="程序和模型都不能确定的地方">
-          <Checks r={r} onJump={jump} pendingAi={pendingAi} />
-        </Column>
+    <div className="flex flex-col">
+      {/* on phones the database diff comes before the run overview, so it is on the first screen */}
+      <div className="order-1"><Intro /></div>
+      <div className="order-2"><Verdict r={r} /></div>
+      <div className="order-4 md:order-3"><Tape r={r} onJump={jump} active={active} /></div>
+      <div className="order-3 mt-5 mb-2 grid gap-5 md:order-4 md:mt-0 md:mb-7 md:grid-cols-[1.15fr_1fr]">
+        <Diff r={r} />
+        <Chain r={r} onJump={jump} pendingAi={pendingAi} />
       </div>
-      <Timeline r={r} keyOnly={keyOnly} setKeyOnly={setKeyOnly} />
-      <Footer r={r} />
+      <div className="order-5"><Evidence r={r} onJump={jump} pendingAi={pendingAi} /></div>
+      <div className="order-6"><Timeline r={r} keyOnly={keyOnly} setKeyOnly={setKeyOnly} /></div>
+      <div className="order-7"><Footer r={r} /></div>
     </div>
   );
 }

@@ -159,6 +159,7 @@ def build_report(path: Path, ai: bool = False, zh: bool = False) -> dict:
         "checks": R.checks(raw, diag, rows),
         "timeline": R.timeline(sim, raw, names, translations),
         "key_steps": R.key_steps(raw, diag, chain),
+        "tape": R.tape(sim, raw, diag, R.key_steps(raw, diag, chain)),
         "tau2": case["tau2"],
         "categories": [{"value": k, "zh": v} for k, v in R.CATEGORY_ZH.items()],
         "footer": {

@@ -24,7 +24,12 @@ REPORTS = ROOT / "web" / "app" / "public" / "data" / "reports"  # page 1: pre-co
 
 # Runs shown as pre-computed reports in the online demo. The first is the default page.
 DEMO_RUNS = [
-    ("results/runs/bug_dropitem/task_2__trial_1.json", "埋 bug（漏掉最后一件）· 任务 2 · 第 1 次 · 假成功"),
+    ("results/runs/bug_dropitem/task_2__trial_1.json", "埋 bug：漏掉最后一件"),
+    ("results/runs/v1/task_33__trial_1.json", "v1"),
+    ("results/runs/v1/task_100__trial_0.json", "v1"),
+    ("results/runs/v1/task_2__trial_0.json", "v1"),
+    ("results/runs/bug_addr2/task_101__trial_0.json", "埋 bug：清空地址第二行"),
+    ("results/runs/v1/task_0__trial_2.json", "v1"),
 ]
 
 
@@ -188,7 +193,11 @@ def reports() -> list[dict]:
         r["id"] = report_id(file)
         r["footer"]["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
         (REPORTS / f"{r['id']}.json").write_text(json.dumps(r, ensure_ascii=False, separators=(",", ":")))
-        index.append({"id": r["id"], "file": file, "label": label})
+        index.append({"id": r["id"], "file": file, "version": label, "task_id": r["task_id"], "trial": r["trial"],
+                      "kind": "AI 拿不准" if r["verdict"]["ai_unsure"] else r["verdict"]["kind"],
+                      "short": r["verdict"]["short"] + ("（" + r["verdict"]["kind"] + "）" if r["verdict"]["ai_unsure"] else ""),
+                      "tone": "warn" if r["verdict"]["ai_unsure"] else r["verdict"]["queue_tone"],
+                      "label": f"{label} · 任务 {r['task_id']} · 第 {r['trial']} 次 · {r['verdict']['kind']}"})
         print(f"web/app/public/data/reports/{r['id']}.json")
     (REPORTS / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1))
     return index

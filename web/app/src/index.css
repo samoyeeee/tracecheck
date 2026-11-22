@@ -1,22 +1,32 @@
 @import "tailwindcss";
 
-/* Semantic colours: red = failure / violation, orange = needs checking,
-   blue = AI inference, green = pass. Neutrals for everything else. */
+/* Palette and type from the design prototype (tracecheck-prototype.html).
+   red = failure, amber = not sure, indigo = AI inference, green = pass. */
 @theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
-    "Noto Sans CJK SC", system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --color-fail: #c0262d;
-  --color-fail-soft: #fdecec;
-  --color-check: #b45309;
-  --color-check-soft: #fff4e0;
-  --color-ai: #2557d6;
-  --color-ai-soft: #eaf0fd;
-  --color-pass: #187a4a;
-  --color-pass-soft: #e5f4ec;
+  --font-sans: "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-paper: #f3f4f1;
+  --color-paper2: #edefeb;
+  --color-sheet: #ffffff;
+  --color-ink: #18202b;
+  --color-ink2: #4a5563;
+  --color-ink3: #8a939e;
+  --color-line: #dde1dc;
+  --color-fail: #c2362b;
+  --color-fail-soft: #fbecea;
+  --color-pass: #2f7d4f;
+  --color-pass-soft: #e7f3ec;
+  --color-ai: #3446c2;
+  --color-ai-soft: #eceefb;
+  --color-check: #a86a0c;
+  --color-check-soft: #fbf1df;
+  --color-tool: #5d6b7a;
+  --color-usr: #9aa6a0;
 }
 
 html { -webkit-text-size-adjust: 100%; }
-body { @apply bg-zinc-50 text-zinc-900 antialiased; }
+body { @apply bg-paper text-ink antialiased; font-size: 15px; line-height: 1.6; }
+:focus-visible { outline: 2px solid var(--color-ai); outline-offset: 2px; border-radius: 4px; }
 .flash { animation: flash 1.4s ease-out; }
-@keyframes flash { 0% { box-shadow: 0 0 0 4px var(--color-ai); } 100% { box-shadow: 0 0 0 0 transparent; } }
+@keyframes flash { 0% { background: var(--color-ai-soft); } 100% { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }

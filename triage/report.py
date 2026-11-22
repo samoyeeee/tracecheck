@@ -111,6 +111,15 @@ class Names:
             return it["name"]
         return f"{it['name']}（{' · '.join(str(v) for v in it['options'].values())}）"
 
+    def item_rows(self, expected: list, actual: list) -> list[dict]:
+        """One row per item: in both (ok), expected but missing, or extra."""
+        out = []
+        for x in expected + [y for y in actual if y not in expected]:
+            it = self.items.get(str(x), {"name": str(x), "options": {}})
+            out.append({"id": x, "name": it["name"], "options": " · ".join(str(v) for v in it["options"].values()),
+                        "status": "ok" if x in expected and x in actual else ("missing" if x in expected else "extra")})
+        return out
+
     def value(self, field: str, v: Any) -> str:
         if v is None or v == [] or v == "":
             return "（空）"
@@ -178,6 +187,8 @@ def comparison(dbs: dict, calls: list[dict], names: Names) -> list[dict]:
                     # short names (no options) for the one-line verdict
                     row["missing_short"] = [names.item(x, options=False) if x in names.items else str(x) for x in ev if x not in fv]
                     row["extra_short"] = [names.item(x, options=False) if x in names.items else str(x) for x in fv if x not in ev]
+                    if all(isinstance(x, str) and x in names.items for x in ev + fv):
+                        row["items"] = names.item_rows(ev, fv)
                 rows.append(row)
     return rows
 
@@ -309,6 +320,10 @@ def ai_column(diag: Optional[dict]) -> Optional[dict]:
         "abstain": diag.get("abstain"), "summary": diag.get("summary") or "",
         "inference": diag.get("inference") or [], "evidence": [e for e in diag.get("evidence") or [] if e.get("valid")],
         "model": diag.get("model"), "prompt_version": diag.get("prompt_version"),
+        # the 3 independent answers the vote was taken over
+        "samples": [{"step": x.get("critical_step"), "category_zh": CATEGORY_ZH.get(x.get("category"), x.get("category") or "—"),
+                     "agrees": x.get("critical_step") == diag.get("critical_step") and x.get("category") == diag.get("category")}
+                    for x in diag.get("samples") or []],
     }
 
 
@@ -352,36 +367,60 @@ def _diff_phrase(r: dict) -> str:
         return f"{r['field_zh']}少了 {'、'.join(r.get('missing_short') or r['missing'])}"
     if r.get("extra") and not r.get("missing"):
         return f"{r['field_zh']}多了 {'、'.join(r.get('extra_short') or r['extra'])}"
+    if r.get("missing") and r.get("extra"):
+        same = "、".join(r["missing_short"]) == "、".join(r["extra_short"])
+        if same:   # same product, different options
+            return f"{r['field_zh']}里的 {'、'.join(r['missing_short'])} 款式不对"
+        return f"{r['field_zh']}应为 {'、'.join(r['missing_short'])}，实际是 {'、'.join(r['extra_short'])}"
     return f"{r['field_zh']}应为「{r['expected']}」，实际是「{r['actual']}」"
 
 
 def verdict(report: dict, rows: list[dict], diag: Optional[dict]) -> dict:
+    """kind (stamp), headline (what happened), sub (how we know + what the AI says), short (queue line)."""
     success = bool(report["tau2_success"])
     bad = [r for r in rows if not r["match"]]
     violations = [f for f in report["findings"] if f["severity"] == "violation"
                   and not f["rule_id"].startswith("claim_") and f["rule_id"] not in SKIP_RULES]
     false_claims = [c for c in report["claims"] if c["status"] in ("executed_but_differs", "not_executed")]
+    sub = []
     if success:
-        kind, sentence = "无", "任务成功：数据库最终状态与标准答案一致，回复内容也达标。"
+        kind, headline, short = "成功", "任务成功：数据库最终状态与标准答案一致，回复内容也达标。", "任务成功"
     elif report["false_success"] and false_claims:
         steps = "、".join(str(s) for s in sorted({c["step"] for c in false_claims}))
         action = ACTION_ZH.get(false_claims[0]["action"], "操作")
-        what = f"，但数据库里的{_diff_phrase(bad[0])}" if bad else "，但数据库不支持这个说法"
-        kind, sentence = "假成功", f"假成功：Agent 在步骤 {steps} 告诉用户{action}已办好{what}（见下方对比）。"
+        kind = "假成功"
+        headline = f"Agent 在第 {steps} 步说{action}已经办好，但数据库里的结果和用户要求的不一致。"
+        short = _diff_phrase(bad[0]) if bad else f"说{action}办好了，数据库不支持"
+        if bad:
+            sub.append(f"数据库核验确认：{_diff_phrase(bad[0])}" + (f"（共 {len(bad)} 处不一致）" if len(bad) > 1 else "") + "。")
     elif violations:
         f = violations[0]
         tool = next((tool_zh(n) for n in TOOL_ZH if f["message"].startswith(n)), "这次操作")
-        kind = "工具报错" if f["rule_id"] == "tool_error" else (
-            "异常终止" if f["rule_id"] == "abnormal_termination" else "违反政策")
-        sentence = f"{kind}：步骤 {f['step']} {RULE_TEXT.get(f['rule_id'], f['rule_id']).format(tool=tool)}。"
+        kind = "工具报错" if f["rule_id"] == "tool_error" else ("异常终止" if f["rule_id"] == "abnormal_termination" else "违反政策")
+        what = RULE_TEXT.get(f["rule_id"], f["rule_id"]).format(tool=tool)
+        headline, short = f"第 {f['step']} 步：{what}。", what
         if bad:
-            sentence += f"最终数据库的{_diff_phrase(bad[0])}。"
+            sub.append(f"最终数据库的{_diff_phrase(bad[0])}" + (f"（共 {len(bad)} 处不一致）" if len(bad) > 1 else "") + "。")
     elif bad:
-        kind, sentence = "结果不符", f"任务失败：最终数据库的{_diff_phrase(bad[0])}（共 {len(bad)} 处不一致）。"
+        kind = "结果不符"
+        headline = f"任务失败：最终数据库的{_diff_phrase(bad[0])}。"
+        short = _diff_phrase(bad[0])
+        if len(bad) > 1:
+            sub.append(f"共 {len(bad)} 处与标准答案不一致，见下方对比。")
     else:
-        kind, sentence = "回复不达标", "任务失败：数据库结果正确，但 Agent 的回复没有满足任务要求的内容。"
-    if not success and diag and not diag.get("abstain") and diag.get("critical_step") is not None:
-        sentence += f"调查 agent 认为根源在步骤 {diag['critical_step']}（{CATEGORY_ZH.get(diag.get('category'), diag.get('category'))}）。"
+        kind, headline, short = "回复不达标", "数据库结果正确，但 Agent 的回复没有满足任务要求的内容。", "数据库对，回复不达标"
+    if not success and diag:
+        if diag.get("abstain"):
+            sub.append("调查 agent 拿不准根源在哪一步，需要你来判断。")
+            short_ai = None
+        elif diag.get("critical_step") is not None:
+            sub.append(f"调查 agent 认为问题出在第 {diag['critical_step']} 步"
+                       f"（{CATEGORY_ZH.get(diag.get('category'), diag.get('category'))}）。")
+            short_ai = None
+        else:
+            short_ai = None
+        if short_ai:
+            short = short_ai
     if not diag:
         ai = {"text": "未运行调查 agent", "tone": "muted"}
     elif diag.get("abstain"):
@@ -390,7 +429,11 @@ def verdict(report: dict, rows: list[dict], diag: Optional[dict]) -> dict:
         conf = diag.get("confidence")
         ai = {"text": f"步骤 {diag.get('critical_step')} · 置信度 {conf:.2f}" if conf is not None
               else f"步骤 {diag.get('critical_step')}", "tone": "ai"}
-    return {"sentence": sentence,
+    tone = "good" if success else ("warn" if diag and diag.get("abstain") and kind not in ("假成功",) else "bad")
+    unsure = bool(diag and diag.get("abstain"))
+    return {"kind": kind, "tone": "good" if success else "bad", "headline": headline, "sub": " ".join(sub),
+            "short": short, "queue_tone": tone, "ai_unsure": unsure,
+            "sentence": headline + (" " + " ".join(sub) if sub else ""),
             "labels": {"task": {"text": "成功" if success else "失败", "tone": "good" if success else "bad"},
                        "kind": {"text": kind, "tone": "good" if success else "bad"}, "ai": ai}}
 
@@ -446,3 +489,19 @@ def key_steps(report: dict, diag: Optional[dict], chain: list[dict]) -> list[int
     if diag and diag.get("critical_step") is not None:
         core.add(diag["critical_step"])
     return sorted({s + d for s in core if s is not None for d in (-1, 0, 1)})
+
+
+def tape(sim: dict, report: dict, diag: Optional[dict], keys: list[int]) -> list[dict]:
+    """Every message as one tick for the run overview strip."""
+    calls = tool_calls(sim.get("messages") or [])
+    errors = {c["result_step"] for c in calls if not c["ok"]}
+    claims = {c["step"] for c in report["claims"] if c["status"] in CLAIM_PHRASE}
+    crit = diag.get("critical_step") if diag and not diag.get("abstain") else None
+    out = []
+    for step, m in enumerate(sim.get("messages") or []):
+        role = m.get("role")
+        kind = "tool" if role == "tool" or (role == "assistant" and m.get("tool_calls") and not (m.get("content") or "").strip()) \
+            else ("user" if role == "user" else "agent")
+        out.append({"step": step, "kind": kind, "error": step in errors or step in claims,
+                    "key": step in keys, "crit": step == crit})
+    return out
