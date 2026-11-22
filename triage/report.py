@@ -125,6 +125,13 @@ class Names:
             return "（空）"
         if field == "status":
             return STATUS_ZH.get(v, str(v))
+        if field == "payment_history" and isinstance(v, list):
+            out = []
+            for x in v:
+                kind, amount, pm = (str(x).split(" ") + ["", "", ""])[:3]
+                label = {"payment": "付款", "refund": "退款"}.get(kind, kind)
+                out.append(f"{label} ${amount}（{self.payments.get(pm, pm)}）")
+            return "；".join(out)
         if isinstance(v, list) and all(isinstance(x, str) and x in self.items for x in v):
             return "、".join(self.item(x) for x in v)
         if isinstance(v, str) and v in self.payments:
@@ -181,6 +188,9 @@ def comparison(dbs: dict, calls: list[dict], names: Names) -> list[dict]:
                        "initial": names.value(key, iv), "expected": names.value(key, ev),
                        "actual": names.value(key, fv), "match": match,
                        "status": "ok" if match else ("bad" if eid in written else "check")}
+                short = lambda v: [names.item(x, options=False) for x in v] if isinstance(v, list) and all(  # noqa: E731
+                    isinstance(x, str) and x in names.items for x in v) else None
+                row["expected_short"], row["actual_short"] = short(ev), short(fv)
                 if isinstance(ev, list) and isinstance(fv, list):
                     row["missing"] = [names.value(key, [x]) for x in ev if x not in fv]
                     row["extra"] = [names.value(key, [x]) for x in fv if x not in ev]
@@ -363,6 +373,12 @@ def checks(report: dict, diag: Optional[dict], rows: list[dict]) -> list[dict]:
 # --- verdict -------------------------------------------------------------------------------------
 
 def _diff_phrase(r: dict) -> str:
+    if r.get("actual") == "（空）" and r.get("expected") != "（空）":
+        exp = "、".join(r["expected_short"]) if r.get("expected_short") else r["expected"]
+        return f"{r['field_zh']}应有 {exp}，实际是空的"
+    if r.get("expected") == "（空）" and r.get("actual") != "（空）":
+        act = "、".join(r["actual_short"]) if r.get("actual_short") else r["actual"]
+        return f"{r['field_zh']}本应为空，实际有 {act}"
     if r.get("missing") and not r.get("extra"):
         return f"{r['field_zh']}少了 {'、'.join(r.get('missing_short') or r['missing'])}"
     if r.get("extra") and not r.get("missing"):

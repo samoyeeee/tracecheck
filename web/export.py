@@ -19,7 +19,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-OUT = ROOT / "web" / "app" / "public" / "legacy" / "data"     # earlier pages 2-4 (until redone)
 REPORTS = ROOT / "web" / "app" / "public" / "data" / "reports"  # page 1: pre-computed diagnosis reports
 
 # Runs shown as pre-computed reports in the online demo. The first is the default page.
@@ -107,25 +106,6 @@ def overview() -> dict:
         },
         "cost": num(cost_summary(), C),
     }
-
-
-# --- audit cards -----------------------------------------------------------------
-
-def audit() -> dict:
-    """Pre-computed demo: the v1 failures the investigator diagnosed (same card as live analysis)."""
-    from triage.pipeline import DIAGNOSIS_FIELDS, case_from_report
-    from triage.trajectory import from_tau2
-
-    d = load("results/diagnoses/v1.json")
-    triage = {r["file"]: r for r in load("results/triage/v1.json")}
-    cases = []
-    for key, x in sorted(d["diagnoses"].items(), key=lambda kv: int(kv[0].split("_")[1])):
-        case = case_from_report(triage[x["file"]], load(x["file"]), from_tau2(ROOT / x["file"]).user_goal)
-        case["id"] = key
-        case["diagnosis"] = {k: x.get(k) for k in DIAGNOSIS_FIELDS}
-        cases.append(case)
-    return {"src_diagnoses": "results/diagnoses/v1.json", "src_triage": "results/triage/v1.json",
-            "selection": d["selection"], "cases": cases}
 
 
 # --- regression ------------------------------------------------------------------
@@ -243,17 +223,11 @@ def main(argv=None) -> int:
     ap.add_argument("--skip-reports", action="store_true", help="only re-export overview / regression data")
     if not ap.parse_args(argv).skip_reports:
         reports()
-    OUT.mkdir(parents=True, exist_ok=True)
     NEW = ROOT / "web" / "app" / "public" / "data"
     for name, fn in (("overview", overview), ("regression", regression)):
         data = fn()
         (NEW / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
         print(f"web/app/public/data/{name}.json")
-    return 0
-    for name, fn in (("overview", overview), ("audit", audit), ("regression", regression)):
-        data = fn()
-        (OUT / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
-        print(f"web/app/public/legacy/data/{name}.json  {(OUT / f'{name}.json').stat().st_size // 1024} KB")
     return 0
 
 

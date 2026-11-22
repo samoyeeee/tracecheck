@@ -73,7 +73,17 @@ export default function Regression() {
           <h2 className="text-base font-bold">按任务类型</h2>
           <span className="text-xs text-ink3"><Source path={r.by_type_bands.src} /> · 事后分析，不在预先登记的方案里</span>
         </div>
-        <div className="overflow-x-auto rounded-[14px] border border-line bg-sheet">
+        <div className="grid gap-2 md:hidden">
+          {types.map(([k, row]) => (
+            <div key={k} className={cn("rounded-xl border border-line bg-sheet p-3 text-sm", row.pass1.verdict === "worse" && "bg-fail-soft/60", row.pass1.verdict === "better" && "bg-pass-soft/60")}>
+              <div className="flex items-center justify-between font-medium">{TYPE_ZH[k] || k}<span className="text-xs font-normal text-ink3">{row.tasks} 个任务</span></div>
+              <div className="mt-1 tabular-nums">pass^1：{pct(row.pass1.v1)} → {pct(row.pass1.v2)}（{pp(row.pass1.diff)}）</div>
+              <div className="text-xs text-ink3">噪声区间 {pp(row.pass1.noise_band[0])} ~ {pp(row.pass1.noise_band[1])} · pass^4 {pct(row.pass4.v1)} → {pct(row.pass4.v2)}</div>
+              <div className="mt-1"><Change row={row.pass1} /></div>
+            </div>
+          ))}
+        </div>
+        <div className="hidden overflow-x-auto rounded-[14px] border border-line bg-sheet md:block">
           <table className="w-full min-w-[720px] text-sm">
             <thead className="bg-paper2 text-left text-xs text-ink2">
               <tr>
@@ -117,7 +127,16 @@ export default function Regression() {
             <Source path={r.plans[0]} label="第一轮方案" /> · <Source path={r.plans[1]} label="补实验方案" />（都在运行前提交）
           </span>
         </div>
-        <div className="overflow-x-auto rounded-[14px] border border-line bg-sheet">
+        <div className="grid gap-2 md:hidden">
+          {r.bugs.map((b) => (
+            <div key={b.name} className="rounded-xl border border-line bg-sheet p-3 text-sm">
+              <div className="flex items-start justify-between gap-2"><b className="font-medium">{BUG_ZH[b.name] || b.name}</b>
+                {b.detected ? <Tag tone="pass">检出{b.localised ? " · 定位到" : ""}</Tag> : <Tag tone="fail">未检出</Tag>}</div>
+              <div className="mt-1 text-xs text-ink3">{b.round === "4" ? "第一轮 · 改提示词" : "补实验 · 改代码"} · {pct(b.base_rate)} → {pct(b.other_rate)} · 校正后 p {b.p_holm < 0.001 ? "<0.001" : b.p_holm.toFixed(3)}</div>
+            </div>
+          ))}
+        </div>
+        <div className="hidden overflow-x-auto rounded-[14px] border border-line bg-sheet md:block">
           <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-paper2 text-left text-xs text-ink2">
               <tr>{["埋的 bug", "轮次", "检验指标：v1 → bug 版", "校正后 p", "检出", "定位"].map((h) => <th key={h} className="px-3 py-2 font-medium">{h}</th>)}</tr>
