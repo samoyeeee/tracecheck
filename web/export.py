@@ -97,6 +97,13 @@ def overview() -> dict:
                                               e["metrics"]["C"]["answered_cases"]["step_within_1"]}, E,
                                          "AgentRx 测试集 20 条，C 组"),
             "stability": num(load("results/diagnoses/stability_v1.json"), "results/diagnoses/stability_v1.json"),
+            "arms": num({arm: {"all": e["metrics"][arm]["all_cases"], "answered": e["metrics"][arm].get("answered_cases"),
+                               "abstain": e["metrics"][arm]["abstain"], "cases": e["metrics"][arm]["cases"]}
+                         for arm in ("A", "B", "C")}, E),
+            "v4": num({"all": load("results/eval_investigator_v4.json")["metrics"]["C"]["all_cases"],
+                       "answered": load("results/eval_investigator_v4.json")["metrics"]["C"]["answered_cases"],
+                       "abstain": load("results/eval_investigator_v4.json")["metrics"]["C"]["abstain"]},
+                      "results/eval_investigator_v4.json"),
         },
         "cost": num(cost_summary(), C),
     }
@@ -172,6 +179,7 @@ def regression() -> dict:
         "summary": num({"phase4": r["summary"], "phase4b": r4["summary"]}, R + " · " + R4b),
         "mechanism_src": "results/bug_mechanism_check.json",
         "plans": ["results/regression_plan.json", "results/regression_plan_4b.json"],
+        "by_type_bands": num(load("results/regression_by_type.json"), "results/regression_by_type.json"),
     }
 
 
@@ -180,32 +188,68 @@ def report_id(file: str) -> str:
     return f"{p.parent.name}__{p.stem}"
 
 
+def library_runs() -> list[tuple[str, str]]:
+    """Case library: the v1 failures the investigator diagnosed (one unexplained failed trial per task)."""
+    d = load("results/diagnoses/v1.json")
+    return [(x["file"], "v1") for x in d["diagnoses"].values()]
+
+
 def reports() -> list[dict]:
-    """Page-1 reports for DEMO_RUNS (investigator v4 + translation; cached, so re-export is free)."""
+    """Page-1 reports for DEMO_RUNS (the review queue) and the case library.
+
+    Investigator v4 + translation; both cached, so a re-export costs no model call.
+    If the daily investigator quota runs out, the remaining reports are written
+    without the AI layer (shown as "未运行") and a later re-export fills them in.
+    """
     from datetime import datetime, timezone
 
+    from runner.gateway import DailyQuotaExhausted
     from triage.pipeline import build_report
 
     REPORTS.mkdir(parents=True, exist_ok=True)
-    index = []
-    for file, label in DEMO_RUNS:
-        r = build_report(ROOT / file, ai=True, zh=True)
+    queue = {f for f, _ in DEMO_RUNS}
+    runs = list(dict.fromkeys(DEMO_RUNS + library_runs()))
+    seen, index, ai_ok = set(), [], True
+    for n, (file, label) in enumerate(runs, 1):
+        if file in seen:
+            continue
+        seen.add(file)
+        try:
+            r = build_report(ROOT / file, ai=ai_ok, zh=True)
+        except DailyQuotaExhausted:
+            ai_ok = False
+            r = build_report(ROOT / file, ai=False, zh=True)
         r["id"] = report_id(file)
         r["footer"]["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
         (REPORTS / f"{r['id']}.json").write_text(json.dumps(r, ensure_ascii=False, separators=(",", ":")))
-        index.append({"id": r["id"], "file": file, "version": label, "task_id": r["task_id"], "trial": r["trial"],
-                      "kind": "AI 拿不准" if r["verdict"]["ai_unsure"] else r["verdict"]["kind"],
-                      "short": r["verdict"]["short"] + ("（" + r["verdict"]["kind"] + "）" if r["verdict"]["ai_unsure"] else ""),
-                      "tone": "warn" if r["verdict"]["ai_unsure"] else r["verdict"]["queue_tone"],
-                      "label": f"{label} · 任务 {r['task_id']} · 第 {r['trial']} 次 · {r['verdict']['kind']}"})
-        print(f"web/app/public/data/reports/{r['id']}.json")
+        v, a = r["verdict"], r["ai"]
+        index.append({
+            "id": r["id"], "file": file, "version": label, "task_id": r["task_id"], "trial": r["trial"],
+            "queue": file in queue, "success": r["tau2"]["reward"] == 1, "false_success": r["tau2"]["false_success"],
+            "kind": v["kind"], "short": v["short"], "tone": "warn" if v["ai_unsure"] else v["queue_tone"],
+            "queue_kind": "AI 拿不准" if v["ai_unsure"] else v["kind"],
+            "ai": None if not a else {"abstain": a["abstain"], "confidence": a["confidence"],
+                                      "critical_step": a["critical_step"], "category_zh": a["category_zh"]},
+            "label": f"{label} · 任务 {r['task_id']} · 第 {r['trial']} 次 · {v['kind']}",
+        })
+        print(f"[{n}/{len(runs)}] {r['id']}  {v['kind']}  ai={'yes' if a else 'no'}", flush=True)
     (REPORTS / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1))
     return index
 
 
-def main() -> int:
-    reports()
+def main(argv=None) -> int:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--skip-reports", action="store_true", help="only re-export overview / regression data")
+    if not ap.parse_args(argv).skip_reports:
+        reports()
     OUT.mkdir(parents=True, exist_ok=True)
+    NEW = ROOT / "web" / "app" / "public" / "data"
+    for name, fn in (("overview", overview), ("regression", regression)):
+        data = fn()
+        (NEW / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+        print(f"web/app/public/data/{name}.json")
+    return 0
     for name, fn in (("overview", overview), ("audit", audit), ("regression", regression)):
         data = fn()
         (OUT / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))

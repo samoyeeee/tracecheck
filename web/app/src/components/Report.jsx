@@ -10,7 +10,7 @@ export function Source({ path, label = "来源", className }) {
             className={cn("text-ink3 underline-offset-2 hover:text-ai hover:underline", className)}>{label}</a>;
 }
 
-const Tag = ({ tone = "fail", className, children }) => (
+export const Tag = ({ tone = "fail", className, children }) => (
   <span className={cn("inline-block rounded-full px-2 text-xs font-medium leading-relaxed whitespace-nowrap", {
     fail: "bg-fail-soft text-fail", ai: "bg-ai-soft text-ai", check: "bg-check-soft text-check", pass: "bg-pass-soft text-pass",
   }[tone], className)}>{children}</span>

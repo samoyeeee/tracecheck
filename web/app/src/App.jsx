@@ -1,23 +1,30 @@
 import { useCallback, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { getStatus, lastReview, liveReport, staticIndex, staticReport } from "@/lib/api";
+import { allReviews, getStatus, liveReport, staticIndex, staticReport } from "@/lib/api";
+import Cases from "@/components/Cases";
+import Overview from "@/components/Overview";
+import Regression from "@/components/Regression";
 import ImportDialog from "@/components/ImportDialog";
 import Report from "@/components/Report";
 import DecisionBar from "@/components/DecisionBar";
 
-// Pages 2-4 are still the earlier version until they are redone.
 const NAV = [
-  { href: "#/", label: "复核", on: true },
-  { href: "legacy/audit.html", label: "案例库" },
-  { href: "legacy/overview.html", label: "评测总览" },
-  { href: "legacy/regression.html", label: "回归对比" },
+  { page: "review", href: "#/", label: "复核" },
+  { page: "cases", href: "#/cases", label: "案例库" },
+  { page: "overview", href: "#/overview", label: "评测总览" },
+  { page: "regression", href: "#/regression", label: "回归对比" },
 ];
+
+function route() {
+  const h = location.hash;
+  if (h.startsWith("#/cases")) return { page: "cases" };
+  if (h.startsWith("#/overview")) return { page: "overview" };
+  if (h.startsWith("#/regression")) return { page: "regression" };
+  const m = h.match(/^#\/report\/(.+)$/);
+  return { page: "review", id: m ? decodeURIComponent(m[1]) : null };
+}
 const TAG = { bad: "bg-fail-soft text-fail", warn: "bg-check-soft text-check", good: "bg-pass-soft text-pass" };
 
-function idFromHash() {
-  const m = location.hash.match(/^#\/report\/(.+)$/);
-  return m ? decodeURIComponent(m[1]) : null;
-}
 
 function Queue({ items, current, reviewed, onPick }) {
   const left = items.filter((x) => !reviewed[x.id]).length;
@@ -35,7 +42,7 @@ function Queue({ items, current, reviewed, onPick }) {
             {reviewed[x.id] && <span className="text-[11.5px] text-pass">已复核</span>}
           </span>
           <span className="mt-0.5 block text-[12.5px] leading-snug text-ink2">
-            <span className={`mr-1 inline-block rounded-full px-2 text-xs font-medium leading-relaxed ${TAG[x.tone] || TAG.bad}`}>{x.kind}</span>
+            <span className={`mr-1 inline-block rounded-full px-2 text-xs font-medium leading-relaxed ${TAG[x.tone] || TAG.bad}`}>{x.queue_kind || x.kind}</span>
             {x.short}
           </span>
           <span className="mt-0.5 hidden text-[11.5px] text-ink3 lg:block">{x.version}</span>
@@ -48,15 +55,14 @@ function Queue({ items, current, reviewed, onPick }) {
 export default function App() {
   const [status, setStatus] = useState(undefined);
   const [index, setIndex] = useState([]);
+  const [where, setWhere] = useState(route());
   const [report, setReport] = useState(null);
   const [progress, setProgress] = useState(null);
   const [error, setError] = useState("");
-  const [reviewed, setReviewed] = useState({});
+  const [reviews, setReviews] = useState({});
   const [toast, setToast] = useState(null);
 
-  const refreshReviewed = useCallback((items) => {
-    setReviewed(Object.fromEntries(items.map((x) => [x.id, Boolean(lastReview(x.id))])));
-  }, []);
+  const refreshReviews = useCallback(async () => setReviews(await allReviews()), []);
 
   const open = useCallback(async (id) => {
     setError("");
@@ -66,35 +72,47 @@ export default function App() {
   useEffect(() => {
     (async () => {
       setStatus(await getStatus());
+      refreshReviews();
       try {
         const items = await staticIndex();
         setIndex(items);
-        refreshReviewed(items);
-        await open(idFromHash() || items[0]?.id);
+        const w = route();
+        if (w.page === "review") await open(w.id || items.find((x) => x.queue)?.id || items[0]?.id);
       } catch (e) { setError(e.message); }
     })();
-    const onHash = () => { const id = idFromHash(); if (id) open(id); };
+    const onHash = () => {
+      const w = route();
+      setWhere(w);
+      if (w.page === "review" && w.id) open(w.id);
+      if (w.page !== "review") window.scrollTo(0, 0);
+    };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
-  }, [open, refreshReviewed]);
+  }, [open, refreshReviews]);
 
   function pick(id) { location.hash = `#/report/${encodeURIComponent(id)}`; }
 
   function say(text, tone = "ink") { setToast({ text, tone }); setTimeout(() => setToast(null), 2400); }
 
-  // After a decision: mark it, then move on to the next item still waiting.
-  function decided(msg) {
-    refreshReviewed(index);
-    const live = !index.some((x) => x.id === report.id);
-    const order = index.map((x) => x.id);
-    const next = order.slice(order.indexOf(report.id) + 1).concat(order).find((id) => id !== report.id && !lastReview(id));
-    say(next && !live ? `${msg}，已打开下一条` : msg, "pass");
-    if (next && !live) setTimeout(() => pick(next), 600);
+  // the queue: items marked for review, plus the one open now if it came from the case library
+  const queue = index.filter((x) => x.queue || x.id === report?.id);
+  const reviewed = Object.fromEntries(index.map((x) => [x.id, Boolean(reviews[x.id])]));
+
+  // After a decision: refresh, then move on to the next queue item still waiting.
+  async function decided(msg) {
+    const latest = await allReviews();
+    setReviews(latest);
+    const order = queue.map((x) => x.id);
+    const inQueue = order.includes(report.id);
+    const next = order.slice(order.indexOf(report.id) + 1).concat(order).find((id) => id !== report.id && !latest[id]);
+    say(next && inQueue ? `${msg}，已打开下一条` : msg, "pass");
+    if (next && inQueue) setTimeout(() => pick(next), 600);
   }
 
   // Live analysis (local server): layers 1-2 first, then the investigator + translation.
   async function analyse(body) {
     setError("");
+    if (where.page !== "review") { history.replaceState(null, "", "#/live"); setWhere({ page: "review" }); }
     setProgress("规则检查和数据库核验…");
     try {
       const first = await liveReport(body);
@@ -106,36 +124,50 @@ export default function App() {
     setProgress(null);
   }
 
+  const review = where.page === "review";
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-20 flex items-center gap-5 border-b border-line bg-sheet px-4 py-3 sm:px-6">
         <a href="#/" className="text-[17px] font-black tracking-tight">Trace<i className="not-italic text-fail">Check</i></a>
         <nav aria-label="主导航" className="hidden gap-1 md:flex">
           {NAV.map((n) => (
-            <a key={n.href} href={n.href} aria-current={n.on ? "page" : undefined}
-               className={`rounded-md px-3 py-1.5 text-sm ${n.on ? "bg-paper font-medium text-ink" : "text-ink2 hover:bg-paper"}`}>
-              {n.label}{!n.on && <span className="ml-1 text-[10px] text-ink3">旧版</span>}
+            <a key={n.page} href={n.href} aria-current={where.page === n.page ? "page" : undefined}
+               className={`rounded-md px-3 py-1.5 text-sm ${where.page === n.page ? "bg-paper font-medium text-ink" : "text-ink2 hover:bg-paper"}`}>
+              {n.label}
             </a>
           ))}
         </nav>
         <div className="flex-1" />
         <ImportDialog status={status} index={index} onAnalyse={analyse} onOpen={pick} />
       </header>
+      <nav aria-label="主导航（手机）" className="flex gap-1 overflow-x-auto border-b border-line bg-sheet px-3 py-1.5 md:hidden">
+        {NAV.map((n) => (
+          <a key={n.page} href={n.href} className={`whitespace-nowrap rounded-md px-3 py-1 text-[13px] ${where.page === n.page ? "bg-paper font-medium" : "text-ink2"}`}>{n.label}</a>
+        ))}
+      </nav>
 
-      <div className="lg:grid lg:min-h-[calc(100vh-57px)] lg:grid-cols-[280px_1fr]">
-        <Queue items={index} current={report?.id} reviewed={reviewed} onPick={pick} />
-        <main className="w-full max-w-[1120px] px-4 pt-4 pb-56 sm:px-9 sm:pt-7 sm:pb-36">
-          {progress && (
-            <div className="mb-4 flex items-center gap-2 rounded-lg border border-ai/30 bg-ai-soft px-4 py-2.5 text-sm text-ai">
-              <Loader2 size={16} className="animate-spin" /> {progress}
-            </div>
-          )}
-          {error && <div className="mb-4 rounded-lg border border-fail/30 bg-fail-soft px-4 py-3 text-sm text-fail">{error}</div>}
-          {report ? <Report report={report} pendingAi={Boolean(progress)} /> : !error && <p className="text-sm text-ink3">加载中…</p>}
+      {review ? (
+        <div className="lg:grid lg:min-h-[calc(100vh-57px)] lg:grid-cols-[280px_1fr]">
+          <Queue items={queue} current={report?.id} reviewed={reviewed} onPick={pick} />
+          <main className="w-full max-w-[1120px] px-4 pt-4 pb-56 sm:px-9 sm:pt-7 sm:pb-36">
+            {progress && (
+              <div className="mb-4 flex items-center gap-2 rounded-lg border border-ai/30 bg-ai-soft px-4 py-2.5 text-sm text-ai">
+                <Loader2 size={16} className="animate-spin" /> {progress}
+              </div>
+            )}
+            {error && <div className="mb-4 rounded-lg border border-fail/30 bg-fail-soft px-4 py-3 text-sm text-fail">{error}</div>}
+            {report ? <Report report={report} pendingAi={Boolean(progress)} /> : !error && <p className="text-sm text-ink3">加载中…</p>}
+          </main>
+        </div>
+      ) : (
+        <main className="mx-auto w-full max-w-[1180px] px-4 pt-5 pb-16 sm:px-9 sm:pt-8">
+          {where.page === "cases" && <Cases index={index} reviews={reviews} onOpen={pick} />}
+          {where.page === "overview" && <Overview />}
+          {where.page === "regression" && <Regression />}
         </main>
-      </div>
+      )}
 
-      {report?.ai && <DecisionBar r={report} onDone={decided} onSay={say} />}
+      {review && report?.ai && <DecisionBar r={report} onDone={decided} onSay={say} />}
       {toast && (
         <div role="status"
              className={`fixed bottom-28 left-1/2 z-40 -translate-x-1/2 rounded-lg px-4 py-2 text-sm text-white ${toast.tone === "pass" ? "bg-pass" : "bg-ink"}`}>

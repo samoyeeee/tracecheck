@@ -61,3 +61,19 @@ export function lastReview(reportId) {
     return null;
   }
 }
+
+// Latest decision per report: the local results/human_review.jsonl plus this browser's copy.
+export async function allReviews() {
+  let out = {};
+  try { JSON.parse(localStorage.getItem(STORE) || "[]").forEach((e) => { out[e.report_id] = e; }); } catch { /* none */ }
+  if (await getStatus()) {
+    try { out = { ...out, ...(await (await fetch("api/reviews")).json()).reviews }; } catch { /* keep browser copy */ }
+  }
+  return out;
+}
+
+export async function staticData(name) {
+  const res = await fetch(`data/${name}.json`);
+  if (!res.ok) throw new Error(`找不到 data/${name}.json`);
+  return res.json();
+}

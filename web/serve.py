@@ -110,6 +110,14 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json(200, {"local": True, "investigator": investigator_available(), "model": model})
         if self.path == "/api/samples":
             return self._json(200, {"samples": samples()})
+        if self.path == "/api/reviews":   # latest human decision per report
+            last = {}
+            if REVIEWS.exists():
+                for line in REVIEWS.read_text().splitlines():
+                    if line.strip():
+                        e = json.loads(line)
+                        last[e.get("report_id")] = e
+            return self._json(200, {"reviews": last, "file": str(REVIEWS.relative_to(ROOT))})
         return super().do_GET()
 
     def do_POST(self):
