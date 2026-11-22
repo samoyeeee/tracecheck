@@ -118,3 +118,4 @@ class Diagnosis:
     model: str = ""
     error: str = ""                     # parse / API problem, if any
     samples: list = field(default_factory=list)  # arm C: the individual answers that were voted on
+    causal_chain: list = field(default_factory=list)  # v4: [{step, text, inferred}] critical step -> outcome

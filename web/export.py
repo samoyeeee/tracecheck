@@ -19,7 +19,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-OUT = ROOT / "web" / "data"
+OUT = ROOT / "web" / "app" / "public" / "legacy" / "data"     # earlier pages 2-4 (until redone)
+REPORTS = ROOT / "web" / "app" / "public" / "data" / "reports"  # page 1: pre-computed diagnosis reports
+
+# Runs shown as pre-computed reports in the online demo. The first is the default page.
+DEMO_RUNS = [
+    ("results/runs/bug_dropitem/task_2__trial_1.json", "埋 bug（漏掉最后一件）· 任务 2 · 第 1 次 · 假成功"),
+]
 
 
 def load(path: str):
@@ -164,12 +170,37 @@ def regression() -> dict:
     }
 
 
+def report_id(file: str) -> str:
+    p = Path(file)
+    return f"{p.parent.name}__{p.stem}"
+
+
+def reports() -> list[dict]:
+    """Page-1 reports for DEMO_RUNS (investigator v4 + translation; cached, so re-export is free)."""
+    from datetime import datetime, timezone
+
+    from triage.pipeline import build_report
+
+    REPORTS.mkdir(parents=True, exist_ok=True)
+    index = []
+    for file, label in DEMO_RUNS:
+        r = build_report(ROOT / file, ai=True, zh=True)
+        r["id"] = report_id(file)
+        r["footer"]["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        (REPORTS / f"{r['id']}.json").write_text(json.dumps(r, ensure_ascii=False, separators=(",", ":")))
+        index.append({"id": r["id"], "file": file, "label": label})
+        print(f"web/app/public/data/reports/{r['id']}.json")
+    (REPORTS / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1))
+    return index
+
+
 def main() -> int:
+    reports()
     OUT.mkdir(parents=True, exist_ok=True)
     for name, fn in (("overview", overview), ("audit", audit), ("regression", regression)):
         data = fn()
         (OUT / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
-        print(f"web/data/{name}.json  {(OUT / f'{name}.json').stat().st_size // 1024} KB")
+        print(f"web/app/public/legacy/data/{name}.json  {(OUT / f'{name}.json').stat().st_size // 1024} KB")
     return 0
 
 

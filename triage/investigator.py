@@ -30,7 +30,11 @@ from triage.schema import CATEGORIES, Diagnosis  # noqa: E402
 from triage.tools import outcome_check, render_steps, rule_findings, same_task_success  # noqa: E402
 from triage.trajectory import Trajectory  # noqa: E402
 
-PROMPT_VERSION = "v3"
+PROMPT_VERSION = "v3"     # what results/eval_investigator.json measured; the CLI default
+# v4 = v3 + a causal chain (step -> step -> outcome) and Chinese explanations,
+# for the web report. Same decision rules, so the step/category task is
+# unchanged, but it is a different prompt: its accuracy is measured separately.
+WEB_PROMPT_VERSION = "v4"
 # Arm C asks the same question SAMPLES times and abstains unless at least
 # MIN_AGREE answers name the same step and category (self-consistency). The
 # model's self-reported confidence was not usable (0.9-1.0 on most wrong
@@ -89,7 +93,21 @@ Answer with JSON only:
  "confidence": <0-1>, "abstain": <true|false>, "summary": "<one sentence>"}"""
 
 
-def build_prompt(t: Trajectory, arm: str, policy: str, db_diff=None, use_reference=False) -> str:
+V4_RULES = """\
+5. Also explain the failure as a causal chain of 2-4 links, in order: the critical step, what followed from it (e.g. the tool accepted the call, the agent told the user it was done), and finally the outcome (the database ended up different from what the user asked for, or the task was not completed). Each link names one step and one short sentence. Mark a link "inferred": true when it is your judgement rather than something visible in the steps or checks. Use the step number of the final link's evidence, or null for the outcome if no single step shows it.
+6. Write summary, observed_facts, inference, needs_verification and the causal-chain sentences in simplified Chinese, in plain words a product manager understands. Keep evidence quotes verbatim in the original language."""
+
+SCHEMA_V4 = """\
+Answer with JSON only:
+{"critical_step": <int>, "failed_agent": "assistant"|"user", "category": "<one category name, in English, exactly as listed>",
+ "evidence": [{"step": <int>, "quote": "<verbatim text from that step>"}],
+ "causal_chain": [{"step": <int or null>, "text": "<one short sentence in Chinese>", "inferred": <true|false>}],
+ "observed_facts": ["..."], "inference": ["..."], "needs_verification": ["..."],
+ "confidence": <0-1>, "abstain": <true|false>, "summary": "<one sentence in Chinese>"}"""
+
+
+def build_prompt(t: Trajectory, arm: str, policy: str, db_diff=None, use_reference=False,
+                 version: str = PROMPT_VERSION) -> str:
     parts = [BASE_TASK, "## Failure categories\n" + CATEGORY_DEFINITIONS,
              "## Agent policy\n" + policy.strip(),
              "## What the simulated user wanted\n" + (t.user_goal or "(not available)"),
@@ -101,7 +119,9 @@ def build_prompt(t: Trajectory, arm: str, policy: str, db_diff=None, use_referen
             ref = same_task_success(t)
             if ref:
                 parts.append("## Reference\n" + ref)
-    if arm == "C":
+    if arm == "C" and version == "v4":
+        parts += [ARM_C_RULES + "\n" + V4_RULES, SCHEMA_V4]
+    elif arm == "C":
         parts += [ARM_C_RULES, SCHEMA_C]
     else:
         parts.append(SCHEMA_SIMPLE)
@@ -171,7 +191,23 @@ def _category(raw) -> str | None:
     return None
 
 
-def to_diagnosis(t: Trajectory, arm: str, parsed: dict, model: str) -> Diagnosis:
+def check_chain(t: Trajectory, chain) -> list[dict]:
+    """Keep well-formed links; a step that is not in the trajectory becomes null (and inferred)."""
+    out = []
+    for link in chain if isinstance(chain, list) else []:
+        if not isinstance(link, dict) or not str(link.get("text") or "").strip():
+            continue
+        try:
+            step = int(link["step"]) if link.get("step") is not None else None
+        except (TypeError, ValueError):
+            step = None
+        known = step in t.steps
+        out.append({"step": step if known else None, "text": str(link["text"]).strip(),
+                    "inferred": bool(link.get("inferred")) or (step is not None and not known)})
+    return out[:4]
+
+
+def to_diagnosis(t: Trajectory, arm: str, parsed: dict, model: str, version: str = PROMPT_VERSION) -> Diagnosis:
     def as_int(v):
         try:
             return int(v)
@@ -185,7 +221,7 @@ def to_diagnosis(t: Trajectory, arm: str, parsed: dict, model: str) -> Diagnosis
             return None
 
     d = Diagnosis(
-        traj_id=t.traj_id, arm=arm, prompt_version=PROMPT_VERSION,
+        traj_id=t.traj_id, arm=arm, prompt_version=version,
         critical_step=as_int(parsed.get("critical_step")),
         failed_agent=str(parsed.get("failed_agent", "")).lower() or None,
         category=_category(parsed.get("category")),
@@ -195,6 +231,7 @@ def to_diagnosis(t: Trajectory, arm: str, parsed: dict, model: str) -> Diagnosis
         needs_verification=list(parsed.get("needs_verification") or []),
         confidence=as_float(parsed.get("confidence")),
         abstain=False, summary=str(parsed.get("summary", "")), model=model,
+        causal_chain=check_chain(t, parsed.get("causal_chain")),
     )
     if parsed.get("category") and d.category is None:
         d.error = f"unknown category {parsed.get('category')!r}"
@@ -222,12 +259,12 @@ def call_model(prompt: str, model: str, run_tag: str, temperature: float = 0.0) 
 
 
 def investigate(t: Trajectory, arm: str, policy: str, model: str, cache_dir: Path,
-                run_tag: str, db_diff=None, use_reference=False) -> Diagnosis:
+                run_tag: str, db_diff=None, use_reference=False, version: str = PROMPT_VERSION) -> Diagnosis:
     """Diagnose one trajectory. Arm C = SAMPLES answers combined by vote."""
     if arm != "C":
-        return _ask(t, arm, policy, model, cache_dir, run_tag, db_diff, use_reference)
+        return _ask(t, arm, policy, model, cache_dir, run_tag, db_diff, use_reference, version=version)
     answers = [_ask(t, arm, policy, model, cache_dir / f"s{i}", run_tag, db_diff, use_reference,
-                    temperature=SAMPLE_TEMPERATURE, sample=i) for i in range(SAMPLES)]
+                    temperature=SAMPLE_TEMPERATURE, sample=i, version=version) for i in range(SAMPLES)]
     return vote(t, answers)
 
 
@@ -264,16 +301,17 @@ def vote(t: Trajectory, answers: list[Diagnosis]) -> Diagnosis:
 
 
 def _ask(t: Trajectory, arm: str, policy: str, model: str, cache_dir: Path, run_tag: str,
-         db_diff=None, use_reference=False, temperature: float = 0.0, sample: int = 0) -> Diagnosis:
+         db_diff=None, use_reference=False, temperature: float = 0.0, sample: int = 0,
+         version: str = PROMPT_VERSION) -> Diagnosis:
     """One model call, reusing a cached answer for the identical prompt."""
-    prompt = build_prompt(t, arm, policy, db_diff, use_reference)
+    prompt = build_prompt(t, arm, policy, db_diff, use_reference, version)
     key = hashlib.sha256(f"{model}\n{temperature}\n{sample}\n{prompt}".encode()).hexdigest()[:16]
     cache = cache_dir / f"{t.traj_id}.json"
     if cache.exists():
         saved = json.loads(cache.read_text())
         if saved.get("prompt_hash") == key and not saved.get("api_error"):
             parsed, note = parse_reply(saved.get("raw", "")) if "raw" in saved else (saved["parsed"], "")
-            return _finish(to_diagnosis(t, arm, parsed, model), parsed, note)
+            return _finish(to_diagnosis(t, arm, parsed, model, version), parsed, note)
     cache_dir.mkdir(parents=True, exist_ok=True)
     try:
         raw, usage = call_model(prompt, model, run_tag, temperature)
@@ -282,13 +320,13 @@ def _ask(t: Trajectory, arm: str, policy: str, model: str, cache_dir: Path, run_
         if isinstance(exc, DailyQuotaExhausted):
             raise
         cache.write_text(json.dumps({"prompt_hash": key, "api_error": f"{type(exc).__name__}: {exc}"[:2000]}))
-        d = to_diagnosis(t, arm, {}, model)
+        d = to_diagnosis(t, arm, {}, model, version)
         d.error, d.abstain, d.abstain_reason = f"API error: {type(exc).__name__}", True, "API error"
         return d
     parsed, note = parse_reply(raw)
-    cache.write_text(json.dumps({"prompt_hash": key, "prompt_version": PROMPT_VERSION, "arm": arm,
+    cache.write_text(json.dumps({"prompt_hash": key, "prompt_version": version, "arm": arm,
                                  "raw": raw, "parsed": parsed, "usage": usage}, indent=1, ensure_ascii=False))
-    return _finish(to_diagnosis(t, arm, parsed, model), parsed, note)
+    return _finish(to_diagnosis(t, arm, parsed, model, version), parsed, note)
 
 
 def _finish(d: Diagnosis, parsed: dict, note: str) -> Diagnosis:

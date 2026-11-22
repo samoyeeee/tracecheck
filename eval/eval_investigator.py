@@ -76,12 +76,12 @@ def score(rows: list[dict]) -> dict:
     return out
 
 
-def run_arm(items, arm: str, model: str, policy_of, experiment: str) -> list[dict]:
+def run_arm(items, arm: str, model: str, policy_of, experiment: str, version: str = inv.PROMPT_VERSION) -> list[dict]:
     rows = []
     for t, gt in items:
         d = inv.investigate(t, arm, policy_of(t), model,
                             ROOT / "results" / "investigator" / f"agentrx_{experiment}_{arm}",
-                            run_tag=f"investigator_agentrx_{arm}")
+                            run_tag=f"investigator_agentrx_{arm}", version=version)
         step_ok = d.critical_step == gt["critical_step"]
         cat_ok = d.category == gt["category"]
         rows.append({
@@ -116,6 +116,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--split", choices=["tune", "test"], required=True)
     ap.add_argument("--arms", nargs="+", default=["A", "B", "C"])
+    ap.add_argument("--prompt-version", default=inv.PROMPT_VERSION, choices=["v3", inv.WEB_PROMPT_VERSION],
+                    help="v4 (web report prompt) writes results/eval_investigator_v4.json and leaves v3 files alone")
     ap.add_argument("--note", default="", help="what changed in this iteration (tuning log)")
     ap.add_argument("--repeat", type=int, default=0,
                     help="re-run the same prompt with a fresh cache (measures run-to-run noise)")
@@ -129,11 +131,12 @@ def main(argv=None) -> int:
     tune, test = split(load_agentrx())
     items = tune if args.split == "tune" else test
     policy_of = lambda t: t.messages[0]["content"] if t.messages and t.messages[0]["role"] == "system" else ""  # noqa: E731
-    experiment = f"{args.split}_{inv.PROMPT_VERSION}" + (f"_r{args.repeat}" if args.repeat else "")
+    version = args.prompt_version
+    experiment = f"{args.split}_{version}" + (f"_r{args.repeat}" if args.repeat else "")
 
     results = {}
     for arm in args.arms:
-        rows = run_arm(items, arm, model, policy_of, experiment)
+        rows = run_arm(items, arm, model, policy_of, experiment, version)
         results[arm] = {"metrics": score(rows), "rows": rows}
         m = results[arm]["metrics"]
         print(f"{arm}: step exact {m['all_cases']['step_exact']['rate']}, +-1 {m['all_cases']['step_within_1']['rate']}, "
@@ -153,7 +156,7 @@ def main(argv=None) -> int:
             for arm, res in results.items():
                 m = res["metrics"]
                 cell = lambda k: f"{m['all_cases'][k]['n']}/{m['cases']}"  # noqa: E731
-                f.write(f"| {stamp} | {inv.PROMPT_VERSION}{f' (重复 {args.repeat})' if args.repeat else ''} | {arm} | {args.note} | {cell('step_exact')} | "
+                f.write(f"| {stamp} | {version}{f' (重复 {args.repeat})' if args.repeat else ''} | {arm} | {args.note} | {cell('step_exact')} | "
                         f"{cell('step_within_1')} | {cell('category')} | {cell('step_and_category')} | "
                         f"{m['abstain']['n']}/{m['cases']} |\n")
         (ROOT / "results" / "investigator" / f"{experiment}_rows.json").write_text(
@@ -163,7 +166,7 @@ def main(argv=None) -> int:
     out = {
         "what": "Investigator vs AgentRx human annotations, tau-bench retail, held-out test split",
         "ground_truth": "vendor/agentrx/data/ground_truth/tau_ground_truth.json (root-cause failure)",
-        "model": model, "prompt_version": inv.PROMPT_VERSION, "abstain_rule": f"arm C: {inv.SAMPLES} samples at temperature {inv.SAMPLE_TEMPERATURE}; abstain unless {inv.MIN_AGREE} agree on step+category and a verbatim quote is found at that step",
+        "model": model, "prompt_version": version, "abstain_rule": f"arm C: {inv.SAMPLES} samples at temperature {inv.SAMPLE_TEMPERATURE}; abstain unless {inv.MIN_AGREE} agree on step+category and a verbatim quote is found at that step",
         "split": {"seed": SPLIT_SEED, "tune_ids": sorted((t.traj_id for t, _ in tune), key=int),
                   "test_ids": sorted((t.traj_id for t, _ in test), key=int)},
         "arms": {"A": "trajectory only", "B": "A + outcome check + rule findings",
@@ -173,6 +176,11 @@ def main(argv=None) -> int:
         "badcases": {a: badcases(r["rows"]) for a, r in results.items()},
         "rows": {a: r["rows"] for a, r in results.items()},
     }
+    if version != inv.PROMPT_VERSION:
+        path = ROOT / "results" / f"eval_investigator_{version}.json"
+        path.write_text(json.dumps(out, indent=1, ensure_ascii=False))
+        print(f"written {path.relative_to(ROOT)}")
+        return 0
     (ROOT / "results" / "eval_investigator.json").write_text(json.dumps(out, indent=1, ensure_ascii=False))
     write_badcase_md(ROOT / "results" / "eval_investigator.json", ROOT / "results" / "investigator_badcases.md")
     print("written results/eval_investigator.json and results/investigator_badcases.md")

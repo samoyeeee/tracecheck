@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/* Semantic colours: red = failure / violation, orange = needs checking,
+   blue = AI inference, green = pass. Neutrals for everything else. */
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans CJK SC", system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-fail: #c0262d;
+  --color-fail-soft: #fdecec;
+  --color-check: #b45309;
+  --color-check-soft: #fff4e0;
+  --color-ai: #2557d6;
+  --color-ai-soft: #eaf0fd;
+  --color-pass: #187a4a;
+  --color-pass-soft: #e5f4ec;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body { @apply bg-zinc-50 text-zinc-900 antialiased; }
+.flash { animation: flash 1.4s ease-out; }
+@keyframes flash { 0% { box-shadow: 0 0 0 4px var(--color-ai); } 100% { box-shadow: 0 0 0 0 transparent; } }

@@ -33,3 +33,14 @@ def test_live_analysis_matches_the_stored_triage():
                   if r["file"].endswith("task_17__trial_0.json"))
     assert raw["false_success"] == stored["false_success"] and raw["db_diff"] == stored["db_diff"]
     assert case["timeline"][0]["step"] == 0 and case["diagnosis"] is None
+
+
+def test_review_entries_are_validated(tmp_path, monkeypatch):
+    import json
+    import web.serve as S
+    monkeypatch.setattr(S, "REVIEWS", tmp_path / "human_review.jsonl")
+    S.append_review({"time": "t", "report_id": "r", "decision": "modify", "original": {}, "human": {"critical_step": 3}})
+    assert json.loads(S.REVIEWS.read_text())["human"]["critical_step"] == 3
+    for bad in ({"decision": "maybe"}, {"decision": "accept", "script": "x"}):
+        with pytest.raises(ValueError):
+            S.append_review(bad)
