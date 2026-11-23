@@ -63,7 +63,12 @@ def localisation(reports: list[dict], tasks: set[str], pattern: re.Pattern) -> d
             "localised": share is not None and share >= 0.5}
 
 
-def main() -> int:
+def main(argv=None) -> int:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", default="results/eval_regression_4b.json",
+                    help="the pre-registered result used claim rule v1; a later rule writes elsewhere")
+    args = ap.parse_args(argv)
     plan = json.loads((ROOT / "results" / "regression_plan_4b.json").read_text())
     v1, rerun = triage("v1"), triage("v1_rerun")
     out: dict = {"plan": "results/regression_plan_4b.json", "alpha": ALPHA, "permutations": PERMUTATIONS,
@@ -96,7 +101,9 @@ def main() -> int:
         "bugs_localised": f"{sum(b['detected'] and b['localised'] for b in out['bugs'].values())}/{len(out['bugs'])}",
         "false_alarms_v1_vs_v1": sum(r["false_alarm"] for r in out["false_alarms"].values()),
     }
-    path = ROOT / "results" / "eval_regression_4b.json"
+    from triage.verify import ITEM_LIST_FIELDS  # noqa: F401  (rule v2 present)
+    out["claim_rule"] = "v2 (item-level + disclosure)" if "rule2" in args.out else "v1 (pre-registered)"
+    path = ROOT / args.out
     path.write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n")
     print(json.dumps(out, indent=1, ensure_ascii=False))
     return 0

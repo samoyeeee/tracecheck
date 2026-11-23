@@ -144,3 +144,12 @@ def test_refund_rule_downgrades_rejected_calls():
 def test_run_rules_flags_abnormal_termination():
     sim = {"termination_reason": "max_steps", "messages": convo()}
     assert any(f.rule_id == "abnormal_termination" for f in run_rules(sim))
+
+
+def test_rule_v2_partial_claim_that_discloses_the_failure_is_not_false_success():
+    from pathlib import Path
+    from triage.verify import verify_run
+    root = Path(__file__).resolve().parent.parent
+    r = verify_run(root / "results/runs/bug_dropitem/task_2__trial_1.json", "t", root)
+    assert not r.false_success
+    assert {c.status for c in r.claims} == {"partial_disclosed"}

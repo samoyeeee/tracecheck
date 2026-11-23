@@ -1,0 +1,114 @@
+{
+ "plan": "results/regression_plan_4b.json",
+ "alpha": 0.05,
+ "permutations": 20000,
+ "bugs": {
+  "bug_addr2": {
+   "description": "Bug 5 (code): the agent's tool-calling code empties address2 in modify_pending_order_address / modify_user_address.",
+   "runs": 80,
+   "runs_expected": 80,
+   "primary": {
+    "tasks": 20,
+    "base_rate": 0.2875,
+    "other_rate": 0.6125,
+    "diff": 0.325,
+    "tasks_up": 14,
+    "tasks_down": 1,
+    "p": 0.0007,
+    "p_holm": 0.0014
+   },
+   "localisation_bug": {
+    "flagged_runs": 49,
+    "flagged_runs_naming_field": 45,
+    "share": 0.9184,
+    "localised": true
+   },
+   "localisation_v1_same_tasks": {
+    "flagged_runs": 23,
+    "flagged_runs_naming_field": 13,
+    "share": 0.5652,
+    "localised": true
+   },
+   "context_tau2_success": {
+    "tasks": 20,
+    "base_rate": 0.1375,
+    "other_rate": 0.0,
+    "diff": -0.1375,
+    "tasks_up": 0,
+    "tasks_down": 5,
+    "p": 0.0624
+   },
+   "detected": true,
+   "localised": true
+  },
+  "bug_dropitem": {
+   "description": "Bug 6 (code): off-by-one in the agent's tool-calling code drops the last item when a return / exchange / item modification covers two or more items.",
+   "runs": 80,
+   "runs_expected": 80,
+   "primary": {
+    "tasks": 20,
+    "base_rate": 0.2625,
+    "other_rate": 0.5,
+    "diff": 0.2375,
+    "tasks_up": 15,
+    "tasks_down": 2,
+    "p": 0.0098,
+    "p_holm": 0.0098
+   },
+   "localisation_bug": {
+    "flagged_runs": 40,
+    "flagged_runs_naming_field": 37,
+    "share": 0.925,
+    "localised": true
+   },
+   "localisation_v1_same_tasks": {
+    "flagged_runs": 21,
+    "flagged_runs_naming_field": 18,
+    "share": 0.8571,
+    "localised": true
+   },
+   "context_tau2_success": {
+    "tasks": 20,
+    "base_rate": 0.1625,
+    "other_rate": 0.0,
+    "diff": -0.1625,
+    "tasks_up": 0,
+    "tasks_down": 8,
+    "p": 0.0077
+   },
+   "detected": true,
+   "localised": true
+  }
+ },
+ "false_alarms": {
+  "bug_addr2": {
+   "tasks": 20,
+   "base_rate": 0.2875,
+   "other_rate": 0.3875,
+   "diff": 0.1,
+   "tasks_up": 8,
+   "tasks_down": 2,
+   "p": 0.073,
+   "p_holm": 0.146,
+   "false_alarm": false
+  },
+  "bug_dropitem": {
+   "tasks": 20,
+   "base_rate": 0.2625,
+   "other_rate": 0.3375,
+   "diff": 0.075,
+   "tasks_up": 8,
+   "tasks_down": 2,
+   "p": 0.3777,
+   "p_holm": 0.3777,
+   "false_alarm": false
+  }
+ },
+ "complete": true,
+ "summary": {
+  "bugs_detected": "2/2",
+  "bugs_localised": "2/2",
+  "false_alarms_v1_vs_v1": 0
+ },
+ "claim_rule": "v2 (item-level + disclosure)"
+}
