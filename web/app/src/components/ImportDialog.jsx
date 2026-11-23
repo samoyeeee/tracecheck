@@ -48,9 +48,9 @@ export default function ImportDialog({ status, index, onAnalyse, onOpen }) {
       </DialogTrigger>
       <DialogContent
         title="导入一条 agent 运行记录"
-        description={local
-          ? "TraceCheck 会当场检查：规则 → 数据库核验 → 调查 agent。"
-          : "这是线上展示版：调查 agent 要调用模型，公开网页不能放 API key，所以只能打开预先分析好的记录。本地运行 python -m web.serve 可分析你自己的记录。"}
+        description={!local ? "展示版只能打开预先分析好的记录。"
+          : status?.public ? `τ²-bench retail 运行记录 · 今天还可 AI 诊断 ${Math.min(status.remaining?.ai_you ?? 0, status.remaining?.ai_today ?? 0)} 次`
+          : "τ²-bench retail 运行记录"}
       >
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList>
@@ -61,7 +61,6 @@ export default function ImportDialog({ status, index, onAnalyse, onOpen }) {
           <TabsContent value="upload" className="mt-3 space-y-2">
             <input type="file" accept=".json,application/json" onChange={(e) => setFile(e.target.files[0])}
                    className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5" />
-            <p className="text-xs text-zinc-500">τ²-bench retail 的单次运行记录，需要 task_id 和 messages，例如 results/runs/v1/task_2__trial_0.json。</p>
           </TabsContent>
           <TabsContent value="paste" className="mt-3">
             <textarea value={text} onChange={(e) => setText(e.target.value)} rows={7}

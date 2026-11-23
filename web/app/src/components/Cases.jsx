@@ -28,10 +28,6 @@ export default function Cases({ index, reviews, onOpen }) {
   return (
     <>
       <h1 className="text-2xl font-black tracking-tight">案例库</h1>
-      <p className="mt-1 max-w-[80ch] text-[13.5px] text-ink2">
-        TraceCheck 预先分析好的 {index.length} 条失败运行：v1 客服 agent 每个失败任务各取 1 条规则没能解释的记录，
-        加上复核队列里的几条代表性记录。点任意一行打开诊断报告。已复核 {done} / {index.length}。
-      </p>
       <div className="my-4 flex flex-wrap items-center gap-3 text-sm">
         <label className="flex items-center gap-2">失败类型
           <select value={kind} onChange={(e) => setKind(e.target.value)} className={sel}>
@@ -45,7 +41,7 @@ export default function Cases({ index, reviews, onOpen }) {
             <option value="unsure">AI 拿不准</option>
           </select>
         </label>
-        <span className="text-ink3">{rows.length} 条</span>
+        <span className="text-ink3">{rows.length} 条 · 已复核 {done}/{index.length}</span>
       </div>
 
       <div className="hidden overflow-hidden rounded-[14px] border border-line bg-sheet md:block">

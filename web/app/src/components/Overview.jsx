@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { staticData } from "@/lib/api";
 import { Source, Tag } from "@/components/Report";
+import InfoTip from "@/components/InfoTip";
 
 const pct = (x, d = 1) => (x === null || x === undefined ? "未测" : `${(x * 100).toFixed(d)}%`);
 const nof = (o) => (o && o.of ? `${o.n}/${o.of}` : "未测");
@@ -10,10 +11,9 @@ function Metric({ value, label, what, sample, src, tone }) {
   const missing = value === "未测";
   return (
     <div className="flex flex-col rounded-[14px] border border-line bg-sheet px-5 py-4">
-      <div className="text-[13px] text-ink2">{label}</div>
+      <div className="flex items-center gap-1 text-[13px] text-ink2">{label}<InfoTip text={what} /></div>
       <div className={`mt-0.5 text-[28px] font-black tracking-tight tabular-nums ${missing ? "text-check" : tone === "fail" ? "text-fail" : tone === "pass" ? "text-pass" : ""}`}>{value}</div>
-      <p className="mt-1 text-[13px] leading-snug text-ink2">{what}</p>
-      <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2.5 text-xs text-ink3">
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-1.5 text-xs text-ink3">
         <span>{sample}</span><Source path={src} />
       </div>
     </div>
@@ -23,8 +23,7 @@ function Metric({ value, label, what, sample, src, tone }) {
 function Section({ title, desc, children }) {
   return (
     <section className="mt-8">
-      <h2 className="text-base font-bold">{title}</h2>
-      {desc && <p className="mt-0.5 mb-3 max-w-[80ch] text-[13px] text-ink3">{desc}</p>}
+      <h2 className="mb-3 flex items-center gap-1 text-base font-bold">{title}<InfoTip text={desc} /></h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{children}</div>
     </section>
   );
@@ -52,12 +51,8 @@ export default function Overview() {
   return (
     <>
       <h1 className="text-2xl font-black tracking-tight">评测总览</h1>
-      <p className="mt-1 max-w-[80ch] text-[13.5px] text-ink2">
-        在 τ²-bench retail 上，先让一个客服 agent（{o.models.agent}）跑 114 个任务、每个 {b.k.v} 次，制造真实失败；
-        再看 TraceCheck 能不能把失败找出来、说清楚、在版本对比里发现退化。每个数字都来自真实运行，点“来源”看原始文件。
-      </p>
 
-      <Section title="被测的客服 agent" desc="这是“病人”的情况，不是 TraceCheck 的成绩，作为背景。">
+      <Section title="被测的客服 agent" desc={`被测的是 ${o.models.agent}，在 τ²-bench retail 114 个任务上各跑 ${b.k.v} 次。这是“病人”的情况，不是 TraceCheck 的成绩。每个数字都来自真实运行。`}>
         <Metric label="一次跑成功（pass^1）" value={pct(b.pass1.v)} what="随机抽一次运行，任务成功的概率。" sample={`${b.runs.v} 次运行`} src={b.pass1.src} />
         <Metric label="4 次全成功（pass^4）" value={pct(b.pass4.v)} what="同一任务连跑 4 次都成功的比例，衡量稳定性。" sample={`${b.tasks.v} 个任务`} src={b.pass4.src} />
         <Metric label="失败运行" value={String(b.failed_runs.v)} what="τ² 判定 reward < 1 的运行，TraceCheck 要分析的对象。" sample={`共 ${b.runs.v} 次`} src={b.failed_runs.src} />
@@ -74,15 +69,12 @@ export default function Overview() {
       </Section>
 
       <section className="mt-8">
-        <h2 className="text-base font-bold">第 ③ 层：调查 agent 的三组对照</h2>
-        <p className="mt-0.5 mb-3 max-w-[80ch] text-[13px] text-ink3">
-          用 AgentRx 的人工标注做标准答案（τ-bench retail 失败轨迹，预留的测试集 20 条），比较调查 agent 能否找对“根源步骤”和“失败类别”。
-          弃权算没答对。样本只有 20 条，组间差 1–2 条在噪声范围内。
-        </p>
+        <h2 className="mb-3 flex items-center gap-1 text-base font-bold">第 ③ 层：调查 agent 的三组对照
+          <InfoTip text="用 AgentRx 的人工标注做标准答案（τ-bench retail 失败轨迹，预留的测试集 20 条），比较调查 agent 能否找对根源步骤和失败类别。弃权算没答对。样本只有 20 条，组间差 1–2 条在噪声范围内。" /></h2>
         <div className="overflow-x-auto rounded-[14px] border border-line bg-sheet">
           <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-paper2 text-left text-xs text-ink2">
-              <tr>{["组", "给调查 agent 的信息", "根源步骤完全对", "差 1 步以内", "类别对", "步骤和类别都对", "弃权"].map((h) => <th key={h} className="px-3 py-2 font-medium">{h}</th>)}</tr>
+              <tr>{["组", "输入", "根源步骤完全对", "差 1 步以内", "类别对", "步骤和类别都对", "弃权"].map((h) => <th key={h} className="px-3 py-2 font-medium">{h}</th>)}</tr>
             </thead>
             <tbody>
               {ARMS.map(([k, name, desc]) => {

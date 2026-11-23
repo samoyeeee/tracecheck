@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import Markdown from "@/components/Markdown";
+import InfoTip from "@/components/InfoTip";
 
 export const REPO = "https://github.com/samoyeeee/tracecheck/blob/main/";
 
@@ -22,36 +23,6 @@ const StepBtn = ({ step, onJump, className }) => step === null || step === undef
 );
 
 const Panel = ({ className, ...p }) => <section className={cn("rounded-[14px] border border-line bg-sheet px-5 py-5 sm:px-[22px]", className)} {...p} />;
-
-// --- onboarding --------------------------------------------------------------------------------
-
-function Intro() {
-  const [show, setShow] = useState(() => { try { return !localStorage.getItem("tc_intro"); } catch { return true; } });
-  if (!show) return null;
-  const steps = [["先看结论", "Agent 哪里没办好，一句话写在最上面。"],
-                 ["再核对证据", "点任何步骤编号，下方对话记录会跳到那一步。"],
-                 ["最后给出判断", "用底部的按钮确认、修改或驳回，然后自动进入下一条。"]];
-  return (
-    <section aria-label="使用说明" className="mb-5 flex items-start gap-3 rounded-[14px] border border-line bg-sheet px-4 py-3 md:grid md:grid-cols-[1fr_auto] md:gap-4 md:px-6 md:py-5">
-      <div className="flex-1">
-        <h3 className="text-[13.5px] font-bold md:mb-2.5 md:text-base">
-          <span className="md:hidden">复核台：确认 AI 的诊断对不对。点步骤编号可跳到对话。</span>
-          <span className="hidden md:inline">这里是 Agent 失败记录的复核台。你只需要做一件事：确认 AI 的诊断对不对。</span>
-        </h3>
-        <ol className="hidden gap-4 md:grid md:grid-cols-3">
-          {steps.map(([b, t], i) => (
-            <li key={b} className="relative pl-[30px] text-[13.5px] text-ink2">
-              <span className="absolute left-0 top-px grid h-[21px] w-[21px] place-items-center rounded-full bg-ink text-xs font-bold text-white">{i + 1}</span>
-              <b className="block font-medium text-ink">{b}</b>{t}
-            </li>
-          ))}
-        </ol>
-      </div>
-      <button onClick={() => { setShow(false); try { localStorage.setItem("tc_intro", "1"); } catch { /* ok */ } }}
-              className="self-start px-2 py-1 text-[13px] text-ink3 hover:text-ink cursor-pointer">知道了</button>
-    </section>
-  );
-}
 
 // --- verdict ----------------------------------------------------------------------------------------
 
@@ -89,7 +60,7 @@ function Tape({ r, onJump, active }) {
   return (
     <section aria-label="运行记录概览" className="mt-6 mb-7">
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-sm font-bold">整次运行 · {r.tape.length} 步</h3>
+        <h3 className="flex items-center gap-1 text-sm font-bold">整次运行 · {r.tape.length} 步<InfoTip text="每一格是一步，点任意一格跳到那一步。红框是 AI 判定的根源。" /></h3>
         <div className="flex gap-3 text-xs text-ink3">
           {[["用户", color.user], ["Agent 回复", color.agent], ["工具调用", color.tool], ["出错", "var(--color-fail)"]].map(([l, c]) => (
             <span key={l} className="inline-flex items-center gap-1"><i className="inline-block h-[9px] w-[9px] rounded-[2px]" style={{ background: c }} />{l}</span>
@@ -107,7 +78,6 @@ function Tape({ r, onJump, active }) {
           </button>
         ))}
       </div>
-      <div className="mt-1 flex justify-between text-[11.5px] text-ink3"><span>开始</span><span>点击任意一格跳到那一步</span><span>结束</span></div>
     </section>
   );
 }
@@ -129,15 +99,14 @@ function Diff({ r }) {
   }, [rows]);
   return (
     <Panel aria-labelledby="diffH">
-      <h3 id="diffH" className="mb-1 text-base font-bold">差在哪</h3>
-      <p className="mb-3.5 text-[13px] text-ink3">标准答案里的数据库 vs 运行结束时的数据库，只列本任务相关字段</p>
+      <h3 id="diffH" className="mb-3 flex items-center gap-1 text-base font-bold">差在哪<InfoTip text="标准答案里的数据库 vs 运行结束时的数据库，只列本任务相关的字段。橙色“待核实”：不一致，但 Agent 没写过这条记录，原因查不清。" /></h3>
       {rows.length === 0 && <p className="text-sm text-ink2">这个任务不需要改数据库，Agent 也没有改动任何记录。</p>}
       {groups.map(([entity, list]) => (
         <div key={entity} className="mb-3 last:mb-0">
           <div className="mb-1.5 text-xs font-medium text-ink3">{entity}</div>
           {list.filter((x) => x.items).map((x) => (
             <div key={x.field} className="mb-2">
-              <div className="mb-1 text-[12.5px] text-ink2">{x.field_zh}：用户要求的 vs 实际的</div>
+              <div className="mb-1 text-[12.5px] text-ink2">{x.field_zh}</div>
               <div className="grid gap-2">
                 {x.items.map((it) => {
                   const s = ITEM_STATUS[it.status];
@@ -175,8 +144,7 @@ function Chain({ r, onJump, pendingAi }) {
   const crit = r.ai && !r.ai.abstain ? r.ai.critical_step : null;
   return (
     <Panel aria-labelledby="chainH">
-      <h3 id="chainH" className="mb-1 text-base font-bold">怎么错的</h3>
-      <p className="mb-3.5 text-[13px] text-ink3">从最早的错误到最后的结果。虚线是 AI 推断，实心是记录里能看到的。</p>
+      <h3 id="chainH" className="mb-3 flex items-center gap-1 text-base font-bold">怎么错的<InfoTip text="调查 agent 给出的因果链：从最早的错误到最后的结果。虚线圆点是 AI 推断，实心是记录里能看到的。" /></h3>
       {chain.length === 0 && <p className="text-sm text-ink2">{pendingAi ? "调查 agent 运行中…" : r.ai ? "调查 agent 没有给出因果链。" : "没有运行调查 agent。"}</p>}
       <ol className="relative">
         {chain.map((l, i) => {
@@ -202,14 +170,14 @@ function Chain({ r, onJump, pendingAi }) {
 
 // --- evidence in three kinds ---------------------------------------------------------------------------------
 
-function Col({ color, dashed, title, desc, children }) {
+function Col({ color, dashed, title, tip, children }) {
   return (
     <div className="border-b border-line px-5 py-[18px] last:border-0 md:border-r md:border-b-0">
       <h4 className="mb-0.5 flex items-center gap-2 text-sm font-bold">
         <i className={cn("inline-block rounded-[2px]", dashed ? "h-2 w-2 border-2 border-dashed" : "h-2.5 w-2.5")}
-           style={dashed ? { borderColor: color } : { background: color }} />{title}
+           style={dashed ? { borderColor: color } : { background: color }} />{title}<InfoTip text={tip} />
       </h4>
-      <p className="mb-3 text-[12.5px] text-ink3">{desc}</p>
+      <div className="mb-3" />
       {children}
     </div>
   );
@@ -221,11 +189,10 @@ function Evidence({ r, onJump, pendingAi }) {
   return (
     <>
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-base font-bold">证据分三类</h3>
-        <span className="text-[13px] text-ink3">确定的、AI 猜的、谁都不确定的，分开放</span>
+        <h3 className="text-base font-bold">证据</h3>
       </div>
       <section aria-label="证据" className="mb-7 grid overflow-hidden rounded-[14px] border border-line bg-sheet md:grid-cols-3">
-        <Col color="var(--color-ink)" title="记录里能看到的" desc="来自数据库核验和规则检查，确定">
+        <Col color="var(--color-ink)" title="记录里能看到的" tip="来自数据库核验和规则检查，是确定的。">
           <ul className="grid gap-2.5">
             <li className={li}>{r.tau2.reward === 1 ? "τ² 判定成功。" : `τ² 判定失败：${r.tau2.db_match ? "数据库正确，但回复内容不达标" : "数据库最终状态与标准答案不一致"}。`}</li>
             {r.facts.map((f) => f.items.map((x, i) => (
@@ -237,7 +204,7 @@ function Evidence({ r, onJump, pendingAi }) {
             )))}
           </ul>
         </Col>
-        <Col color="var(--color-ai)" dashed title="AI 的判断" desc="调查 Agent 给出，可能出错">
+        <Col color="var(--color-ai)" dashed title="AI 的判断" tip="调查 agent 给出，可能出错。3 格投票条是 3 次独立分析的结果，一致不等于正确。">
           {!a ? <p className="text-sm text-ink2">{pendingAi ? "调查 agent 运行中…" : "没有运行调查 agent。"}</p> : (
             <>
               <ul className="grid gap-2.5">
@@ -246,23 +213,22 @@ function Evidence({ r, onJump, pendingAi }) {
                 {a.summary && <li className={li}>{a.summary}</li>}
                 {a.inference.map((s, i) => <li key={i} className={li}>{s}</li>)}
                 {a.evidence.map((e, i) => (
-                  <li key={"e" + i} className={cn(li, "text-ink2")}><StepBtn step={e.step} onJump={onJump} />原文（已逐字核对）：“{e.quote.length > 120 ? e.quote.slice(0, 120) + "…" : e.quote}”</li>
+                  <li key={"e" + i} className={cn(li, "text-ink2")}><StepBtn step={e.step} onJump={onJump} />“{e.quote.length > 120 ? e.quote.slice(0, 120) + "…" : e.quote}”</li>
                 ))}
               </ul>
               <div className="mt-3.5 border-t border-line pt-3 text-[13px] text-ink2">
-                3 次独立分析，{a.samples.filter((s) => s.agrees).length} 次都指向{a.critical_step !== null ? `第 ${a.critical_step} 步` : "同一结论"}
+                {a.samples.filter((s) => s.agrees).length}/3 次指向{a.critical_step !== null ? `第 ${a.critical_step} 步` : "同一结论"}{a.abstain && "，已弃权"}
                 <div className="my-1.5 flex gap-1">
                   {a.samples.map((s, i) => (
                     <span key={i} title={`第 ${s.step} 步 · ${s.category_zh}`}
                           className={cn("h-2 w-[26px] rounded-[2px]", s.agrees ? "bg-ai" : "bg-line")} />
                   ))}
                 </div>
-                <span className="text-xs text-ink3">{a.abstain ? "3 次不一致或缺少证据，所以 AI 弃权，交给你判断" : "一致不等于正确，这正是需要你复核的原因"}</span>
               </div>
             </>
           )}
         </Col>
-        <Col color="var(--color-check)" title="还不确定的" desc="程序和模型都给不出答案">
+        <Col color="var(--color-check)" title="还不确定的" tip="程序和模型都给不出答案的地方。">
           {r.checks.length === 0 ? <p className="text-sm text-ink2">{pendingAi ? "等待调查 agent…" : "没有。"}</p> : (
             <ul className="grid gap-2.5">
               {r.checks.map((c, i) => <li key={i} className={li}><StepBtn step={c.step} onJump={onJump} />{c.text}</li>)}
@@ -421,7 +387,6 @@ export default function Report({ report: r, pendingAi }) {
   return (
     <div className="flex flex-col">
       {/* on phones the database diff comes before the run overview, so it is on the first screen */}
-      <div className="order-1"><Intro /></div>
       <div className="order-2"><Verdict r={r} /></div>
       <div className="order-4 md:order-3"><Tape r={r} onJump={jump} active={active} /></div>
       <div className="order-3 mt-5 mb-2 grid gap-5 md:order-4 md:mt-0 md:mb-7 md:grid-cols-[1.15fr_1fr]">

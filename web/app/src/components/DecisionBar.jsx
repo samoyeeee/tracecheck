@@ -67,10 +67,8 @@ export default function DecisionBar({ r, onDone, onSay }) {
          className="fixed inset-x-0 bottom-0 z-30 flex flex-wrap items-center gap-2 bg-ink px-3 py-2 text-white sm:gap-4 sm:px-9 sm:py-3.5 lg:left-[280px]">
       <div className="min-w-full flex-1 sm:min-w-[240px]">
         <b className="text-[13.5px] sm:text-[15px]">{question}</b>
-        <span className="hidden text-[12.5px] text-[#b9c1cb] sm:block">
-          {prev ? `你上次的判断：${{ accept: "确认", modify: "修改", reject: "不对" }[prev.decision]}（${prev.time.slice(0, 16).replace("T", " ")}）· 可以再改`
-                : "你的判断会被记录下来，用来校准 AI 的诊断"}
-        </span>
+        {prev && <span className="hidden text-[12.5px] text-[#b9c1cb] sm:block">
+          上次：{{ accept: "确认", modify: "修改", reject: "不对" }[prev.decision]}（{prev.time.slice(0, 16).replace("T", " ")}）</span>}
       </div>
       {!a.abstain && <button className={`${btn} border-white bg-white text-ink`} onClick={() => act("accept")}>对<span className="hidden sm:inline">，确认</span> <kbd className={kbd}>A</kbd></button>}
       <button className={`${btn} border-[#4a5563]`} onClick={() => act("modify")}>{a.abstain ? "我来判断" : <><span className="sm:hidden">部分对</span><span className="hidden sm:inline">部分对，我来改</span></>} <kbd className={kbd}>E</kbd></button>
@@ -92,7 +90,7 @@ export default function DecisionBar({ r, onDone, onSay }) {
             </select>
           </label>
           <label className="grid min-w-[200px] flex-1 gap-1 text-[12.5px] text-[#b9c1cb]">补充说明（可选）
-            <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="例如：Agent 其实告诉了用户手表退不了"
+            <input value={note} onChange={(e) => setNote(e.target.value)} placeholder=""
                    className="rounded-md border border-[#4a5563] bg-[#222b36] px-2 py-1.5 text-sm text-white" />
           </label>
           <button className={`${btn} border-white bg-white text-ink`} onClick={() => save(mode)}>保存{mode === "reject" ? "（记为不对）" : "修改"}</button>

@@ -42,7 +42,7 @@ const STORE = "tracecheck.human_review";
 // Human review of the AI judgement: results/human_review.jsonl locally, browser storage online.
 export async function saveReview(entry) {
   const st = await getStatus();
-  if (st) return { where: "results/human_review.jsonl", ...(await post("api/review", entry)) };
+  if (st && st.reviews !== "browser") return { where: "results/human_review.jsonl", ...(await post("api/review", entry)) };
   try {
     const all = JSON.parse(localStorage.getItem(STORE) || "[]");
     all.push(entry);
@@ -66,7 +66,8 @@ export function lastReview(reportId) {
 export async function allReviews() {
   let out = {};
   try { JSON.parse(localStorage.getItem(STORE) || "[]").forEach((e) => { out[e.report_id] = e; }); } catch { /* none */ }
-  if (await getStatus()) {
+  const st = await getStatus();
+  if (st && st.reviews !== "browser") {
     try { out = { ...out, ...(await (await fetch("api/reviews")).json()).reviews }; } catch { /* keep browser copy */ }
   }
   return out;

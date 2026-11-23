@@ -44,3 +44,21 @@ def test_review_entries_are_validated(tmp_path, monkeypatch):
     for bad in ({"decision": "maybe"}, {"decision": "accept", "script": "x"}):
         with pytest.raises(ValueError):
             S.append_review(bad)
+
+
+def test_public_limits_cap_per_visitor_and_per_day(tmp_path):
+    from web.limits import LimitExceeded, Limits
+    day = ["2026-11-23"]
+    lim = Limits(tmp_path / "u.json", ai_daily=3, ai_per_ip=2, checks_per_ip=1, today=lambda: day[0])
+    lim.take_ai("a"); lim.take_ai("a")
+    with pytest.raises(LimitExceeded):
+        lim.take_ai("a")                      # per visitor
+    lim.take_ai("b")
+    with pytest.raises(LimitExceeded):
+        lim.take_ai("c")                      # all visitors together
+    lim.take_check("a")
+    with pytest.raises(LimitExceeded):
+        lim.take_check("a")
+    assert lim.remaining("a") == {"ai_today": 0, "ai_you": 0, "checks_you": 0}
+    day[0] = "2026-11-24"                     # resets the next day
+    assert lim.remaining("a") == {"ai_today": 3, "ai_you": 2, "checks_you": 1}

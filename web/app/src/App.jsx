@@ -119,7 +119,8 @@ export default function App() {
       setReport(first);
       history.replaceState(null, "", "#/live");
       setProgress("调查 agent 正在阅读整条记录，并翻译对话（约 10–60 秒）…");
-      setReport(await liveReport({ file: first.file }, { ai: Boolean(status?.investigator), zh: true }));
+      const aiLeft = !status?.public || Math.min(status.remaining?.ai_you ?? 0, status.remaining?.ai_today ?? 0) > 0;
+      setReport(await liveReport({ file: first.file }, { ai: Boolean(status?.investigator) && aiLeft, zh: aiLeft }));
     } catch (e) { setError(e.message); }
     setProgress(null);
   }
