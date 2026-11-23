@@ -54,10 +54,47 @@ REVIEW_KEYS = {"time", "report_id", "file", "original", "decision", "human", "no
 def resolve_run_file(rel: str) -> Path:
     """Only run files under results/runs/ or results/uploads/ may be read by name (no path traversal)."""
     path = (ROOT / rel).resolve()
-    allowed = [(ROOT / "results" / d).resolve() for d in ("runs", "uploads")]
+    allowed = [(ROOT / "results" / d).resolve() for d in ("runs", "uploads", "replays")]
     if not any(a in path.parents for a in allowed) or path.suffix != ".json" or not path.is_file():
         raise ValueError("只能选择 results/runs/ 下的运行记录。")
     return path
+
+
+# --- regression replays (local only: each replay is ~20-40 real model calls) -------------
+import threading  # noqa: E402
+
+JOBS: dict[str, dict] = {}
+JOB_LOCK = threading.Lock()
+
+
+def start_replays(cid: str, version: str, n: int) -> dict:
+    """Run n replays of a case one after another in a background thread."""
+    from triage.regression_case import MAX_REPEATS, load_case, replay
+    load_case(cid)
+    n = max(1, min(int(n), MAX_REPEATS))
+    if not JOB_LOCK.acquire(blocking=False):
+        raise ValueError("已经有一组重放在运行，请等它结束。")
+    job = {"id": f"job{len(JOBS) + 1}", "case": cid, "version": version, "n": n, "done": 0,
+           "state": "running", "message": "排队中…", "records": []}
+    JOBS[job["id"]] = job
+
+    def work():
+        try:
+            for _ in range(n):
+                rec = replay(cid, version, progress=lambda m: job.update(message=m))
+                job["records"].append(rec)
+                job["done"] += 1
+                if rec.get("error_kind") in ("quota", "reset_failed", "bad_version"):
+                    job["message"] = rec["error"]
+                    break           # the next replay would fail the same way
+            job["state"] = "finished"
+        except Exception as exc:  # noqa: BLE001
+            job.update(state="failed", message=f"{type(exc).__name__}: {exc}")
+        finally:
+            JOB_LOCK.release()
+
+    threading.Thread(target=work, daemon=True).start()
+    return job
 
 
 def append_review(entry: dict) -> None:
@@ -138,6 +175,22 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json(200, st)
         if self.path == "/api/samples":
             return self._json(200, {"samples": [] if PUBLIC else samples()})
+        if self.path.startswith("/api/rcase/") or self.path.startswith("/api/job/") or self.path == "/api/versions":
+            if PUBLIC:
+                return self._json(403, {"error": "在线版不提供真实重放。"})
+            from triage.regression_case import load_case, summarise
+            if self.path == "/api/versions":
+                from agent.versions import SPECS
+                return self._json(200, {"versions": [{"name": k, "description": v.description} for k, v in SPECS.items()]})
+            if self.path.startswith("/api/job/"):
+                job = JOBS.get(self.path.rsplit("/", 1)[-1])
+                return self._json(200, job) if job else self._json(404, {"error": "没有这个任务"})
+            try:
+                case = load_case(self.path.rsplit("/", 1)[-1])
+            except ValueError as exc:
+                return self._json(404, {"error": str(exc)})
+            running = next((j for j in JOBS.values() if j["case"] == case["id"] and j["state"] == "running"), None)
+            return self._json(200, {"case": case, "summary": summarise(case), "job": running})
         if self.path == "/api/fs-review":      # human check of the false-success detector (owner only)
             if PUBLIC:
                 return self._json(403, {"error": "在线版不能修改人工核验。"})
@@ -186,6 +239,16 @@ class Handler(SimpleHTTPRequestHandler):
                     return self._json(200, build_report(path, ai=ai, zh=zh))
                 finally:
                     limits().ai_running.release()
+            if self.path in ("/api/rcase", "/api/rcase-run"):
+                if PUBLIC:
+                    return self._json(403, {"error": "在线版不提供真实重放。"})
+                from triage.regression_case import create_case, summarise
+                if self.path == "/api/rcase":
+                    case = create_case(str(resolve_run_file(body.get("file") or "").relative_to(ROOT)))
+                    return self._json(200, {"case": case, "summary": summarise(case)})
+                if not os.environ.get("ZHIPU_API_KEY") or not os.environ.get("GEMINI_API_KEY"):
+                    raise ValueError("重放需要调用被测 agent 和用户模拟器：请设置 ZHIPU_API_KEY 和 GEMINI_API_KEY。")
+                return self._json(200, start_replays(str(body.get("case")), str(body.get("version")), body.get("n", 1)))
             if self.path == "/api/fs-review":
                 if PUBLIC:
                     return self._json(403, {"error": "在线版不能修改人工核验。"})

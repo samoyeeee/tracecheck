@@ -221,6 +221,29 @@ def reports() -> list[dict]:
     return index
 
 
+def rcases_data() -> None:
+    """Pre-computed regression cases and their replays, for the static site (read-only)."""
+    from triage.pipeline import build_report
+    from triage.regression_case import CASES, summarise
+    out = ROOT / "web" / "app" / "public" / "data" / "rcases"
+    out.mkdir(parents=True, exist_ok=True)
+    index = []
+    for f in sorted(CASES.glob("rc_*.json")):
+        case = json.loads(f.read_text())
+        (out / f"{case['id']}.json").write_text(json.dumps({"case": case, "summary": summarise(case)},
+                                                           ensure_ascii=False, separators=(",", ":")))
+        index.append({"id": case["id"], "source_file": case["source_file"], "task_id": case["task_id"]})
+        for r in case["replays"]:
+            if r.get("file"):
+                rid = report_id(r["file"])
+                if not (REPORTS / f"{rid}.json").exists():
+                    rep = build_report(ROOT / r["file"])
+                    rep["id"] = rid
+                    (REPORTS / f"{rid}.json").write_text(json.dumps(rep, ensure_ascii=False, separators=(",", ":")))
+    (out / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1))
+    print(f"web/app/public/data/rcases/ ({len(index)} cases)")
+
+
 def fs_review_data() -> dict:
     """Read-only copy of the false-success check for the static site."""
     from eval.fs_review import apply, web_data
@@ -250,6 +273,7 @@ def main(argv=None) -> int:
         reports()
     NEW = ROOT / "web" / "app" / "public" / "data"
     review_reports()
+    rcases_data()
     (NEW / "fs_review.json").write_text(json.dumps(fs_review_data(), ensure_ascii=False, separators=(",", ":")))
     print("web/app/public/data/fs_review.json")
     for name, fn in (("overview", overview), ("regression", regression)):

@@ -26,7 +26,7 @@ const Panel = ({ className, ...p }) => <section className={cn("rounded-[14px] bo
 
 // --- verdict ----------------------------------------------------------------------------------------
 
-function Verdict({ r }) {
+function Verdict({ r, onRegression, regressionLabel }) {
   const [orig, setOrig] = useState(false);
   const v = r.verdict;
   const version = r.file.split("/").slice(-2, -1)[0];
@@ -36,6 +36,7 @@ function Verdict({ r }) {
         <span>任务 {r.task_id} · 第 {r.trial} 次运行</span>
         <span>Agent 版本：{version}</span>
         <Source path={r.file} label={r.file.split("/").pop()} className="font-mono text-[12.5px]" />
+        {onRegression && <button onClick={onRegression} className="text-ai underline-offset-2 hover:underline cursor-pointer">{regressionLabel} →</button>}
       </div>
       <h1 className="mb-2.5 max-w-[34ch] text-[23px] leading-[1.3] font-black tracking-[-0.015em] sm:text-[30px]">
         <span className={cn("mr-2.5 inline-block -rotate-2 rounded-md border-[2.5px] px-2.5 align-[4px] text-[18px] sm:text-[22px]",
@@ -362,7 +363,7 @@ function Footer({ r }) {
 
 // --- page --------------------------------------------------------------------------------------------------------------
 
-export default function Report({ report: r, pendingAi }) {
+export default function Report({ report: r, pendingAi, onRegression, regressionLabel }) {
   const [keyOnly, setKeyOnly] = useState(true);
   const [active, setActive] = useState(null);
   useEffect(() => { setKeyOnly(true); setActive(null); }, [r.id]);
@@ -388,7 +389,7 @@ export default function Report({ report: r, pendingAi }) {
   return (
     <div className="flex flex-col">
       {/* on phones the database diff comes before the run overview, so it is on the first screen */}
-      <div className="order-2"><Verdict r={r} /></div>
+      <div className="order-2"><Verdict r={r} onRegression={onRegression} regressionLabel={regressionLabel} /></div>
       <div className="order-4 md:order-3"><Tape r={r} onJump={jump} active={active} /></div>
       <div className="order-3 mt-5 mb-2 grid gap-5 md:order-4 md:mt-0 md:mb-7 md:grid-cols-[1.15fr_1fr]">
         <Diff r={r} />

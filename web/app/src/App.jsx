@@ -5,6 +5,7 @@ import Cases from "@/components/Cases";
 import Overview from "@/components/Overview";
 import Regression from "@/components/Regression";
 import Verify from "@/components/Verify";
+import RegressionCase from "@/components/RegressionCase";
 import ImportDialog from "@/components/ImportDialog";
 import Report from "@/components/Report";
 import DecisionBar from "@/components/DecisionBar";
@@ -23,6 +24,8 @@ function route() {
   if (h.startsWith("#/overview")) return { page: "overview" };
   if (h.startsWith("#/regression")) return { page: "regression" };
   if (h.startsWith("#/verify")) return { page: "verify" };
+  const rc = h.match(/^#\/rcase\/(.+)$/);
+  if (rc) return { page: "rcase", id: decodeURIComponent(rc[1]) };
   const m = h.match(/^#\/report\/(.+)$/);
   return { page: "review", id: m ? decodeURIComponent(m[1]) : null };
 }
@@ -64,6 +67,7 @@ export default function App() {
   const [error, setError] = useState("");
   const [reviews, setReviews] = useState({});
   const [toast, setToast] = useState(null);
+  const [rcases, setRcases] = useState([]);
 
   const refreshReviews = useCallback(async () => setReviews(await allReviews()), []);
 
@@ -76,6 +80,7 @@ export default function App() {
     (async () => {
       setStatus(await getStatus());
       refreshReviews();
+      fetch("data/rcases/index.json").then((r) => (r.ok ? r.json() : [])).then(setRcases).catch(() => {});
       try {
         const items = await staticIndex();
         setIndex(items);
@@ -129,6 +134,29 @@ export default function App() {
   }
 
   const review = where.page === "review";
+  const live = Boolean(status && !status.public);
+
+  // Regression case for the report on screen: create it (local server) or open the pre-computed one.
+  const existingCase = report && rcases.find((c) => c.source_file === report.file);
+  async function regression() {
+    if (existingCase && !live) { location.hash = `#/rcase/${existingCase.id}`; return; }
+    try {
+      const res = await fetch("api/rcase", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file: report.file }) });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error);
+      location.hash = `#/rcase/${body.case.id}`;
+    } catch (e) { setError(e.message); }
+  }
+
+  // A replay's full record: analysed live (rules + database check), or pre-computed online.
+  async function openReplay(file) {
+    const p = file.split("/");
+    if (!live) { pick(`${p[p.length - 2]}__${p[p.length - 1].replace(".json", "")}`); return; }
+    setWhere({ page: "review" });
+    history.replaceState(null, "", "#/live");
+    try { setReport(await liveReport({ file })); } catch (e) { setError(e.message); }
+  }
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-20 flex items-center gap-5 border-b border-line bg-sheet px-4 py-3 sm:px-6">
@@ -160,7 +188,10 @@ export default function App() {
               </div>
             )}
             {error && <div className="mb-4 rounded-lg border border-fail/30 bg-fail-soft px-4 py-3 text-sm text-fail">{error}</div>}
-            {report ? <Report report={report} pendingAi={Boolean(progress)} /> : !error && <p className="text-sm text-ink3">加载中…</p>}
+            {report ? <Report report={report} pendingAi={Boolean(progress)}
+                              onRegression={report.tau2.reward !== 1 && (live || existingCase) ? regression : null}
+                              regressionLabel={live ? "用此案例创建回归测试" : "查看回归测试"} />
+                    : !error && <p className="text-sm text-ink3">加载中…</p>}
           </main>
         </div>
       ) : (
@@ -169,6 +200,7 @@ export default function App() {
           {where.page === "overview" && <Overview />}
           {where.page === "regression" && <Regression />}
           {where.page === "verify" && <Verify onOpen={pick} />}
+          {where.page === "rcase" && <RegressionCase id={where.id} onOpenReplay={openReplay} />}
         </main>
       )}
 
