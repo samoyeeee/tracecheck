@@ -21,7 +21,8 @@ GEMINI_API_KEY=… ZHIPU_API_KEY=… vendor/tau2-bench/.venv/bin/python -m web.s
 
 - **只读展示版**（免费、不休眠）：Hugging Face 静态 Space，https://huggingface.co/spaces/ray12138888/tracecheck 。
   更新：`HF_TOKEN=… deploy/hf_static.sh ray12138888/tracecheck`。
-- **能导入记录的在线版**：Render 免费套餐，用仓库根目录的 `Dockerfile` 和 `render.yaml`。
+- **能导入记录的在线版**：Render 免费套餐，https://tracecheck-uf75.onrender.com ，用仓库根目录的 `Dockerfile` 和 `render.yaml`
+  （`autoDeploy: false`：推送新代码后在 Render 后台点 Manual Deploy → Deploy latest commit）。
   公开模式（`PUBLIC_MODE=1`）下：每人每天 3 次 AI 诊断、全站每天 40 次、同时只跑一个；复核只存在访客浏览器；
   不能读取服务器上的运行记录。限额见 `web/limits.py`，可用环境变量改。
   Hugging Face 的 Docker Space 从 2026 年起需要 PRO 订阅，所以没用它。
