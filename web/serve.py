@@ -254,7 +254,8 @@ class Handler(SimpleHTTPRequestHandler):
                     return self._json(403, {"error": "在线版不能修改人工核验。"})
                 from eval.fs_review import set_label
                 return self._json(200, {"precision": set_label(int(body.get("case", 0)), body.get("label"),
-                                                               str(body.get("note") or ""))})
+                                                               str(body.get("note") or ""),
+                                                               str(body.get("sample") or "A"))})
             if self.path == "/api/review":
                 if PUBLIC:
                     return self._json(403, {"error": "在线版的复核只保存在你的浏览器里。"})

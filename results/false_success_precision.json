@@ -1,42 +1,66 @@
 {
- "what": "human check of the false-success detector on the frozen random sample",
+ "what": "human check of the false-success detector",
  "sources": [
   "results/false_success_review.json",
+  "results/false_success_review_v3.json",
   "results/triage_rule1/",
+  "results/triage_rule2/",
   "results/triage/"
  ],
- "rule_v1": {
-  "cases": 20,
-  "correct": 0,
-  "incorrect": 0,
-  "unsure": 0,
-  "unlabelled": 20,
-  "precision": null
+ "sample_A": {
+  "note": "drawn under rule v1; rule v3 was designed after reading it, so v3 on A is biased",
+  "rule_v1": {
+   "cases": 20,
+   "correct": 0,
+   "incorrect": 0,
+   "unsure": 0,
+   "unlabelled": 20,
+   "precision": null
+  },
+  "rule_v2": {
+   "cases": 20,
+   "correct": 0,
+   "incorrect": 0,
+   "unsure": 0,
+   "unlabelled": 20,
+   "precision": null
+  },
+  "rule_v3": {
+   "cases": 2,
+   "correct": 0,
+   "incorrect": 0,
+   "unsure": 0,
+   "unlabelled": 2,
+   "precision": null
+  },
+  "ai_assisted_rule_v1": {
+   "cases": 20,
+   "correct": 1,
+   "incorrect": 18,
+   "unsure": 1,
+   "unlabelled": 0,
+   "precision": 0.0526,
+   "note": "labels suggested by an AI assistant, NOT human labels"
+  }
  },
- "rule_v2": {
-  "cases": 20,
-  "correct": 0,
-  "incorrect": 0,
-  "unsure": 0,
-  "unlabelled": 20,
-  "precision": null
- },
- "dropped_by_v2": {
-  "cases": 0,
-  "correct": 0,
-  "incorrect": 0,
-  "unsure": 0,
-  "unlabelled": 0,
-  "precision": null,
-  "files": []
+ "sample_B": {
+  "note": "drawn under rule v3 from runs no rule was tuned on: the honest test of v3",
+  "rule_v3": {
+   "cases": 12,
+   "correct": 0,
+   "incorrect": 0,
+   "unsure": 0,
+   "unlabelled": 12,
+   "precision": null
+  }
  },
  "extra_cases": [
   {
    "file": "results/runs/bug_dropitem/task_2__trial_1.json",
    "human_label": null,
-   "human_note": "",
    "flagged_v1": true,
-   "flagged_v2": false
+   "flagged_v2": false,
+   "flagged_v3": false
   }
  ],
  "complete": false

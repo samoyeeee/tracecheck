@@ -102,7 +102,8 @@ def main(argv=None) -> int:
         "false_alarms_v1_vs_v1": sum(r["false_alarm"] for r in out["false_alarms"].values()),
     }
     from triage.verify import ITEM_LIST_FIELDS  # noqa: F401  (rule v2 present)
-    out["claim_rule"] = "v2 (item-level + disclosure)" if "rule2" in args.out else "v1 (pre-registered)"
+    out["claim_rule"] = ("v3 (claim vs execution)" if "rule3" in args.out else "v2 (item-level + disclosure)"
+                         if "rule2" in args.out else "v1 (pre-registered)")
     path = ROOT / args.out
     path.write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n")
     print(json.dumps(out, indent=1, ensure_ascii=False))

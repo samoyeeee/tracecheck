@@ -63,10 +63,14 @@ export default function Overview() {
         <Metric label="失败里有异常信号" value={pct(v.any_signal.v.rate)} what="失败的运行里，TraceCheck 至少报出一个问题（数据库不符、假成功或违规）的比例。" sample={`${nof(v.any_signal.v)} 次失败`} src={v.any_signal.src} tone="pass" />
         <Metric label="能指出具体哪一步" value={pct(v.step_level.v.rate)} what="失败里能定位到一个具体步骤（假成功或违规）的比例；只知道数据库不对不算。" sample={`${nof(v.step_level.v)} 次失败`} src={v.step_level.src} />
         <Metric label="成功运行被误报" value={pct(v.any_signal.v.flagged_passing_runs.rate)} what="τ² 判成功的运行，被 TraceCheck 报了问题的比例。越低越好。" sample={`${nof(v.any_signal.v.flagged_passing_runs)} 次成功`} src={v.any_signal.src} tone="pass" />
-        <Metric label="发现的假成功" value={String(v.false_success.v.n)} what="Agent 说“办好了”，但数据库不支持这个说法的失败运行数。" sample={`占失败 ${pct(v.false_success.v.rate)}`} src={v.false_success.src} tone="fail" />
-        <Metric label="假成功判断的准确率" value={o.fs_precision.v.rule_v2.precision === null ? "未测" : pct(o.fs_precision.v.rule_v2.precision)}
-                what="随机抽 20 条假成功由项目作者逐条人工核对，判对的比例（当前规则）。在“人工核验”页标注。"
-                sample={`已核验 ${o.fs_precision.v.rule_v2.correct + o.fs_precision.v.rule_v2.incorrect + o.fs_precision.v.rule_v2.unsure}/${o.fs_precision.v.rule_v2.cases}`} src={o.fs_precision.src} />
+        <Metric label="假成功（说法与执行矛盾）" value={String(v.false_success.v.n)} what="当前规则 v3：Agent 说办好了，但它自己成功执行的操作里没有这一项。照用户确认的做了、只是和标准答案不同的不算。" sample={`占失败 ${pct(v.false_success.v.rate)}`} src={v.false_success.src} tone="fail" />
+        <Metric label="声称完成，但结果与任务不符" value={String(o.fs_rule1.v.n)} what="旧规则 v1 的信号：Agent 说办好了，而数据库结果和任务标准答案不一致。它不等于 Agent 说谎（常见原因是用户中途改了要求），但正是这个信号在回归测试里检出了代码 bug。" sample={`占失败 ${pct(o.fs_rule1.v.rate)}`} src={o.fs_rule1.src} />
+        <Metric label="假成功判断的准确率（v3）" value={o.fs_precision.v.sample_B.rule_v3.precision === null ? "未测" : pct(o.fs_precision.v.sample_B.rule_v3.precision)}
+                what="按 v3 抽出、没参与规则设计的样本 B，由项目作者逐条人工核对，判对的比例。在“人工核验”页标注。"
+                sample={`已核验 ${o.fs_precision.v.sample_B.rule_v3.cases - o.fs_precision.v.sample_B.rule_v3.unlabelled}/${o.fs_precision.v.sample_B.rule_v3.cases}`} src={o.fs_precision.src} />
+        <Metric label="旧规则 v1 的准确率（AI 辅助候选）" value={o.fs_precision.v.sample_A.ai_assisted_rule_v1.precision === null ? "未测" : pct(o.fs_precision.v.sample_A.ai_assisted_rule_v1.precision)}
+                what="另一个 AI 助手读样本 A 原始记录给出的建议标签算出的比例，不是人工标注。大部分被它判为误报的，是 Agent 照用户确认的做了、和标准答案不同。"
+                sample="样本 A 20 条 · 非人工" src="results/ai_assisted_review/false_success_audit.csv" tone="fail" />
         <Metric label="数据库重放和 τ² 一致" value={nof(v.replay_sanity.v)} what="我们自己重放出的数据库结论，与 τ² 官方判定一致的比例，用来确认核验本身没算错。" sample="可重放的运行" src={v.replay_sanity.src} tone="pass" />
       </Section>
 

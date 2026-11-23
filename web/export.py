@@ -106,6 +106,7 @@ def overview() -> dict:
         },
         "cost": num(cost_summary(), C),
         "fs_precision": num(load("results/false_success_precision.json"), "results/false_success_precision.json"),
+        "fs_rule1": num(load("results/eval_verify_rule1.json")["false_success"]["runs"], "results/eval_verify_rule1.json"),
         "bug_effect": num(load("results/bug_effect.json")["bugs"], "results/bug_effect.json"),
         "confusion": num({k: v["reasons"] for k, v in load("results/category_confusion.json")["arms"].items()},
                          "results/category_confusion.json"),
@@ -142,7 +143,7 @@ def regression() -> dict:
                      "success": [b["success"]["base_rate"], b["success"]["other_rate"]], "src": R})
     for name, b in r4["bugs"].items():
         bugs.append({"name": name, "round": "4b", "description": b["description"], "detected": b["detected"],
-                     "localised": b["localised"], "metric": "false_success",
+                     "localised": b["localised"], "metric": "claim_then_result_differs",
                      "base_rate": b["primary"]["base_rate"], "other_rate": b["primary"]["other_rate"],
                      "p": b["primary"]["p"], "p_holm": b["primary"]["p_holm"],
                      "success": [b["context_tau2_success"]["base_rate"], b["context_tau2_success"]["other_rate"]],
@@ -253,9 +254,9 @@ def fs_review_data() -> dict:
 def review_reports() -> None:
     """Page-1 reports (rules + database check only, no model call) for the cases under human check."""
     from triage.pipeline import build_report
-    from eval.fs_review import REVIEW
+    from eval.fs_review import _items
     have = {p.stem for p in REPORTS.glob("*.json")}
-    for it in json.loads(REVIEW.read_text()):
+    for it in _items("A") + _items("B"):
         rid = report_id(it["file"])
         if rid in have:
             continue

@@ -32,9 +32,9 @@ def test_comparison_marks_missing_items_and_unexplained_rows():
 def test_verdict_and_facts_do_not_repeat_and_name_the_difference():
     names = R.Names(DB)
     rows = R.comparison(_dbs(["4"]), [{"name": "return_delivered_order_items", "ok": True, "args": {"order_id": "#W1"}}], names)
-    claim = {"step": 5, "action": "return", "status": "executed_but_differs", "sentence": "done"}
+    claim = {"step": 5, "action": "return", "status": "claim_contradicts_execution", "sentence": "done"}
     rep = {"tau2_success": False, "false_success": True, "claims": [claim, dict(claim)],
-           "findings": [{"rule_id": "claim_executed_but_differs", "severity": "violation", "step": 5, "message": "x"}]}
+           "findings": [{"rule_id": "claim_claim_contradicts_execution", "severity": "violation", "step": 5, "message": "x"}]}
     v = R.verdict(rep, rows, None)
     assert v["labels"]["kind"]["text"] == "假成功" and "少了 Smart Watch" in v["sentence"]
     facts = R.facts(rep)

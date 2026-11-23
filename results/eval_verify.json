@@ -28,9 +28,9 @@
   },
   "step_level_explanation": {
    "what": "false success or a violation-level rule hit, i.e. a concrete step to look at (DB difference alone does not say which step went wrong)",
-   "n": 137,
+   "n": 21,
    "of": 299,
-   "rate": 0.4582,
+   "rate": 0.0702,
    "flagged_passing_runs": {
     "n": 1,
     "of": 157,
@@ -45,9 +45,9 @@
      "rate": 1.0
     },
     "step_level_explanation": {
-     "n": 130,
+     "n": 14,
      "of": 274,
-     "rate": 0.4745
+     "rate": 0.0511
     }
    },
    "db_ok_nl_assertion_failed": {
@@ -79,13 +79,12 @@
  "false_success": {
   "definition": "tau2 failure AND the agent told the user an action was done, but no successful matching write happened before that message (not_executed) or the written entity differs from the expected end state (executed_but_differs)",
   "runs": {
-   "n": 82,
+   "n": 14,
    "of": 299,
-   "rate": 0.2742
+   "rate": 0.0468
   },
   "runs_by_type": {
-   "executed_but_differs": 81,
-   "partial_undisclosed": 4,
+   "claim_contradicts_execution": 13,
    "not_executed": 1
   },
   "unbacked_claims_in_passing_runs": 0,
@@ -98,14 +97,13 @@
   "total": 877,
   "by_status": {
    "verified": 453,
-   "executed_but_differs": 226,
+   "done_not_goal": 306,
    "unverifiable": 82,
-   "wrong_action": 33,
-   "unrequested_change": 69,
+   "claim_contradicts_execution": 23,
    "partial_undisclosed": 6,
    "claimed_before_executed": 2,
    "not_executed": 4,
-   "partial_disclosed": 2
+   "partial_disclosed": 1
   },
   "by_action": {
    "exchange": 175,
@@ -130,6 +128,16 @@
    "share_of_failed_runs": 0.0234,
    "share_of_passing_runs": 0.0
   },
+  "claim_claim_contradicts_execution": {
+   "in_failed_runs": 13,
+   "in_passing_runs": 0,
+   "hits": 23,
+   "severity": [
+    "violation"
+   ],
+   "share_of_failed_runs": 0.0435,
+   "share_of_passing_runs": 0.0
+  },
   "claim_claimed_before_executed": {
    "in_failed_runs": 2,
    "in_passing_runs": 0,
@@ -138,16 +146,6 @@
     "info"
    ],
    "share_of_failed_runs": 0.0067,
-   "share_of_passing_runs": 0.0
-  },
-  "claim_executed_but_differs": {
-   "in_failed_runs": 81,
-   "in_passing_runs": 0,
-   "hits": 226,
-   "severity": [
-    "violation"
-   ],
-   "share_of_failed_runs": 0.2709,
    "share_of_passing_runs": 0.0
   },
   "claim_not_executed": {
@@ -163,31 +161,11 @@
   "claim_partial_disclosed": {
    "in_failed_runs": 1,
    "in_passing_runs": 0,
-   "hits": 2,
+   "hits": 1,
    "severity": [
     "info"
    ],
    "share_of_failed_runs": 0.0033,
-   "share_of_passing_runs": 0.0
-  },
-  "claim_partial_undisclosed": {
-   "in_failed_runs": 4,
-   "in_passing_runs": 0,
-   "hits": 6,
-   "severity": [
-    "violation"
-   ],
-   "share_of_failed_runs": 0.0134,
-   "share_of_passing_runs": 0.0
-  },
-  "claim_unrequested_change": {
-   "in_failed_runs": 34,
-   "in_passing_runs": 0,
-   "hits": 69,
-   "severity": [
-    "violation"
-   ],
-   "share_of_failed_runs": 0.1137,
    "share_of_passing_runs": 0.0
   },
   "claim_unverifiable": {
@@ -199,16 +177,6 @@
    ],
    "share_of_failed_runs": 0.1739,
    "share_of_passing_runs": 0.1019
-  },
-  "claim_wrong_action": {
-   "in_failed_runs": 24,
-   "in_passing_runs": 0,
-   "hits": 33,
-   "severity": [
-    "violation"
-   ],
-   "share_of_failed_runs": 0.0803,
-   "share_of_passing_runs": 0.0
   },
   "policy_authenticate_first": {
    "in_failed_runs": 1,

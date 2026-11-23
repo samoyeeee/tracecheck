@@ -115,7 +115,7 @@ export default function Regression() {
       <section className="mt-8">
         <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="flex items-center gap-1 text-base font-bold">埋已知 bug：TraceCheck 能不能发现
-            <InfoTip text={`检验方法都在运行前提交。第一轮没检出：事后核对发现两个 bug 几乎没改变 agent 的行为，加上每次比较要对 20 个指标一起做多重校正，影响只集中在少数任务时不可能显著。补实验改为只检验一个事先指定的指标（假成功率）。同版本重跑的误报：${r.false_alarms.v.phase4 + r.false_alarms.v.phase4b} 次。`} /></h2>
+            <InfoTip text={`检验方法都在运行前提交。第一轮没检出：事后核对发现两个 bug 几乎没改变 agent 的行为，加上每次比较要对 20 个指标一起做多重校正，影响只集中在少数任务时不可能显著。补实验改为只检验一个事先指定的指标（旧规则 v1 的“声称完成但结果与任务不符”率）。按后来的规则 v3（说法与执行矛盾）重算，两个代码 bug 都不显著（校正后 p = 0.07）：v3 只核对商品、不核对地址内容。同版本重跑的误报：${r.false_alarms.v.phase4 + r.false_alarms.v.phase4b} 次。`} /></h2>
           <span className="text-xs text-ink3">
             <Source path={r.plans[0]} label="第一轮方案" /> · <Source path={r.plans[1]} label="补实验方案" /> · <Source path={r.mechanism_src} label="事后核对" />
           </span>
