@@ -221,11 +221,13 @@ def summarise(case: dict) -> dict:
     """Per version: how many replays passed. Wording never claims a verified fix."""
     out = {}
     for r in case["replays"]:
-        s = out.setdefault(r["version"], {"runs": 0, "passed": 0, "failed": 0, "errors": 0})
+        s = out.setdefault(r["version"], {"runs": 0, "passed": 0, "failed": 0, "errors": 0, "task_passed": 0})
         s["runs"] += 1
         s[{"passed": "passed", "failed": "failed"}.get(r["status"], "errors")] += 1
+        s["task_passed"] += 1 if r.get("tau2_reward") == 1 else 0
     for v, s in out.items():
         done = s["passed"] + s["failed"]
-        s["statement"] = (f"{done} 次可核验的重放中 {s['passed']} 次通过" if done else "还没有可核验的重放") + \
+        s["statement"] = (f"{done} 次可核验的重放中，用例字段 {s['passed']} 次全部正确，"
+                          f"整个任务（τ² 判定）{s['task_passed']} 次通过" if done else "还没有可核验的重放") + \
             ("；次数太少，不能说明修复已被充分验证，也不代表统计显著" if done else "")
     return out

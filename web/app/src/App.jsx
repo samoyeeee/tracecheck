@@ -153,6 +153,7 @@ export default function App() {
   async function openReplay(file) {
     const p = file.split("/");
     if (!live) { pick(`${p[p.length - 2]}__${p[p.length - 1].replace(".json", "")}`); return; }
+    setReport(null);                       // never show the previous report while loading
     setWhere({ page: "review" });
     history.replaceState(null, "", "#/live");
     try { setReport(await liveReport({ file })); } catch (e) { setError(e.message); }

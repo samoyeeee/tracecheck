@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Source, Tag } from "@/components/Report";
 import InfoTip from "@/components/InfoTip";
 
-const STATUS = { passed: ["核验通过", "pass"], failed: ["核验未通过", "fail"], error: ["没能完成", "check"] };
+const STATUS = { passed: ["用例字段正确", "pass"], failed: ["用例字段不对", "fail"], error: ["没能完成", "check"] };
 const ERROR_KIND = {
   quota: "模型额度不足", rate_limited: "被限流", run_failed: "运行失败", reset_failed: "环境重置失败",
   unverifiable: "无法核验", bad_version: "版本不存在", internal: "内部错误",
@@ -139,7 +139,7 @@ export default function RegressionCase({ id, onOpenReplay }) {
           {Object.entries(data.summary).map(([v, s]) => (
             <div key={v} className="rounded-[14px] border border-line bg-sheet px-5 py-3">
               <div className="flex items-center justify-between"><b className="font-mono">{v}</b>
-                <span className="text-sm tabular-nums">{s.passed}/{s.passed + s.failed} 通过{s.errors ? ` · ${s.errors} 次没跑完` : ""}</span></div>
+                <span className="text-sm tabular-nums">用例 {s.passed}/{s.passed + s.failed} · 整个任务 {s.task_passed}/{s.passed + s.failed}{s.errors ? ` · ${s.errors} 次没跑完` : ""}</span></div>
               <p className="mt-1 text-[13px] text-ink2">{s.statement}</p>
             </div>
           ))}
@@ -147,7 +147,7 @@ export default function RegressionCase({ id, onOpenReplay }) {
         <div className="mt-3 overflow-x-auto rounded-[14px] border border-line bg-sheet">
           <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-paper2 text-left text-xs text-ink2">
-              <tr>{["#", "版本", "结果", "核对的字段", "τ² 判定", "调用", "用时", ""].map((h) => <th key={h} className="px-3 py-2 font-medium">{h}</th>)}</tr>
+              <tr>{["#", "版本", "用例结果", "核对的字段", "整个任务（τ²）", "调用", "用时", ""].map((h) => <th key={h} className="px-3 py-2 font-medium">{h}</th>)}</tr>
             </thead>
             <tbody>
               {c.replays.map((r) => {
@@ -163,7 +163,7 @@ export default function RegressionCase({ id, onOpenReplay }) {
                         <div key={k.field} className={cn(!k.ok && "text-fail")}>{k.ok ? "✓" : "✗"} {k.field_zh}{!k.ok && `：实际「${k.actual}」`}</div>
                       ))}
                     </td>
-                    <td className="px-3 py-2.5 tabular-nums">{r.tau2_reward ?? "—"}</td>
+                    <td className="px-3 py-2.5">{r.tau2_reward === undefined || r.tau2_reward === null ? "—" : r.tau2_reward === 1 ? <Tag tone="pass">通过</Tag> : <><Tag tone="fail">未通过</Tag>{r.kind && <div className="mt-1 text-xs text-ink2">{r.kind}</div>}</>}</td>
                     <td className="px-3 py-2.5 tabular-nums">{r.model_calls ?? "—"}</td>
                     <td className="px-3 py-2.5 tabular-nums">{r.seconds}s</td>
                     <td className="px-3 py-2.5">{r.file && <button onClick={() => onOpenReplay(r.file)} className="text-[13px] text-ai cursor-pointer">看记录 →</button>}</td>
