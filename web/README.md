@@ -17,10 +17,17 @@ GEMINI_API_KEY=… ZHIPU_API_KEY=… vendor/tau2-bench/.venv/bin/python -m web.s
 - 对 AI 判断的“接受 / 驳回 / 修改”写入 `results/human_review.jsonl`（时间、原判断、人工判断）。
 - 上传的记录存在 `results/uploads/`（git-ignore）。
 
-## 线上展示版（静态）
+## 在线部署
 
-把 `web/site/` 当静态站点发布。没有后端时只能打开预先生成的报告（`web/export.py` 里的 `DEMO_RUNS`），复核结果只存在浏览器里。
+- **只读展示版**（免费、不休眠）：Hugging Face 静态 Space，https://huggingface.co/spaces/ray12138888/tracecheck 。
+  更新：`HF_TOKEN=… deploy/hf_static.sh ray12138888/tracecheck`。
+- **能导入记录的在线版**：Render 免费套餐，用仓库根目录的 `Dockerfile` 和 `render.yaml`。
+  公开模式（`PUBLIC_MODE=1`）下：每人每天 3 次 AI 诊断、全站每天 40 次、同时只跑一个；复核只存在访客浏览器；
+  不能读取服务器上的运行记录。限额见 `web/limits.py`，可用环境变量改。
+  Hugging Face 的 Docker Space 从 2026 年起需要 PRO 订阅，所以没用它。
+
+重新生成页面数据：
 
 ```bash
-vendor/tau2-bench/.venv/bin/python -m web.export   # 重新生成 web/app/public/data/ 下的数据，然后再 npm run build
+vendor/tau2-bench/.venv/bin/python -m web.export   # 再 cd web/app && npm run build
 ```
