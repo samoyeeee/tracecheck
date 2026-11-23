@@ -105,6 +105,10 @@ def overview() -> dict:
                       "results/eval_investigator_v4.json"),
         },
         "cost": num(cost_summary(), C),
+        "fs_precision": num(load("results/false_success_precision.json"), "results/false_success_precision.json"),
+        "bug_effect": num(load("results/bug_effect.json")["bugs"], "results/bug_effect.json"),
+        "confusion": num({k: v["reasons"] for k, v in load("results/category_confusion.json")["arms"].items()},
+                         "results/category_confusion.json"),
     }
 
 
@@ -217,6 +221,27 @@ def reports() -> list[dict]:
     return index
 
 
+def fs_review_data() -> dict:
+    """Read-only copy of the false-success check for the static site."""
+    from eval.fs_review import apply, web_data
+    return {"cases": web_data(), "precision": apply()}
+
+
+def review_reports() -> None:
+    """Page-1 reports (rules + database check only, no model call) for the cases under human check."""
+    from triage.pipeline import build_report
+    from eval.fs_review import REVIEW
+    have = {p.stem for p in REPORTS.glob("*.json")}
+    for it in json.loads(REVIEW.read_text()):
+        rid = report_id(it["file"])
+        if rid in have:
+            continue
+        r = build_report(ROOT / it["file"])
+        r["id"] = rid
+        (REPORTS / f"{rid}.json").write_text(json.dumps(r, ensure_ascii=False, separators=(",", ":")))
+        print(f"web/app/public/data/reports/{rid}.json (review case, no AI)")
+
+
 def main(argv=None) -> int:
     import argparse
     ap = argparse.ArgumentParser()
@@ -224,6 +249,9 @@ def main(argv=None) -> int:
     if not ap.parse_args(argv).skip_reports:
         reports()
     NEW = ROOT / "web" / "app" / "public" / "data"
+    review_reports()
+    (NEW / "fs_review.json").write_text(json.dumps(fs_review_data(), ensure_ascii=False, separators=(",", ":")))
+    print("web/app/public/data/fs_review.json")
     for name, fn in (("overview", overview), ("regression", regression)):
         data = fn()
         (NEW / f"{name}.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))

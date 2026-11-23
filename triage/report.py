@@ -58,6 +58,7 @@ CLAIM_PHRASE = {
     "unrequested_change": "但改动了用户没有要求的内容",
     "wrong_action": "但实际执行的操作类型不对",
     "claimed_before_executed": "但说这句话时操作还没执行",
+    "partial_undisclosed": "但还有商品没办成，Agent 没有告诉用户",
 }
 RULE_TEXT = {
     "tool_error": "{tool}被系统拒绝",
@@ -309,6 +310,8 @@ def facts(report: dict) -> list[dict]:
     for c in report["claims"]:
         if c["status"] in CLAIM_PHRASE:
             add(c["step"], f"Agent 告诉用户{ACTION_ZH.get(c['action'], '操作')}已完成，{CLAIM_PHRASE[c['status']]}", "violation")
+        elif c["status"] == "partial_disclosed":
+            add(c["step"], f"Agent 说部分{ACTION_ZH.get(c['action'], '操作')}已办好（属实），并告诉了用户没办成的部分", "info")
     for f in report["findings"]:
         if f["rule_id"].startswith("claim_") or f["rule_id"] in SKIP_RULES:
             continue
@@ -397,7 +400,7 @@ def verdict(report: dict, rows: list[dict], diag: Optional[dict]) -> dict:
     bad = [r for r in rows if not r["match"]]
     violations = [f for f in report["findings"] if f["severity"] == "violation"
                   and not f["rule_id"].startswith("claim_") and f["rule_id"] not in SKIP_RULES]
-    false_claims = [c for c in report["claims"] if c["status"] in ("executed_but_differs", "not_executed")]
+    false_claims = [c for c in report["claims"] if c["status"] in ("executed_but_differs", "not_executed", "partial_undisclosed")]
     sub = []
     if success:
         kind, headline, short = "成功", "任务成功：数据库最终状态与标准答案一致，回复内容也达标。", "任务成功"
@@ -500,7 +503,7 @@ def timeline(sim: dict, report: dict, names: Names, translations: dict[str, str]
 def key_steps(report: dict, diag: Optional[dict], chain: list[dict]) -> list[int]:
     """Steps shown in "只看关键步骤": the causal chain, claims, violations, the critical step, each +-1."""
     core = {link["step"] for link in chain if link.get("step") is not None}
-    core |= {c["step"] for c in report["claims"] if c["status"] in CLAIM_PHRASE}
+    core |= {c["step"] for c in report["claims"] if c["status"] in CLAIM_PHRASE or c["status"] == "partial_disclosed"}
     core |= {f["step"] for f in report["findings"] if f["severity"] == "violation" and f["rule_id"] not in SKIP_RULES}
     if diag and diag.get("critical_step") is not None:
         core.add(diag["critical_step"])

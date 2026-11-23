@@ -64,7 +64,9 @@ export default function Overview() {
         <Metric label="能指出具体哪一步" value={pct(v.step_level.v.rate)} what="失败里能定位到一个具体步骤（假成功或违规）的比例；只知道数据库不对不算。" sample={`${nof(v.step_level.v)} 次失败`} src={v.step_level.src} />
         <Metric label="成功运行被误报" value={pct(v.any_signal.v.flagged_passing_runs.rate)} what="τ² 判成功的运行，被 TraceCheck 报了问题的比例。越低越好。" sample={`${nof(v.any_signal.v.flagged_passing_runs)} 次成功`} src={v.any_signal.src} tone="pass" />
         <Metric label="发现的假成功" value={String(v.false_success.v.n)} what="Agent 说“办好了”，但数据库不支持这个说法的失败运行数。" sample={`占失败 ${pct(v.false_success.v.rate)}`} src={v.false_success.src} tone="fail" />
-        <Metric label="假成功判断的准确率" value={v.precision.v === null ? "未测" : pct(v.precision.v)} what="抽 20 条假成功由人工逐条核对，判对的比例。等人工复核完成后才有数。" sample="20 条待人工核对" src={v.precision.src} />
+        <Metric label="假成功判断的准确率" value={o.fs_precision.v.rule_v2.precision === null ? "未测" : pct(o.fs_precision.v.rule_v2.precision)}
+                what="随机抽 20 条假成功由项目作者逐条人工核对，判对的比例（当前规则）。在“人工核验”页标注。"
+                sample={`已核验 ${o.fs_precision.v.rule_v2.correct + o.fs_precision.v.rule_v2.incorrect + o.fs_precision.v.rule_v2.unsure}/${o.fs_precision.v.rule_v2.cases}`} src={o.fs_precision.src} />
         <Metric label="数据库重放和 τ² 一致" value={nof(v.replay_sanity.v)} what="我们自己重放出的数据库结论，与 τ² 官方判定一致的比例，用来确认核验本身没算错。" sample="可重放的运行" src={v.replay_sanity.src} tone="pass" />
       </Section>
 
@@ -97,6 +99,9 @@ export default function Overview() {
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Metric label="作答时步骤差 1 步以内" value={nof(arms.C.answered.step_within_1)} what="C 组没有弃权的那些案例里，根源步骤差 1 步以内的比例。" sample={`作答 ${arms.C.answered.step_within_1.of} 条`} src={c.arms.src} />
           <Metric label="作答时类别对" value={nof(arms.C.answered.category)} what="C 组作答的案例里，失败类别和人工标注一致的比例。类别是弱项。" sample={`作答 ${arms.C.answered.category.of} 条`} src={c.arms.src} tone="fail" />
+          <Metric label="类别对不上：选错步骤" value={`${(o.confusion.v.v3_C.other_step || 0) + (o.confusion.v.v3_C.other_annotated_failure_other_category || 0)}/${14 - o.confusion.v.v3_C.match}`}
+                  what="C 组作答但类别不对的案例里，模型选的根源步骤本身就和标注不同的数量。其余是步骤对、叫法不同。两边用的是同一套 AgentRx 分类。最常见的分歧：标注认为是用户信息不足，模型判为 Agent 未遵循流程。"
+                  sample="C 组作答 14 条" src={o.confusion.src} />
           <Metric label="重跑后结论不变" value={`${st.answered_in_both_same_category_and_step}/${st.answered_in_both}`} what="同一批记录让调查 agent 重跑一次，两次都作答的案例里，步骤和类别都相同的数量。" sample={`两次都作答 ${st.answered_in_both} 条`} src={c.stability.src} tone="pass" />
           <Metric label="重跑后“答不答”不变" value={`${st.abstain_decision_same}/${st.without_parse_errors_in_either}`} what="同上，但看的是“作答还是弃权”这个决定，两次一致的数量。不稳定主要在这里。" sample="两次都能解析的案例" src={c.stability.src} />
         </div>
@@ -105,6 +110,10 @@ export default function Overview() {
       <Section title="回归检测：埋已知 bug，看能不能发现" desc="检验方法在运行前登记好。详细结果见“回归对比”。">
         <Metric label="只改提示词的 bug" value={sum.phase4.bugs_detected} what="4 个改提示词的 bug 有几个被检出。其中两个几乎没改变 agent 行为，加上 20 个指标一起校正太严，所以没检出。" sample="每个 20 任务 × 4 次" src="results/eval_regression.json" tone="fail" />
         <Metric label="改代码的 bug" value={sum.phase4b.bugs_detected} what="2 个改工具调用代码的 bug，每个只检验一个事先指定的指标（假成功率），都检出并定位到被改的字段。" sample="每个 20 任务 × 4 次" src="results/eval_regression_4b.json" tone="pass" />
+        <Metric label="提示词 bug 真让 agent 变差的"
+                value={`${Object.entries(o.bug_effect.v).filter(([k, b]) => ["bug_auth", "bug_transfer", "bug_noconfirm", "bug_param"].includes(k) && b.agent_measurably_worse).length}/4`}
+                what="4 个改提示词的 bug 里，τ² 成功率的下降超出 v1 自身噪声区间的个数。只有删掉“先验证身份”这一个真的让 agent 变差了，而它没被检出；其余 3 个没检出是因为 bug 本身没起作用。"
+                sample="每个 20 任务 × 4 次" src={o.bug_effect.src} tone="fail" />
         <Metric label="同版本重跑的误报" value={String(r.false_alarms.v.phase4 + r.false_alarms.v.phase4b)} what="v1 自己重跑一遍再和 v1 比，被误判为“有变化”的次数。" sample="全部 114 任务" src="results/eval_regression.json" tone="pass" />
         <Metric label="v2 发布建议" value={r.release.v.verdict} what={`按事先定好的规则给出。总成功率 ${pct(r.success.v.v1)} → ${pct(r.success.v.v2)}，变化不显著。`} sample="114 任务 × 4 次" src={r.release.src} />
       </Section>

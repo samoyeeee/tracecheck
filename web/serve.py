@@ -138,6 +138,11 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json(200, st)
         if self.path == "/api/samples":
             return self._json(200, {"samples": [] if PUBLIC else samples()})
+        if self.path == "/api/fs-review":      # human check of the false-success detector (owner only)
+            if PUBLIC:
+                return self._json(403, {"error": "在线版不能修改人工核验。"})
+            from eval.fs_review import apply, web_data
+            return self._json(200, {"cases": web_data(), "precision": apply()})
         if self.path == "/api/reviews" and PUBLIC:
             return self._json(200, {"reviews": {}, "file": None})
         if self.path == "/api/reviews":   # latest human decision per report
@@ -181,6 +186,12 @@ class Handler(SimpleHTTPRequestHandler):
                     return self._json(200, build_report(path, ai=ai, zh=zh))
                 finally:
                     limits().ai_running.release()
+            if self.path == "/api/fs-review":
+                if PUBLIC:
+                    return self._json(403, {"error": "在线版不能修改人工核验。"})
+                from eval.fs_review import set_label
+                return self._json(200, {"precision": set_label(int(body.get("case", 0)), body.get("label"),
+                                                               str(body.get("note") or ""))})
             if self.path == "/api/review":
                 if PUBLIC:
                     return self._json(403, {"error": "在线版的复核只保存在你的浏览器里。"})

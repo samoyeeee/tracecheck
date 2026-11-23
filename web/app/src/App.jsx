@@ -4,6 +4,7 @@ import { allReviews, getStatus, liveReport, staticIndex, staticReport } from "@/
 import Cases from "@/components/Cases";
 import Overview from "@/components/Overview";
 import Regression from "@/components/Regression";
+import Verify from "@/components/Verify";
 import ImportDialog from "@/components/ImportDialog";
 import Report from "@/components/Report";
 import DecisionBar from "@/components/DecisionBar";
@@ -13,6 +14,7 @@ const NAV = [
   { page: "cases", href: "#/cases", label: "案例库" },
   { page: "overview", href: "#/overview", label: "评测总览" },
   { page: "regression", href: "#/regression", label: "回归对比" },
+  { page: "verify", href: "#/verify", label: "人工核验" },
 ];
 
 function route() {
@@ -20,6 +22,7 @@ function route() {
   if (h.startsWith("#/cases")) return { page: "cases" };
   if (h.startsWith("#/overview")) return { page: "overview" };
   if (h.startsWith("#/regression")) return { page: "regression" };
+  if (h.startsWith("#/verify")) return { page: "verify" };
   const m = h.match(/^#\/report\/(.+)$/);
   return { page: "review", id: m ? decodeURIComponent(m[1]) : null };
 }
@@ -165,6 +168,7 @@ export default function App() {
           {where.page === "cases" && <Cases index={index} reviews={reviews} onOpen={pick} />}
           {where.page === "overview" && <Overview />}
           {where.page === "regression" && <Regression />}
+          {where.page === "verify" && <Verify onOpen={pick} />}
         </main>
       )}
 
